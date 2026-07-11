@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  NO_ANSWER
+  INTERVIEW_DONE
+  FIT
+  NOT_FIT
+  SENT_TO_CLIENT
+  ACCEPTED
+  CANDIDATE_REFUSED
+  DUPLICATE
+}
+
+enum AdminRole {
+  ADMIN
+  MANAGER
+  VACANCY_ADMIN
+}
+
+model Vacancy {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  title            String
+  project          String
+  city             String
+  workFormat       String        @map("work_format")
+  salary           String?
+  schedule         String?
+  responsibilities String        @db.Text
+  requirements     String        @db.Text
+  conditions       String        @db.Text
+  address          String?
+  contactComment   String?       @map("contact_comment") @db.Text
+  isActive         Boolean       @default(true) @map("is_active")
+  applications     Application[]
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  @@index([city])
+  @@index([isActive])
+  @@map("vacancies")
+}
+
+model Application {
+  id                   String     @id @default(cuid())
+  vacancyId            String     @map("vacancy_id")
+  vacancy              Vacancy    @relation(fields: [vacancyId], references: [id], onDelete: Restrict)
+  vacancyTitleSnapshot String     @map("vacancy_title_snapshot")
+  projectSnapshot      String     @map("project_snapshot")
+  candidateName        String     @map("candidate_name")
+  phone                String
+  normalizedPhone      String     @map("normalized_phone")
+  city                 String?
+  age                  Int?
+  candidateComment     String?    @map("candidate_comment") @db.Text
+  trafficSource        String?    @map("traffic_source")
+  utmSource            String?    @map("utm_source")
+  utmMedium            String?    @map("utm_medium")
+  utmCampaign          String?    @map("utm_campaign")
+  utmContent           String?    @map("utm_content")
+  utmTerm              String?    @map("utm_term")
+  status               LeadStatus @default(NEW)
+  responsibleManager   String?    @map("responsible_manager")
+  managerComment       String?    @map("manager_comment") @db.Text
+  telegramSentAt       DateTime?  @map("telegram_sent_at")
+  telegramError        String?    @map("telegram_error") @db.Text
+  auditLogs             ApplicationAuditLog[]
+  createdAt            DateTime   @default(now()) @map("created_at")
+  updatedAt            DateTime   @updatedAt @map("updated_at")
+
+  @@index([createdAt])
+  @@index([normalizedPhone])
+  @@index([status])
+  @@index([vacancyId])
+  @@map("applications")
+}
+
+model AdminUser {
+  id           String      @id @default(cuid())
+  username     String      @unique
+  fullName     String?     @map("full_name")
+  passwordHash String      @map("password_hash")
+  roles        AdminRole[] @default([MANAGER])
+  isActive     Boolean     @default(true) @map("is_active")
+  lastLoginAt  DateTime?   @map("last_login_at")
+  auditLogs    ApplicationAuditLog[]
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  @@index([isActive])
+  @@map("admin_users")
+}
+
+model ApplicationAuditLog {
+  id                     String      @id @default(cuid())
+  applicationId          String      @map("application_id")
+  application            Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  adminUserId            String      @map("admin_user_id")
+  adminUser              AdminUser   @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
+  actorUsername           String      @map("actor_username")
+  previousStatus         LeadStatus? @map("previous_status")
+  newStatus              LeadStatus? @map("new_status")
+  previousManagerComment String?     @map("previous_manager_comment") @db.Text
+  newManagerComment      String?     @map("new_manager_comment") @db.Text
+  createdAt              DateTime    @default(now()) @map("created_at")
+
+  @@index([applicationId])
+  @@index([adminUserId])
+  @@index([createdAt])
+  @@map("application_audit_logs")
+}
