@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { VacancyFilterOptions, VacancyFilters } from "@/lib/vacancies";
 
 type VacancyFiltersProps = {
@@ -17,15 +17,28 @@ export function VacancyFiltersPanel({
 }: VacancyFiltersProps) {
   const initialSalaryTo = selectedFilters.salaryTo ?? options.salaryRange.max;
   const [salaryTo, setSalaryTo] = useState(initialSalaryTo);
+  const [isOpen, setIsOpen] = useState(false);
   const hasSalaryRange = options.salaryRange.max > options.salaryRange.min;
+  const formId = useId();
 
   return (
     <aside className="filters-panel" aria-label="Фильтры вакансий">
       <div className="filters-heading">
-        <h2>Фильтры</h2>
+        <div className="filters-heading__row">
+          <h2>Фильтры</h2>
+          <button
+            type="button"
+            className="filters-toggle"
+            aria-expanded={isOpen}
+            aria-controls={formId}
+            onClick={() => setIsOpen((value) => !value)}
+          >
+            {isOpen ? "Скрыть" : "Показать"}
+          </button>
+        </div>
         <p>{formatVacancyCount(resultCount)}</p>
       </div>
-      <form className="filters-form" action="/">
+      <form id={formId} className="filters-form" data-open={isOpen} action="/">
         <FilterSelect
           label="Вакансия"
           name="title"

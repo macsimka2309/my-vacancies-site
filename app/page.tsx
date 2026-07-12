@@ -1,5 +1,8 @@
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
 import { VacancyFiltersPanel } from "@/components/vacancies/VacancyFilters";
 import { VacancyList } from "@/components/vacancies/VacancyList";
+import { site } from "@/lib/site";
 import {
   getActiveVacancies,
   getVacancyFilterOptions,
@@ -26,25 +29,29 @@ async function VacancyHome({ filters }: { filters: VacancyFilters }) {
   ]);
 
   return (
-    <main className="page-shell">
-      <section className="page-header">
-        <p className="eyebrow">Работа в стабильной компании</p>
-        <h1>Вакансии</h1>
-        <p className="muted">
-          Выберите подходящую позицию и посмотрите подробные условия.
-        </p>
-      </section>
-      <section className="vacancy-layout">
-        <VacancyFiltersPanel
-          options={filterOptions}
-          resultCount={vacancies.length}
-          selectedFilters={filters}
-        />
-        <div className="vacancy-results">
-          <VacancyList vacancies={vacancies} />
-        </div>
-      </section>
-    </main>
+    <>
+      <SiteHeader />
+      <main className="page-shell">
+        <section className="page-header">
+          <p className="eyebrow">{site.tagline}</p>
+          <h1>Вакансии</h1>
+          <p className="muted">
+            Выберите подходящую позицию и посмотрите подробные условия.
+          </p>
+        </section>
+        <section className="vacancy-layout">
+          <VacancyFiltersPanel
+            options={filterOptions}
+            resultCount={vacancies.length}
+            selectedFilters={filters}
+          />
+          <div className="vacancy-results">
+            <VacancyList vacancies={vacancies} />
+          </div>
+        </section>
+      </main>
+      <SiteFooter />
+    </>
   );
 }
 

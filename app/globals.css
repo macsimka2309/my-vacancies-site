@@ -155,10 +155,37 @@ select {
   margin-bottom: 18px;
 }
 
+.filters-heading__row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .filters-heading h2 {
   margin: 0;
   font-size: 20px;
   line-height: 1.25;
+}
+
+/* Переключатель фильтров нужен только на мобиле (см. медиазапрос ниже). */
+.filters-toggle {
+  display: none;
+  min-height: 40px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--accent-strong);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 8px 16px;
+}
+
+.filters-toggle:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  outline: 0;
 }
 
 .filters-heading p {
@@ -301,6 +328,15 @@ select {
   margin: 0;
   font-size: 26px;
   line-height: 1.2;
+}
+
+.vacancy-salary {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .vacancy-meta,
@@ -604,6 +640,155 @@ select {
 .apply-preview p {
   max-width: 640px;
   margin: 0;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+}
+
+.site-header__inner {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 14px 0;
+}
+
+.site-brand {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.site-brand__mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  box-shadow: 0 6px 16px rgba(33, 160, 56, 0.28);
+}
+
+.site-brand__name {
+  color: var(--foreground);
+}
+
+.site-header__phone {
+  color: var(--accent-strong);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.site-header__phone:hover {
+  color: var(--accent);
+}
+
+.site-footer {
+  margin-top: 48px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 40px;
+  align-items: center;
+  justify-content: space-between;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0;
+}
+
+.site-footer__name {
+  margin: 0;
+  font-weight: 700;
+}
+
+.site-footer__col p {
+  margin: 0;
+}
+
+.site-footer__col .muted {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.site-footer__links a {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.site-footer__links a:hover {
+  color: var(--accent);
+}
+
+.site-footer__copy {
+  margin: 0;
+  font-size: 13px;
+}
+
+.legal-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.legal-article {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  padding: 28px;
+  line-height: 1.6;
+}
+
+.legal-article h1 {
+  margin: 0 0 6px;
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.legal-article h2 {
+  margin: 24px 0 8px;
+  font-size: 20px;
+}
+
+.legal-article p {
+  margin: 0;
+}
+
+.legal-note {
+  margin-top: 28px;
+  font-size: 13px;
+}
+
+.apply-trust {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: -4px 0 0;
+  color: var(--accent-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.apply-trust__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 .admin-shell {
@@ -1322,6 +1507,24 @@ select {
 
   .filters-panel {
     position: static;
+  }
+
+  .filters-heading {
+    margin-bottom: 0;
+  }
+
+  .filters-toggle {
+    display: inline-flex;
+  }
+
+  /* На мобиле форма свёрнута — список вакансий виден сразу. */
+  .filters-form {
+    display: none;
+    margin-top: 18px;
+  }
+
+  .filters-form[data-open="true"] {
+    display: grid;
   }
 
   .vacancy-card,

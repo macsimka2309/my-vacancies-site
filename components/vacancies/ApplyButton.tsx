@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useId, useState } from "react";
+import { site } from "@/lib/site";
 
 type ApplyVacancy = {
   id: string;
@@ -146,6 +147,10 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                   onChange={(event) => setPhone(formatPhone(event.target.value))}
                 />
               </label>
+              <p className="apply-trust">
+                <span className="apply-trust__dot" aria-hidden="true" />
+                {site.callbackPromise}
+              </p>
               {submitState.message ? (
                 <p className={`form-message form-message--${submitState.type}`}>
                   {submitState.message}

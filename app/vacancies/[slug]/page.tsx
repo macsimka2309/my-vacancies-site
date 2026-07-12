@@ -1,10 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
 import { ApplyButton } from "@/components/vacancies/ApplyButton";
 import { VacancyTextBlock } from "@/components/vacancies/VacancyTextBlock";
-import { getVacancyBySlug } from "@/lib/vacancies";
+import { buildJobPostingJsonLd } from "@/lib/vacancy-jsonld";
+import { getVacancyBySlug, type VacancyDetails } from "@/lib/vacancies";
 
 export const dynamic = "force-dynamic";
+
+// Один запрос на рендер: и generateMetadata, и сама страница берут из кэша.
+const loadVacancy = cache((slug: string) => getVacancyBySlug(slug));
 
 type VacancyPageProps = {
   params: Promise<{
@@ -12,19 +20,54 @@ type VacancyPageProps = {
   }>;
 };
 
+export async function generateMetadata({
+  params,
+}: VacancyPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const vacancy = await loadVacancy(slug);
+
+  if (!vacancy) {
+    return { title: "Вакансия не найдена" };
+  }
+
+  const title = buildVacancyTitle(vacancy);
+  const description = buildVacancyDescription(vacancy);
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/vacancies/${vacancy.slug}` },
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url: `/vacancies/${vacancy.slug}`,
+    },
+  };
+}
+
 export default async function VacancyPage({ params }: VacancyPageProps) {
   const { slug } = await params;
-  const vacancy = await getVacancyBySlug(slug);
+  const vacancy = await loadVacancy(slug);
 
   if (!vacancy) {
     notFound();
   }
 
+  const jobPostingJsonLd = buildJobPostingJsonLd(vacancy);
+
   return (
-    <main className="page-shell detail-layout">
-      <Link className="back-link" href="/">
-        Назад к вакансиям
-      </Link>
+    <>
+      <SiteHeader />
+      <main className="page-shell detail-layout">
+        {/* Микроразметка вакансии для поисковиков (Яндекс/Google Jobs). */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingJsonLd) }}
+        />
+        <Link className="back-link" href="/">
+          Назад к вакансиям
+        </Link>
 
       <section className="detail-hero">
         <p className="eyebrow">{vacancy.project}</p>
@@ -84,6 +127,35 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
           Смотреть все вакансии
         </Link>
       </section>
-    </main>
+      </main>
+      <SiteFooter />
+    </>
   );
+}
+
+function buildVacancyTitle(vacancy: VacancyDetails) {
+  const parts = [vacancy.title, vacancy.city];
+
+  if (vacancy.salary) {
+    parts.push(vacancy.salary);
+  }
+
+  return parts.join(" — ");
+}
+
+function buildVacancyDescription(vacancy: VacancyDetails) {
+  const firstResponsibility = vacancy.responsibilities
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)[0];
+
+  const lead = [vacancy.project, vacancy.city, vacancy.salary]
+    .filter(Boolean)
+    .join(" · ");
+
+  const description = [lead, firstResponsibility].filter(Boolean).join(". ");
+
+  return description.length > 300
+    ? `${description.slice(0, 297)}...`
+    : description;
 }
