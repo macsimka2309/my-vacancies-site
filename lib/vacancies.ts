@@ -3,17 +3,13 @@ import { db } from "./db";
 export type VacancyFilters = {
   title?: string;
   project?: string;
-  salaryTo?: number;
+  salaryFrom?: number;
 };
 
 export type VacancyFilterOptions = {
   titles: string[];
   projects: string[];
-  salaryRange: {
-    min: number;
-    max: number;
-    step: number;
-  };
+  salaryPresets: number[];
 };
 
 export async function getActiveVacancies(filters: VacancyFilters = {}) {
@@ -42,14 +38,14 @@ export async function getActiveVacancies(filters: VacancyFilters = {}) {
     },
   });
 
-  if (!filters.salaryTo) {
+  if (!filters.salaryFrom) {
     return vacancies;
   }
 
   return vacancies.filter((vacancy) => {
     const salaryAmount = getSalaryAmount(vacancy.salary);
 
-    return salaryAmount !== null && salaryAmount <= filters.salaryTo!;
+    return salaryAmount !== null && salaryAmount >= filters.salaryFrom!;
   });
 }
 
@@ -73,7 +69,7 @@ export async function getVacancyFilterOptions(): Promise<VacancyFilterOptions> {
   return {
     titles: uniqueSorted(vacancies.map((vacancy) => vacancy.title)),
     projects: uniqueSorted(vacancies.map((vacancy) => vacancy.project)),
-    salaryRange: getSalaryRange(vacancies.map((vacancy) => vacancy.salary)),
+    salaryPresets: getSalaryPresets(vacancies.map((vacancy) => vacancy.salary)),
   };
 }
 
@@ -114,26 +110,21 @@ function uniqueSorted(values: Array<string | null | undefined>) {
   );
 }
 
-function getSalaryRange(values: Array<string | null | undefined>) {
+// Пресеты «зарплата от» для чипсов: берём круглые пороги, которые не выше
+// максимальной зарплаты в подборке (иначе чип не даёт ни одной вакансии).
+function getSalaryPresets(values: Array<string | null | undefined>) {
   const salaryAmounts = values
     .map(getSalaryAmount)
     .filter((value): value is number => value !== null);
 
   if (salaryAmounts.length === 0) {
-    return {
-      min: 0,
-      max: 0,
-      step: 5000,
-    };
+    return [];
   }
 
   const maxSalary = Math.max(...salaryAmounts);
+  const candidates = [50000, 80000, 100000, 150000, 200000, 300000];
 
-  return {
-    min: 0,
-    max: Math.ceil(maxSalary / 5000) * 5000,
-    step: 5000,
-  };
+  return candidates.filter((candidate) => candidate <= maxSalary);
 }
 
 function getSalaryAmount(value: string | null | undefined) {

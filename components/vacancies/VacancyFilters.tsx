@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import type { VacancyFilterOptions, VacancyFilters } from "@/lib/vacancies";
 
@@ -15,11 +16,36 @@ export function VacancyFiltersPanel({
   resultCount,
   selectedFilters,
 }: VacancyFiltersProps) {
-  const initialSalaryTo = selectedFilters.salaryTo ?? options.salaryRange.max;
-  const [salaryTo, setSalaryTo] = useState(initialSalaryTo);
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const hasSalaryRange = options.salaryRange.max > options.salaryRange.min;
   const formId = useId();
+
+  // Любое изменение фильтра сразу перестраивает список (без кнопки «Показать»).
+  function applyFilters(next: VacancyFilters) {
+    const params = new URLSearchParams();
+
+    if (next.title) {
+      params.set("title", next.title);
+    }
+
+    if (next.project) {
+      params.set("project", next.project);
+    }
+
+    if (next.salaryFrom) {
+      params.set("salaryFrom", String(next.salaryFrom));
+    }
+
+    const query = params.toString();
+
+    router.push(query ? `/?${query}` : "/");
+  }
+
+  const hasActiveFilters = Boolean(
+    selectedFilters.title ||
+      selectedFilters.project ||
+      selectedFilters.salaryFrom,
+  );
 
   return (
     <aside className="filters-panel" aria-label="Фильтры вакансий">
@@ -38,48 +64,57 @@ export function VacancyFiltersPanel({
         </div>
         <p>{formatVacancyCount(resultCount)}</p>
       </div>
-      <form id={formId} className="filters-form" data-open={isOpen} action="/">
+      <div id={formId} className="filters-form" data-open={isOpen}>
         <FilterSelect
           label="Вакансия"
-          name="title"
           placeholder="Все вакансии"
           options={options.titles}
-          value={selectedFilters.title}
+          value={selectedFilters.title ?? ""}
+          onChange={(value) =>
+            applyFilters({ ...selectedFilters, title: value || undefined })
+          }
         />
         <FilterSelect
           label="Проект"
-          name="project"
           placeholder="Все проекты"
           options={options.projects}
-          value={selectedFilters.project}
+          value={selectedFilters.project ?? ""}
+          onChange={(value) =>
+            applyFilters({ ...selectedFilters, project: value || undefined })
+          }
         />
-        <label className="filter-field range-field">
-          <span>Оплата до</span>
-          <strong className="range-value">
-            {salaryTo < options.salaryRange.max
-              ? formatSalary(salaryTo)
-              : "Любая оплата"}
-          </strong>
-          <input
-            type="range"
-            name="salaryTo"
-            min={options.salaryRange.min}
-            max={options.salaryRange.max}
-            step={options.salaryRange.step}
-            value={salaryTo}
-            disabled={!hasSalaryRange}
-            onChange={(event) => setSalaryTo(Number(event.target.value))}
-          />
-        </label>
-        <div className="filter-actions">
-          <button className="button-link filter-submit" type="submit">
-            Показать
-          </button>
-          <Link className="secondary-link" href="/">
-            Сбросить
-          </Link>
-        </div>
-      </form>
+        {options.salaryPresets.length > 0 ? (
+          <div className="filter-field">
+            <span>Зарплата от</span>
+            <div className="salary-chips" role="group" aria-label="Зарплата от">
+              <SalaryChip
+                active={!selectedFilters.salaryFrom}
+                label="Любая"
+                onClick={() =>
+                  applyFilters({ ...selectedFilters, salaryFrom: undefined })
+                }
+              />
+              {options.salaryPresets.map((preset) => (
+                <SalaryChip
+                  key={preset}
+                  active={selectedFilters.salaryFrom === preset}
+                  label={`от ${formatSalary(preset)}`}
+                  onClick={() =>
+                    applyFilters({ ...selectedFilters, salaryFrom: preset })
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {hasActiveFilters ? (
+          <div className="filter-actions">
+            <Link className="secondary-link" href="/">
+              Сбросить
+            </Link>
+          </div>
+        ) : null}
+      </div>
     </aside>
   );
 }
@@ -106,23 +141,23 @@ function formatVacancyCount(count: number) {
 
 type FilterSelectProps = {
   label: string;
-  name: keyof VacancyFilters;
   placeholder: string;
   options: string[];
-  value?: string;
+  value: string;
+  onChange: (value: string) => void;
 };
 
 function FilterSelect({
   label,
-  name,
   placeholder,
   options,
-  value = "",
+  value,
+  onChange,
 }: FilterSelectProps) {
   return (
     <label className="filter-field">
       <span>{label}</span>
-      <select name={name} defaultValue={value}>
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
         <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option} value={option}>
@@ -131,5 +166,25 @@ function FilterSelect({
         ))}
       </select>
     </label>
+  );
+}
+
+type SalaryChipProps = {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+};
+
+function SalaryChip({ active, label, onClick }: SalaryChipProps) {
+  return (
+    <button
+      type="button"
+      className="salary-chip"
+      data-active={active}
+      aria-pressed={active}
+      onClick={onClick}
+    >
+      {label}
+    </button>
   );
 }

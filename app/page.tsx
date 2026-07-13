@@ -61,7 +61,7 @@ function getFiltersFromSearchParams(
   return {
     title: getSingleParam(params.title),
     project: getSingleParam(params.project),
-    salaryTo: getNumberParam(params.salaryTo),
+    salaryFrom: getNumberParam(params.salaryFrom),
   };
 }
 
