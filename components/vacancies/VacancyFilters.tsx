@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { VacancyFilterOptions, VacancyFilters } from "@/lib/vacancies";
+
+const SALARY_STEP = 5000;
+const APPLY_DELAY_MS = 400;
 
 type VacancyFiltersProps = {
   options: VacancyFilterOptions;
@@ -18,9 +21,20 @@ export function VacancyFiltersPanel({
 }: VacancyFiltersProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [salaryFrom, setSalaryFrom] = useState(selectedFilters.salaryFrom ?? 0);
+  const applyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const formId = useId();
 
-  // Любое изменение фильтра сразу перестраивает список (без кнопки «Показать»).
+  // Синхронизируем локальное значение зарплаты, если фильтр сменился извне
+  // (например, кнопкой «Сбросить» или навигацией назад).
+  useEffect(() => {
+    setSalaryFrom(selectedFilters.salaryFrom ?? 0);
+  }, [selectedFilters.salaryFrom]);
+
+  useEffect(() => () => clearTimeout(applyTimer.current), []);
+
   function applyFilters(next: VacancyFilters) {
     const params = new URLSearchParams();
 
@@ -41,10 +55,26 @@ export function VacancyFiltersPanel({
     router.push(query ? `/?${query}` : "/");
   }
 
+  // Поле и слайдер меняют значение мгновенно, а навигацию откладываем,
+  // чтобы не дёргать список на каждый символ/тик слайдера.
+  function changeSalary(value: number) {
+    const clamped = Math.max(0, Math.min(value, options.salaryMax));
+
+    setSalaryFrom(clamped);
+    clearTimeout(applyTimer.current);
+    applyTimer.current = setTimeout(() => {
+      applyFilters({ ...selectedFilters, salaryFrom: clamped || undefined });
+    }, APPLY_DELAY_MS);
+  }
+
+  function resetFilters() {
+    clearTimeout(applyTimer.current);
+    setSalaryFrom(0);
+    router.push("/");
+  }
+
   const hasActiveFilters = Boolean(
-    selectedFilters.title ||
-      selectedFilters.project ||
-      selectedFilters.salaryFrom,
+    selectedFilters.title || selectedFilters.project || salaryFrom,
   );
 
   return (
@@ -83,35 +113,43 @@ export function VacancyFiltersPanel({
             applyFilters({ ...selectedFilters, project: value || undefined })
           }
         />
-        {options.salaryPresets.length > 0 ? (
-          <div className="filter-field">
+        {options.salaryMax > 0 ? (
+          <div className="filter-field salary-filter">
             <span>Зарплата от</span>
-            <div className="salary-chips" role="group" aria-label="Зарплата от">
-              <SalaryChip
-                active={!selectedFilters.salaryFrom}
-                label="Любая"
-                onClick={() =>
-                  applyFilters({ ...selectedFilters, salaryFrom: undefined })
+            <div className="salary-input-wrap">
+              <input
+                className="salary-input"
+                inputMode="numeric"
+                aria-label="Зарплата от, рублей в месяц"
+                placeholder="Любая"
+                value={salaryFrom ? formatNumber(salaryFrom) : ""}
+                onChange={(event) =>
+                  changeSalary(parseDigits(event.target.value))
                 }
               />
-              {options.salaryPresets.map((preset) => (
-                <SalaryChip
-                  key={preset}
-                  active={selectedFilters.salaryFrom === preset}
-                  label={`от ${formatSalary(preset)}`}
-                  onClick={() =>
-                    applyFilters({ ...selectedFilters, salaryFrom: preset })
-                  }
-                />
-              ))}
+              <span className="salary-input-suffix">₽/мес</span>
             </div>
+            <input
+              className="salary-range"
+              type="range"
+              min={0}
+              max={options.salaryMax}
+              step={SALARY_STEP}
+              value={salaryFrom}
+              aria-label="Зарплата от"
+              onChange={(event) => changeSalary(Number(event.target.value))}
+            />
           </div>
         ) : null}
         {hasActiveFilters ? (
           <div className="filter-actions">
-            <Link className="secondary-link" href="/">
+            <button
+              type="button"
+              className="secondary-link"
+              onClick={resetFilters}
+            >
               Сбросить
-            </Link>
+            </button>
           </div>
         ) : null}
       </div>
@@ -119,8 +157,14 @@ export function VacancyFiltersPanel({
   );
 }
 
-function formatSalary(value: number) {
-  return `${new Intl.NumberFormat("ru-RU").format(value)} ₽`;
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("ru-RU").format(value);
+}
+
+function parseDigits(value: string) {
+  const digits = value.replace(/\D/g, "");
+
+  return digits ? Number(digits) : 0;
 }
 
 function formatVacancyCount(count: number) {
@@ -166,25 +210,5 @@ function FilterSelect({
         ))}
       </select>
     </label>
-  );
-}
-
-type SalaryChipProps = {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-};
-
-function SalaryChip({ active, label, onClick }: SalaryChipProps) {
-  return (
-    <button
-      type="button"
-      className="salary-chip"
-      data-active={active}
-      aria-pressed={active}
-      onClick={onClick}
-    >
-      {label}
-    </button>
   );
 }

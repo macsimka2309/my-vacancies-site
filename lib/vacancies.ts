@@ -9,7 +9,7 @@ export type VacancyFilters = {
 export type VacancyFilterOptions = {
   titles: string[];
   projects: string[];
-  salaryPresets: number[];
+  salaryMax: number;
 };
 
 export async function getActiveVacancies(filters: VacancyFilters = {}) {
@@ -69,7 +69,7 @@ export async function getVacancyFilterOptions(): Promise<VacancyFilterOptions> {
   return {
     titles: uniqueSorted(vacancies.map((vacancy) => vacancy.title)),
     projects: uniqueSorted(vacancies.map((vacancy) => vacancy.project)),
-    salaryPresets: getSalaryPresets(vacancies.map((vacancy) => vacancy.salary)),
+    salaryMax: getSalaryMax(vacancies.map((vacancy) => vacancy.salary)),
   };
 }
 
@@ -110,21 +110,18 @@ function uniqueSorted(values: Array<string | null | undefined>) {
   );
 }
 
-// Пресеты «зарплата от» для чипсов: берём круглые пороги, которые не выше
-// максимальной зарплаты в подборке (иначе чип не даёт ни одной вакансии).
-function getSalaryPresets(values: Array<string | null | undefined>) {
+// Верхняя граница слайдера «зарплата от»: максимум по подборке, округлённый
+// вверх до 5 000. 0 — если зарплаты нигде не указаны (контрол скрываем).
+function getSalaryMax(values: Array<string | null | undefined>) {
   const salaryAmounts = values
     .map(getSalaryAmount)
     .filter((value): value is number => value !== null);
 
   if (salaryAmounts.length === 0) {
-    return [];
+    return 0;
   }
 
-  const maxSalary = Math.max(...salaryAmounts);
-  const candidates = [50000, 80000, 100000, 150000, 200000, 300000];
-
-  return candidates.filter((candidate) => candidate <= maxSalary);
+  return Math.ceil(Math.max(...salaryAmounts) / 5000) * 5000;
 }
 
 function getSalaryAmount(value: string | null | undefined) {
