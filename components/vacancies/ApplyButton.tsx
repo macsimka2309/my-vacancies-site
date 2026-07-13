@@ -22,6 +22,10 @@ type SubmitState =
   | {
       type: "error";
       message: string;
+    }
+  | {
+      type: "success";
+      message: "";
     };
 
 export function ApplyButton({ vacancy }: ApplyButtonProps) {
@@ -30,6 +34,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [consent, setConsent] = useState(false);
   const [submitState, setSubmitState] = useState<SubmitState>({
     type: "idle",
     message: "",
@@ -37,6 +42,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
 
   function openForm() {
     setIsOpen(true);
+    setConsent(false);
     setSubmitState({
       type: "idle",
       message: "",
@@ -68,6 +74,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
         name,
         phone,
         vacancyId: vacancy.id,
+        consent,
       }),
     });
     const result = (await response.json().catch(() => null)) as {
@@ -86,11 +93,11 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
 
     setName("");
     setPhone("");
+    setConsent(false);
     setSubmitState({
-      type: "idle",
+      type: "success",
       message: "",
     });
-    setIsOpen(false);
   }
 
   return (
@@ -116,63 +123,103 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
             >
               ×
             </button>
-            <div className="apply-modal__header">
-              <p className="eyebrow">{vacancy.project}</p>
-              <h2 id={titleId}>Откликнуться</h2>
-              <p className="muted">
-                {vacancy.title}, {vacancy.city}
-              </p>
-            </div>
-            <form className="apply-form" onSubmit={handleSubmit}>
-              <label className="apply-field">
-                <span>Имя</span>
-                <input
-                  autoComplete="name"
-                  minLength={2}
-                  name="name"
-                  required
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                />
-              </label>
-              <label className="apply-field">
-                <span>Телефон</span>
-                <input
-                  autoComplete="tel"
-                  inputMode="tel"
-                  name="phone"
-                  placeholder="+7 (999) 999-99-99"
-                  required
-                  value={phone}
-                  onChange={(event) => setPhone(formatPhone(event.target.value))}
-                />
-              </label>
-              <p className="apply-trust">
-                <span className="apply-trust__dot" aria-hidden="true" />
-                {site.callbackPromise}
-              </p>
-              {submitState.message ? (
-                <p className={`form-message form-message--${submitState.type}`}>
-                  {submitState.message}
+            {submitState.type === "success" ? (
+              <div className="apply-success" role="status">
+                <span className="apply-success__icon" aria-hidden="true">
+                  ✓
+                </span>
+                <h2 id={titleId}>Спасибо, отклик отправлен!</h2>
+                <p className="muted">
+                  {site.callbackPromise}. Держите телефон под рукой.
                 </p>
-              ) : null}
-              <div className="apply-form__actions">
                 <button
                   className="button-link"
-                  disabled={isSubmitting}
-                  type="submit"
-                >
-                  {isSubmitting ? "Отправляем" : "Отправить"}
-                </button>
-                <button
-                  className="secondary-link form-secondary-button"
                   type="button"
                   onClick={closeForm}
                 >
-                  Закрыть
+                  Хорошо
                 </button>
               </div>
-            </form>
+            ) : (
+              <>
+                <div className="apply-modal__header">
+                  <p className="eyebrow">{vacancy.project}</p>
+                  <h2 id={titleId}>Откликнуться</h2>
+                  <p className="muted">
+                    {vacancy.title}, {vacancy.city}
+                  </p>
+                </div>
+                <form className="apply-form" onSubmit={handleSubmit}>
+                  <label className="apply-field">
+                    <span>Имя</span>
+                    <input
+                      autoComplete="name"
+                      minLength={2}
+                      name="name"
+                      required
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                    />
+                  </label>
+                  <label className="apply-field">
+                    <span>Телефон</span>
+                    <input
+                      autoComplete="tel"
+                      inputMode="tel"
+                      name="phone"
+                      placeholder="+7 (999) 999-99-99"
+                      required
+                      value={phone}
+                      onChange={(event) =>
+                        setPhone(formatPhone(event.target.value))
+                      }
+                    />
+                  </label>
+                  <p className="apply-trust">
+                    <span className="apply-trust__dot" aria-hidden="true" />
+                    {site.callbackPromise}
+                  </p>
+                  <label className="apply-consent">
+                    <input
+                      type="checkbox"
+                      name="consent"
+                      checked={consent}
+                      required
+                      onChange={(event) => setConsent(event.target.checked)}
+                    />
+                    <span>
+                      Я согласен на обработку{" "}
+                      <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                        персональных данных
+                      </a>
+                    </span>
+                  </label>
+                  {submitState.message ? (
+                    <p
+                      className={`form-message form-message--${submitState.type}`}
+                    >
+                      {submitState.message}
+                    </p>
+                  ) : null}
+                  <div className="apply-form__actions">
+                    <button
+                      className="button-link"
+                      disabled={isSubmitting || !consent}
+                      type="submit"
+                    >
+                      {isSubmitting ? "Отправляем" : "Отправить"}
+                    </button>
+                    <button
+                      className="secondary-link form-secondary-button"
+                      type="button"
+                      onClick={closeForm}
+                    >
+                      Закрыть
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
           </section>
         </div>
       ) : null}

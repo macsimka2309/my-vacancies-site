@@ -8,6 +8,7 @@ const applicationSchema = z.object({
   name: z.string().trim().min(2).max(80),
   phone: z.string().trim().min(1).max(40),
   vacancyId: z.string().trim().min(1),
+  consent: z.literal(true),
 });
 
 export async function POST(request: Request) {
@@ -15,8 +16,16 @@ export async function POST(request: Request) {
   const parsedBody = applicationSchema.safeParse(body);
 
   if (!parsedBody.success) {
+    const consentFailed = parsedBody.error.issues.some((issue) =>
+      issue.path.includes("consent"),
+    );
+
     return NextResponse.json(
-      { error: "Проверьте имя и телефон." },
+      {
+        error: consentFailed
+          ? "Подтвердите согласие на обработку персональных данных."
+          : "Проверьте имя и телефон.",
+      },
       { status: 400 },
     );
   }
@@ -63,6 +72,7 @@ export async function POST(request: Request) {
       phone: parsedBody.data.phone,
       normalizedPhone,
       city: vacancy.city,
+      personalDataConsentAt: new Date(),
       trafficSource: "site",
     },
     select: {

@@ -791,6 +791,71 @@ select {
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
+.apply-consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.apply-consent input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.apply-consent a {
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.apply-consent a:hover {
+  color: var(--accent);
+}
+
+.apply-success {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 8px 0 4px;
+  text-align: center;
+}
+
+.apply-success__icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.apply-success h2 {
+  margin: 6px 0 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.apply-success p {
+  margin: 0;
+  max-width: 320px;
+}
+
+.apply-success .button-link {
+  margin-top: 8px;
+  min-width: 160px;
+}
+
 .admin-shell {
   width: min(1240px, calc(100% - 32px));
   margin: 0 auto;

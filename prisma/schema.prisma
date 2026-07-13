@@ -71,6 +71,7 @@ model Application {
   status               LeadStatus @default(NEW)
   responsibleManager   String?    @map("responsible_manager")
   managerComment       String?    @map("manager_comment") @db.Text
+  personalDataConsentAt DateTime? @map("personal_data_consent_at")
   telegramSentAt       DateTime?  @map("telegram_sent_at")
   telegramError        String?    @map("telegram_error") @db.Text
   auditLogs             ApplicationAuditLog[]
