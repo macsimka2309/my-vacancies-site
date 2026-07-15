@@ -208,7 +208,8 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                       <a href="/privacy" target="_blank" rel="noopener noreferrer">
                         персональных данных
                       </a>{" "}
-                      и их трансграничную передачу в мессенджер Telegram
+                      и получение моего отклика через Telegram (серверы могут быть
+                      за пределами России)
                     </span>
                   </label>
                   {submitState.message ? (
