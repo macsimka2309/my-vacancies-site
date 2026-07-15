@@ -15,6 +15,22 @@ export const metadata: Metadata = {
     locale: "ru_RU",
     siteName: site.name,
     url: site.url,
+    title: `Вакансии — ${site.name}`,
+    description:
+      "Актуальные вакансии с достойной оплатой. Оставьте отклик — перезвоним и расскажем условия.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Вакансии — ${site.name}`,
+    description:
+      "Актуальные вакансии с достойной оплатой. Оставьте отклик — перезвоним и расскажем условия.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: site.url,
   },
 };
 
