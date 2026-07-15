@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useId, useState } from "react";
+import { FormEvent, useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 import { site } from "@/lib/site";
 
 type ApplyVacancy = {
@@ -39,6 +40,20 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
     type: "idle",
     message: "",
   });
+
+  // Пока модалка открыта — блокируем прокрутку фона.
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   function openForm() {
     setIsOpen(true);
@@ -106,7 +121,8 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
         Откликнуться
       </button>
 
-      {isOpen ? (
+      {isOpen && typeof document !== "undefined"
+        ? createPortal(
         <div className="modal-backdrop" role="presentation" onMouseDown={closeForm}>
           <section
             aria-labelledby={titleId}
@@ -222,8 +238,10 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
               </>
             )}
           </section>
-        </div>
-      ) : null}
+        </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }
