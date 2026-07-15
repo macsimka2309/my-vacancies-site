@@ -204,12 +204,13 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                       onChange={(event) => setConsent(event.target.checked)}
                     />
                     <span>
-                      Я согласен на обработку моих{" "}
+                      Я даю согласие на обработку моих персональных данных (имени и
+                      номера телефона) и соглашаюсь, что мой отклик поступит
+                      работодателю через зарубежный сервис Telegram. С{" "}
                       <a href="/privacy" target="_blank" rel="noopener noreferrer">
-                        персональных данных
+                        политикой конфиденциальности
                       </a>{" "}
-                      и получение моего отклика через Telegram (серверы могут быть
-                      за пределами России)
+                      ознакомлен(а)
                     </span>
                   </label>
                   {submitState.message ? (
