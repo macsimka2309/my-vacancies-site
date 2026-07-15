@@ -49,7 +49,7 @@ export default function OpengraphImage() {
             Вакансии с достойной оплатой
           </div>
           <div style={{ fontSize: 34, color: "#5b6770" }}>
-            Оставьте отклик — {site.callbackPromise.toLowerCase()}
+            {`Оставьте отклик — ${site.callbackPromise.toLowerCase()}`}
           </div>
         </div>
       </div>
