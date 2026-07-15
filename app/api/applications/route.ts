@@ -2,18 +2,40 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { normalizeRuPhone } from "@/lib/phone";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { sendApplicationTelegramNotification } from "@/lib/telegram";
+
+// Не больше 5 откликов с одного IP за 10 минут.
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 10 * 60 * 1000;
 
 const applicationSchema = z.object({
   name: z.string().trim().min(2).max(80),
   phone: z.string().trim().min(1).max(40),
   vacancyId: z.string().trim().min(1),
   consent: z.literal(true),
+  // Honeypot: настоящие люди это поле не видят и не заполняют.
+  company: z.string().max(200).optional(),
 });
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const limit = rateLimit(`apply:${ip}`, RATE_LIMIT, RATE_WINDOW_MS);
+
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Слишком много попыток. Попробуйте позже." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
+    );
+  }
+
   const body = await readJsonBody(request);
   const parsedBody = applicationSchema.safeParse(body);
+
+  // Honeypot сработал — тихо «принимаем», ничего не сохраняя и не отправляя.
+  if (parsedBody.success && parsedBody.data.company) {
+    return NextResponse.json({ ok: true });
+  }
 
   if (!parsedBody.success) {
     const consentFailed = parsedBody.error.issues.some((issue) =>

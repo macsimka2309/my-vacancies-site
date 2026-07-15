@@ -36,6 +36,8 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
+  // Honeypot — скрытое поле-ловушка для ботов.
+  const [company, setCompany] = useState("");
   const [submitState, setSubmitState] = useState<SubmitState>({
     type: "idle",
     message: "",
@@ -90,6 +92,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
         phone,
         vacancyId: vacancy.id,
         consent,
+        company,
       }),
     });
     const result = (await response.json().catch(() => null)) as {
@@ -166,6 +169,22 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                   </p>
                 </div>
                 <form className="apply-form" onSubmit={handleSubmit}>
+                  <input
+                    type="text"
+                    name="company"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    value={company}
+                    onChange={(event) => setCompany(event.target.value)}
+                    style={{
+                      position: "absolute",
+                      left: "-9999px",
+                      width: 1,
+                      height: 1,
+                      opacity: 0,
+                    }}
+                  />
                   <label className="apply-field">
                     <span>Имя</span>
                     <input
