@@ -16,7 +16,33 @@ const applicationSchema = z.object({
   consent: z.literal(true),
   // Honeypot: настоящие люди это поле не видят и не заполняют.
   company: z.string().max(200).optional(),
+  // Маркетинговая атрибуция (необязательная).
+  utmSource: z.string().max(200).optional(),
+  utmMedium: z.string().max(200).optional(),
+  utmCampaign: z.string().max(200).optional(),
+  utmContent: z.string().max(200).optional(),
+  utmTerm: z.string().max(200).optional(),
+  referrer: z.string().max(500).optional(),
 });
+
+function resolveTrafficSource(data: {
+  utmSource?: string;
+  referrer?: string;
+}): string {
+  if (data.utmSource) {
+    return data.utmSource;
+  }
+
+  if (data.referrer) {
+    try {
+      return new URL(data.referrer).host || "direct";
+    } catch {
+      return "direct";
+    }
+  }
+
+  return "direct";
+}
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -95,7 +121,12 @@ export async function POST(request: Request) {
       normalizedPhone,
       city: vacancy.city,
       personalDataConsentAt: new Date(),
-      trafficSource: "site",
+      trafficSource: resolveTrafficSource(parsedBody.data),
+      utmSource: parsedBody.data.utmSource,
+      utmMedium: parsedBody.data.utmMedium,
+      utmCampaign: parsedBody.data.utmCampaign,
+      utmContent: parsedBody.data.utmContent,
+      utmTerm: parsedBody.data.utmTerm,
     },
     select: {
       id: true,

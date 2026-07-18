@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AttributionTracker } from "@/components/analytics/AttributionTracker";
+import { YandexMetrika } from "@/components/analytics/YandexMetrika";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -39,9 +41,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const metrikaId = Number(process.env.METRIKA_ID) || null;
+
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body>
+        <AttributionTracker />
+        {metrikaId ? <YandexMetrika counterId={metrikaId} /> : null}
+        {children}
+      </body>
     </html>
   );
 }

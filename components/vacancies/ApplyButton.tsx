@@ -2,6 +2,8 @@
 
 import { FormEvent, useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
+import { getAttribution } from "@/lib/attribution";
+import { reachGoal } from "@/lib/metrika";
 import { site } from "@/lib/site";
 
 type ApplyVacancy = {
@@ -58,6 +60,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
   }, [isOpen]);
 
   function openForm() {
+    reachGoal("application_form_open");
     setIsOpen(true);
     setConsent(false);
     setSubmitState({
@@ -93,6 +96,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
         vacancyId: vacancy.id,
         consent,
         company,
+        ...getAttribution(),
       }),
     });
     const result = (await response.json().catch(() => null)) as {
@@ -109,6 +113,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
       return;
     }
 
+    reachGoal("application_submit");
     setName("");
     setPhone("");
     setConsent(false);
