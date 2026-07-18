@@ -46,7 +46,18 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const session = await getAdminSession();
 
   if (!session) {
-    return <AdminLogin hasError={getSingleParam(params.login) === "error"} />;
+    const loginParam = getSingleParam(params.login);
+    return (
+      <AdminLogin
+        variant={
+          loginParam === "throttled"
+            ? "throttled"
+            : loginParam === "error"
+              ? "error"
+              : "none"
+        }
+      />
+    );
   }
 
   if (!canManageApplications(session)) {
@@ -281,7 +292,11 @@ function AdminAccessDenied() {
   );
 }
 
-function AdminLogin({ hasError }: { hasError: boolean }) {
+function AdminLogin({
+  variant,
+}: {
+  variant: "none" | "error" | "throttled";
+}) {
   return (
     <main className="admin-login-shell">
       <section className="admin-login-panel">
@@ -302,9 +317,15 @@ function AdminLogin({ hasError }: { hasError: boolean }) {
               type="password"
             />
           </label>
-          {hasError ? (
+          {variant === "error" ? (
             <p className="form-message form-message--error">
               Неверный логин или пароль.
+            </p>
+          ) : null}
+          {variant === "throttled" ? (
+            <p className="form-message form-message--error">
+              Слишком много попыток входа. Подождите пару минут и попробуйте
+              снова.
             </p>
           ) : null}
           <button className="button-link" type="submit">
