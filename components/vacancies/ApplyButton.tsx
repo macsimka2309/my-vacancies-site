@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useId, useState } from "react";
+import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { getAttribution } from "@/lib/attribution";
 import { reachGoal } from "@/lib/metrika";
@@ -44,6 +44,8 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
     type: "idle",
     message: "",
   });
+  const dialogRef = useRef<HTMLElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   // Пока модалка открыта — блокируем прокрутку фона.
   useEffect(() => {
@@ -57,6 +59,58 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
     return () => {
       document.body.style.overflow = previousOverflow;
     };
+  }, [isOpen]);
+
+  // Доступность модалки: фокус внутрь при открытии, Escape для закрытия,
+  // удержание фокуса внутри (focus trap) и возврат фокуса на кнопку при закрытии.
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    (nameInputRef.current ?? dialogRef.current)?.focus();
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeForm();
+        return;
+      }
+
+      if (event.key !== "Tab" || !dialogRef.current) {
+        return;
+      }
+
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+
+      if (focusable.length === 0) {
+        return;
+      }
+
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      const active = document.activeElement;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      previouslyFocused?.focus?.();
+    };
+    // closeForm стабильна в рамках открытого состояния; зависимость только от isOpen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   function openForm() {
@@ -133,10 +187,12 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
         ? createPortal(
         <div className="modal-backdrop" role="presentation" onMouseDown={closeForm}>
           <section
+            ref={dialogRef}
             aria-labelledby={titleId}
             aria-modal="true"
             className="apply-modal"
             role="dialog"
+            tabIndex={-1}
             onMouseDown={(event) => event.stopPropagation()}
           >
             <button
@@ -193,6 +249,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                   <label className="apply-field">
                     <span>Имя</span>
                     <input
+                      ref={nameInputRef}
                       autoComplete="name"
                       minLength={2}
                       name="name"
