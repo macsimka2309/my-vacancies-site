@@ -108,25 +108,6 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
       <VacancyTextBlock title="Обязанности" text={vacancy.responsibilities} />
       <VacancyTextBlock title="Требования" text={vacancy.requirements} />
       <VacancyTextBlock title="Условия" text={vacancy.conditions} />
-
-      {vacancy.contactComment ? (
-        <section className="detail-section detail-note">
-          <h2>Комментарий</h2>
-          <p>{vacancy.contactComment}</p>
-        </section>
-      ) : null}
-
-      <section className="apply-preview">
-        <div>
-          <h2>Другие вакансии</h2>
-          <p className="muted">
-            Вернитесь к списку, чтобы сравнить условия по другим направлениям.
-          </p>
-        </div>
-        <Link className="button-link" href="/">
-          Смотреть все вакансии
-        </Link>
-      </section>
       </main>
       <SiteFooter />
     </>
