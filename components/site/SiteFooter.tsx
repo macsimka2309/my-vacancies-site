@@ -13,6 +13,9 @@ export function SiteFooter() {
         </div>
         <nav className="site-footer__links" aria-label="Правовая информация">
           <Link href="/privacy">Политика конфиденциальности</Link>
+          {site.email ? (
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          ) : null}
           {site.phone ? (
             <a href={`tel:${site.phone.replace(/[^\d+]/g, "")}`}>{site.phone}</a>
           ) : null}

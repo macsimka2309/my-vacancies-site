@@ -4,6 +4,7 @@ type SiteConfig = {
   name: string;
   legalName: string;
   inn: string;
+  email: string;
   url: string;
   tagline: string;
   phone: string;
@@ -17,6 +18,8 @@ export const site: SiteConfig = {
   legalName: "Салихов Руслан Эркинович",
   /** ИНН оператора (для футера и политики конфиденциальности). */
   inn: "525689929260",
+  /** Контакт оператора для обращений по персональным данным. */
+  email: "macsimnn@mail.ru",
   /** Канонический адрес сайта (для метаданных и микроразметки). */
   url: "https://my-dream-vacancy.ru",
   /** Короткий слоган над заголовком. */
