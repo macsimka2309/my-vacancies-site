@@ -696,6 +696,12 @@ select {
   box-shadow: 0 6px 16px rgba(33, 160, 56, 0.28);
 }
 
+.site-brand__logo {
+  height: 35px;
+  width: auto;
+  display: block;
+}
+
 .site-brand__name {
   color: var(--foreground);
 }

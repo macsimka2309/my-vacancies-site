@@ -6,7 +6,14 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="site-header__inner">
         <Link className="site-brand" href="/" aria-label={`${site.name} — на главную`}>
-          <span className="site-brand__mark" aria-hidden="true" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="site-brand__logo"
+            src="/logo-mark.png"
+            alt=""
+            width={28}
+            height={35}
+          />
           <span className="site-brand__name">{site.name}</span>
         </Link>
         {site.phone ? (
