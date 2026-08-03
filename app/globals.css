@@ -325,6 +325,41 @@ select {
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
+.salary-basis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #eef4f1;
+}
+
+.salary-basis__option {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 9px;
+  padding: 8px 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--motion),
+    color var(--motion);
+}
+
+.salary-basis__option[data-active="true"] {
+  background: #ffffff;
+  color: var(--accent-strong);
+  box-shadow: 0 1px 3px rgba(20, 58, 94, 0.1);
+}
+
+.salary-basis__option:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
 .filter-actions {
   display: grid;
   gap: 10px;

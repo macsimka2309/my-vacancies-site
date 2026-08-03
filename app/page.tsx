@@ -62,8 +62,15 @@ function getFiltersFromSearchParams(
     title: getSingleParam(params.title),
     project: getSingleParam(params.project),
     cities: getMultiParam(params.city),
+    salaryBasis: getSalaryBasisParam(params.salaryBasis),
     salaryFrom: getNumberParam(params.salaryFrom),
   };
+}
+
+function getSalaryBasisParam(value: string | string[] | undefined) {
+  const param = getSingleParam(value);
+
+  return param === "shift" || param === "vahta" ? param : undefined;
 }
 
 function getMultiParam(value: string | string[] | undefined) {

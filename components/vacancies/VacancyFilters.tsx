@@ -3,9 +3,21 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import type { VacancyFilterOptions, VacancyFilters } from "@/lib/vacancies";
+import type {
+  SalaryBasis,
+  VacancyFilterOptions,
+  VacancyFilters,
+} from "@/lib/vacancies";
 
-const SALARY_STEP = 5000;
+const SALARY_STEP: Record<SalaryBasis, number> = { shift: 500, vahta: 5000 };
+const SALARY_BASIS_LABEL: Record<SalaryBasis, string> = {
+  shift: "За смену",
+  vahta: "За вахту",
+};
+const SALARY_SUFFIX: Record<SalaryBasis, string> = {
+  shift: "₽/смена",
+  vahta: "₽/вахта",
+};
 const APPLY_DELAY_MS = 400;
 
 type VacancyFiltersProps = {
@@ -22,16 +34,25 @@ export function VacancyFiltersPanel({
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [salaryFrom, setSalaryFrom] = useState(selectedFilters.salaryFrom ?? 0);
+  const [salaryBasis, setSalaryBasis] = useState<SalaryBasis>(
+    selectedFilters.salaryBasis ?? "shift",
+  );
   const applyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
   const formId = useId();
 
-  // Синхронизируем локальное значение зарплаты, если фильтр сменился извне
+  // Синхронизируем локальные значения зарплаты, если фильтр сменился извне
   // (например, кнопкой «Сбросить» или навигацией назад).
   useEffect(() => {
     setSalaryFrom(selectedFilters.salaryFrom ?? 0);
   }, [selectedFilters.salaryFrom]);
+
+  useEffect(() => {
+    if (selectedFilters.salaryBasis) {
+      setSalaryBasis(selectedFilters.salaryBasis);
+    }
+  }, [selectedFilters.salaryBasis]);
 
   useEffect(() => () => clearTimeout(applyTimer.current), []);
 
@@ -52,6 +73,7 @@ export function VacancyFiltersPanel({
 
     if (next.salaryFrom) {
       params.set("salaryFrom", String(next.salaryFrom));
+      params.set("salaryBasis", next.salaryBasis ?? "shift");
     }
 
     const query = params.toString();
@@ -62,13 +84,36 @@ export function VacancyFiltersPanel({
   // Поле и слайдер меняют значение мгновенно, а навигацию откладываем,
   // чтобы не дёргать список на каждый символ/тик слайдера.
   function changeSalary(value: number) {
-    const clamped = Math.max(0, Math.min(value, options.salaryMax));
+    const clamped = Math.max(0, Math.min(value, options.salaryMax[salaryBasis]));
 
     setSalaryFrom(clamped);
     clearTimeout(applyTimer.current);
     applyTimer.current = setTimeout(() => {
-      applyFilters({ ...selectedFilters, salaryFrom: clamped || undefined });
+      applyFilters({
+        ...selectedFilters,
+        salaryBasis,
+        salaryFrom: clamped || undefined,
+      });
     }, APPLY_DELAY_MS);
+  }
+
+  // Смена типа зарплаты: шкала другая, поэтому сбрасываем порог.
+  function changeSalaryBasis(basis: SalaryBasis) {
+    if (basis === salaryBasis) {
+      return;
+    }
+
+    clearTimeout(applyTimer.current);
+    setSalaryBasis(basis);
+    setSalaryFrom(0);
+
+    if (selectedFilters.salaryFrom) {
+      applyFilters({
+        ...selectedFilters,
+        salaryBasis: basis,
+        salaryFrom: undefined,
+      });
+    }
   }
 
   function resetFilters() {
@@ -151,28 +196,46 @@ export function VacancyFiltersPanel({
             applyFilters({ ...selectedFilters, project: value || undefined })
           }
         />
-        {options.salaryMax > 0 ? (
+        {options.salaryMax.shift > 0 || options.salaryMax.vahta > 0 ? (
           <div className="filter-field salary-filter">
             <span>Зарплата от</span>
+            <div className="salary-basis" role="group" aria-label="Тип зарплаты">
+              {(["shift", "vahta"] as const).map((basis) => (
+                <button
+                  key={basis}
+                  type="button"
+                  className="salary-basis__option"
+                  data-active={salaryBasis === basis}
+                  aria-pressed={salaryBasis === basis}
+                  onClick={() => changeSalaryBasis(basis)}
+                >
+                  {SALARY_BASIS_LABEL[basis]}
+                </button>
+              ))}
+            </div>
             <div className="salary-input-wrap">
               <input
                 className="salary-input"
                 inputMode="numeric"
-                aria-label="Зарплата от, рублей в месяц"
+                aria-label={`Зарплата от, ${SALARY_BASIS_LABEL[
+                  salaryBasis
+                ].toLowerCase()}`}
                 placeholder="Любая"
                 value={salaryFrom ? formatNumber(salaryFrom) : ""}
                 onChange={(event) =>
                   changeSalary(parseDigits(event.target.value))
                 }
               />
-              <span className="salary-input-suffix">₽/мес</span>
+              <span className="salary-input-suffix">
+                {SALARY_SUFFIX[salaryBasis]}
+              </span>
             </div>
             <input
               className="salary-range"
               type="range"
               min={0}
-              max={options.salaryMax}
-              step={SALARY_STEP}
+              max={options.salaryMax[salaryBasis]}
+              step={SALARY_STEP[salaryBasis]}
               value={salaryFrom}
               aria-label="Зарплата от"
               onChange={(event) => changeSalary(Number(event.target.value))}

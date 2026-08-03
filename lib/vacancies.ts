@@ -1,9 +1,12 @@
 import { db } from "./db";
 
+export type SalaryBasis = "shift" | "vahta";
+
 export type VacancyFilters = {
   title?: string;
   project?: string;
   cities?: string[];
+  salaryBasis?: SalaryBasis;
   salaryFrom?: number;
 };
 
@@ -11,7 +14,8 @@ export type VacancyFilterOptions = {
   titles: string[];
   projects: string[];
   cities: string[];
-  salaryMax: number;
+  // Верхняя граница «зарплата от» отдельно по каждому типу.
+  salaryMax: Record<SalaryBasis, number>;
 };
 
 export async function getActiveVacancies(filters: VacancyFilters = {}) {
@@ -41,14 +45,16 @@ export async function getActiveVacancies(filters: VacancyFilters = {}) {
     },
   });
 
-  if (!filters.salaryFrom) {
+  if (!filters.salaryFrom || !filters.salaryBasis) {
     return vacancies;
   }
 
-  return vacancies.filter((vacancy) => {
-    const salaryAmount = getSalaryAmount(vacancy.salary);
+  const basis = filters.salaryBasis;
 
-    return salaryAmount !== null && salaryAmount >= filters.salaryFrom!;
+  return vacancies.filter((vacancy) => {
+    const amount = parseSalary(vacancy.salary)[basis];
+
+    return amount !== null && amount >= filters.salaryFrom!;
   });
 }
 
@@ -77,6 +83,8 @@ export async function getVacancyFilterOptions(): Promise<VacancyFilterOptions> {
     salaryMax: getSalaryMax(vacancies.map((vacancy) => vacancy.salary)),
   };
 }
+
+const SALARY_ROUND: Record<SalaryBasis, number> = { shift: 500, vahta: 5000 };
 
 export async function getVacancyBySlug(slug: string) {
   return db.vacancy.findFirst({
@@ -115,35 +123,61 @@ function uniqueSorted(values: Array<string | null | undefined>) {
   );
 }
 
-// Верхняя граница слайдера «зарплата от»: максимум по подборке, округлённый
-// вверх до 5 000. 0 — если зарплаты нигде не указаны (контрол скрываем).
-function getSalaryMax(values: Array<string | null | undefined>) {
-  const salaryAmounts = values
-    .map(getSalaryAmount)
-    .filter((value): value is number => value !== null);
+// Верхняя граница «зарплата от» по каждому типу: максимум по подборке,
+// округлённый вверх (смена — до 500, вахта — до 5000). 0 — если тип нигде не указан.
+function getSalaryMax(
+  values: Array<string | null | undefined>,
+): Record<SalaryBasis, number> {
+  const result: Record<SalaryBasis, number> = { shift: 0, vahta: 0 };
 
-  if (salaryAmounts.length === 0) {
-    return 0;
+  for (const basis of ["shift", "vahta"] as const) {
+    const amounts = values
+      .map((value) => parseSalary(value)[basis])
+      .filter((value): value is number => value !== null);
+
+    if (amounts.length > 0) {
+      const step = SALARY_ROUND[basis];
+      result[basis] = Math.ceil(Math.max(...amounts) / step) * step;
+    }
   }
 
-  return Math.ceil(Math.max(...salaryAmounts) / 5000) * 5000;
+  return result;
 }
 
-function getSalaryAmount(value: string | null | undefined) {
+// Разбор строки зарплаты вида «4000–6000 ₽ за смену · от 110 000 ₽ за вахту»
+// на максимальную сумму по каждому типу (смена / вахта).
+function parseSalary(
+  value: string | null | undefined,
+): Record<SalaryBasis, number | null> {
+  const result: Record<SalaryBasis, number | null> = {
+    shift: null,
+    vahta: null,
+  };
+
   if (!value) {
-    return null;
+    return result;
   }
 
-  const amounts = value
-    .match(/\d[\d\s]*/g)
-    ?.map((amount) => Number(amount.replace(/\D/g, "")))
-    .filter((amount) => Number.isFinite(amount) && amount > 0);
+  for (const segment of value.split(/[·;\n]/)) {
+    const amounts = segment
+      .match(/\d[\d\s]*/g)
+      ?.map((amount) => Number(amount.replace(/\D/g, "")))
+      .filter((amount) => Number.isFinite(amount) && amount > 0);
 
-  if (!amounts?.length) {
-    return null;
+    if (!amounts?.length) {
+      continue;
+    }
+
+    const amount = Math.max(...amounts);
+
+    if (/смен/i.test(segment)) {
+      result.shift = amount;
+    } else if (/вахт/i.test(segment)) {
+      result.vahta = amount;
+    }
   }
 
-  return Math.max(...amounts);
+  return result;
 }
 
 export type VacancyListItem = Awaited<
