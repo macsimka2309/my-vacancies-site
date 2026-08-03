@@ -631,14 +631,47 @@ select {
   line-height: 1.25;
 }
 
-.detail-section ul {
+.text-block {
   display: grid;
-  gap: 10px;
-  margin: 0;
-  padding-left: 20px;
+  gap: 12px;
 }
 
-.detail-section li,
+.text-block__para {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.text-block__subhead {
+  margin: 2px 0 -2px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.text-block__list {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 2px;
+}
+
+.text-block__list li {
+  position: relative;
+  padding-left: 20px;
+  line-height: 1.55;
+}
+
+.text-block__list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
 .detail-note p,
 .apply-preview p {
   line-height: 1.55;
