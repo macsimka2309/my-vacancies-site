@@ -93,7 +93,14 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
           ) : null}
         </dl>
         <div className="detail-actions">
-          <ApplyButton vacancy={vacancy} />
+          <ApplyButton
+            vacancy={{
+              id: vacancy.id,
+              title: vacancy.title,
+              project: vacancy.project,
+              city: vacancy.city,
+            }}
+          />
         </div>
       </section>
 

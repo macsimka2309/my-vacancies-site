@@ -31,7 +31,14 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
         </dl>
       </div>
       <div className="vacancy-card__actions">
-        <ApplyButton vacancy={vacancy} />
+        <ApplyButton
+          vacancy={{
+            id: vacancy.id,
+            title: vacancy.title,
+            project: vacancy.project,
+            city: vacancy.city,
+          }}
+        />
         <Link className="secondary-link" href={`/vacancies/${vacancy.slug}`}>
           Подробнее
         </Link>
