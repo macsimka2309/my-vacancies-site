@@ -71,12 +71,10 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
 
       <section className="detail-hero">
         <p className="eyebrow">{vacancy.project}</p>
-        <h1>{vacancy.title}</h1>
+        <h1>
+          {vacancy.title} — {vacancy.city}
+        </h1>
         <dl className="detail-meta" aria-label="Основные условия вакансии">
-          <div>
-            <dt>Город</dt>
-            <dd>{vacancy.city}</dd>
-          </div>
           <div>
             <dt>Формат</dt>
             <dd>{vacancy.workFormat}</dd>

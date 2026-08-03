@@ -11,15 +11,13 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
     <article className="vacancy-card">
       <div className="vacancy-card__body">
         <p className="eyebrow">{vacancy.project}</p>
-        <h2>{vacancy.title}</h2>
+        <h2>
+          {vacancy.title} — {vacancy.city}
+        </h2>
         {vacancy.salary ? (
           <p className="vacancy-salary">{vacancy.salary}</p>
         ) : null}
         <dl className="vacancy-meta" aria-label="Краткая информация о вакансии">
-          <div>
-            <dt>Город</dt>
-            <dd>{vacancy.city}</dd>
-          </div>
           <div>
             <dt>Формат</dt>
             <dd>{vacancy.workFormat}</dd>

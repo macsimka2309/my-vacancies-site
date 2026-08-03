@@ -3,12 +3,14 @@ import { db } from "./db";
 export type VacancyFilters = {
   title?: string;
   project?: string;
+  city?: string;
   salaryFrom?: number;
 };
 
 export type VacancyFilterOptions = {
   titles: string[];
   projects: string[];
+  cities: string[];
   salaryMax: number;
 };
 
@@ -18,6 +20,7 @@ export async function getActiveVacancies(filters: VacancyFilters = {}) {
       isActive: true,
       ...(filters.title ? { title: filters.title } : {}),
       ...(filters.project ? { project: filters.project } : {}),
+      ...(filters.city ? { city: filters.city } : {}),
     },
     orderBy: [
       {
@@ -57,6 +60,7 @@ export async function getVacancyFilterOptions(): Promise<VacancyFilterOptions> {
     select: {
       title: true,
       project: true,
+      city: true,
       salary: true,
     },
     orderBy: [
@@ -69,6 +73,7 @@ export async function getVacancyFilterOptions(): Promise<VacancyFilterOptions> {
   return {
     titles: uniqueSorted(vacancies.map((vacancy) => vacancy.title)),
     projects: uniqueSorted(vacancies.map((vacancy) => vacancy.project)),
+    cities: uniqueSorted(vacancies.map((vacancy) => vacancy.city)),
     salaryMax: getSalaryMax(vacancies.map((vacancy) => vacancy.salary)),
   };
 }

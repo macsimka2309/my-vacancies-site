@@ -46,6 +46,10 @@ export function VacancyFiltersPanel({
       params.set("project", next.project);
     }
 
+    if (next.city) {
+      params.set("city", next.city);
+    }
+
     if (next.salaryFrom) {
       params.set("salaryFrom", String(next.salaryFrom));
     }
@@ -74,7 +78,10 @@ export function VacancyFiltersPanel({
   }
 
   const hasActiveFilters = Boolean(
-    selectedFilters.title || selectedFilters.project || salaryFrom,
+    selectedFilters.title ||
+      selectedFilters.project ||
+      selectedFilters.city ||
+      salaryFrom,
   );
 
   return (
@@ -95,6 +102,15 @@ export function VacancyFiltersPanel({
         <p>{formatVacancyCount(resultCount)}</p>
       </div>
       <div id={formId} className="filters-form" data-open={isOpen}>
+        <FilterSelect
+          label="Город"
+          placeholder="Все города"
+          options={options.cities}
+          value={selectedFilters.city ?? ""}
+          onChange={(value) =>
+            applyFilters({ ...selectedFilters, city: value || undefined })
+          }
+        />
         <FilterSelect
           label="Вакансия"
           placeholder="Все вакансии"
