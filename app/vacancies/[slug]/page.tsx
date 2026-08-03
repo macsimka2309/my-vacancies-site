@@ -91,12 +91,6 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
               <dd>{vacancy.schedule}</dd>
             </div>
           ) : null}
-          {vacancy.address ? (
-            <div>
-              <dt>Адрес</dt>
-              <dd>{vacancy.address}</dd>
-            </div>
-          ) : null}
         </dl>
         <div className="detail-actions">
           <ApplyButton vacancy={vacancy} />

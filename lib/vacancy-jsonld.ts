@@ -35,7 +35,6 @@ export function buildJobPostingJsonLd(vacancy: VacancyDetails) {
         "@type": "PostalAddress",
         addressLocality: vacancy.city,
         addressCountry: "RU",
-        ...(vacancy.address ? { streetAddress: vacancy.address } : {}),
       },
     };
   }
