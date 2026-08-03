@@ -3,7 +3,7 @@ import { db } from "./db";
 export type VacancyFilters = {
   title?: string;
   project?: string;
-  city?: string;
+  cities?: string[];
   salaryFrom?: number;
 };
 
@@ -20,7 +20,7 @@ export async function getActiveVacancies(filters: VacancyFilters = {}) {
       isActive: true,
       ...(filters.title ? { title: filters.title } : {}),
       ...(filters.project ? { project: filters.project } : {}),
-      ...(filters.city ? { city: filters.city } : {}),
+      ...(filters.cities?.length ? { city: { in: filters.cities } } : {}),
     },
     orderBy: [
       {

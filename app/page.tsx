@@ -61,9 +61,17 @@ function getFiltersFromSearchParams(
   return {
     title: getSingleParam(params.title),
     project: getSingleParam(params.project),
-    city: getSingleParam(params.city),
+    cities: getMultiParam(params.city),
     salaryFrom: getNumberParam(params.salaryFrom),
   };
+}
+
+function getMultiParam(value: string | string[] | undefined) {
+  const values = (Array.isArray(value) ? value : [value])
+    .map((item) => item?.trim())
+    .filter((item): item is string => Boolean(item));
+
+  return values.length ? [...new Set(values)] : undefined;
 }
 
 function getSingleParam(value: string | string[] | undefined) {

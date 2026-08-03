@@ -288,6 +288,43 @@ select {
   outline: 0;
 }
 
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--foreground);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13.5px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color var(--motion),
+    background var(--motion),
+    color var(--motion);
+}
+
+.filter-chip:hover {
+  border-color: var(--accent);
+}
+
+.filter-chip[data-active="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.filter-chip:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
 .filter-actions {
   display: grid;
   gap: 10px;

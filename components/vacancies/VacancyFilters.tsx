@@ -46,8 +46,8 @@ export function VacancyFiltersPanel({
       params.set("project", next.project);
     }
 
-    if (next.city) {
-      params.set("city", next.city);
+    for (const city of next.cities ?? []) {
+      params.append("city", city);
     }
 
     if (next.salaryFrom) {
@@ -77,10 +77,20 @@ export function VacancyFiltersPanel({
     router.push("/");
   }
 
+  function toggleCity(city: string) {
+    const current = selectedFilters.cities ?? [];
+    const next = current.includes(city)
+      ? current.filter((value) => value !== city)
+      : [...current, city];
+
+    applyFilters({ ...selectedFilters, cities: next.length ? next : undefined });
+  }
+
+  const selectedCities = selectedFilters.cities ?? [];
   const hasActiveFilters = Boolean(
     selectedFilters.title ||
       selectedFilters.project ||
-      selectedFilters.city ||
+      selectedCities.length ||
       salaryFrom,
   );
 
@@ -102,15 +112,27 @@ export function VacancyFiltersPanel({
         <p>{formatVacancyCount(resultCount)}</p>
       </div>
       <div id={formId} className="filters-form" data-open={isOpen}>
-        <FilterSelect
-          label="Город"
-          placeholder="Все города"
-          options={options.cities}
-          value={selectedFilters.city ?? ""}
-          onChange={(value) =>
-            applyFilters({ ...selectedFilters, city: value || undefined })
-          }
-        />
+        <div className="filter-field">
+          <span>Город</span>
+          <div className="filter-chips" role="group" aria-label="Города">
+            {options.cities.map((city) => {
+              const active = selectedCities.includes(city);
+
+              return (
+                <button
+                  key={city}
+                  type="button"
+                  className="filter-chip"
+                  data-active={active}
+                  aria-pressed={active}
+                  onClick={() => toggleCity(city)}
+                >
+                  {city}
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <FilterSelect
           label="Вакансия"
           placeholder="Все вакансии"
