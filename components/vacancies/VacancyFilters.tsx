@@ -37,6 +37,7 @@ export function VacancyFiltersPanel({
   const [salaryBasis, setSalaryBasis] = useState<SalaryBasis>(
     selectedFilters.salaryBasis ?? "shift",
   );
+  const [citySearch, setCitySearch] = useState("");
   const applyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
@@ -132,6 +133,14 @@ export function VacancyFiltersPanel({
   }
 
   const selectedCities = selectedFilters.cities ?? [];
+  const cityQuery = citySearch.trim().toLowerCase();
+  const visibleCities = cityQuery
+    ? options.cities.filter(
+        (city) =>
+          selectedCities.includes(city) ||
+          city.toLowerCase().includes(cityQuery),
+      )
+    : options.cities;
   const hasActiveFilters = Boolean(
     selectedFilters.title ||
       selectedFilters.project ||
@@ -159,23 +168,38 @@ export function VacancyFiltersPanel({
       <div id={formId} className="filters-form" data-open={isOpen}>
         <div className="filter-field">
           <span>Город</span>
+          {options.cities.length > 12 ? (
+            <input
+              className="city-search"
+              type="search"
+              inputMode="search"
+              placeholder="Поиск города…"
+              value={citySearch}
+              onChange={(event) => setCitySearch(event.target.value)}
+              aria-label="Поиск города"
+            />
+          ) : null}
           <div className="filter-chips" role="group" aria-label="Города">
-            {options.cities.map((city) => {
-              const active = selectedCities.includes(city);
+            {visibleCities.length > 0 ? (
+              visibleCities.map((city) => {
+                const active = selectedCities.includes(city);
 
-              return (
-                <button
-                  key={city}
-                  type="button"
-                  className="filter-chip"
-                  data-active={active}
-                  aria-pressed={active}
-                  onClick={() => toggleCity(city)}
-                >
-                  {city}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={city}
+                    type="button"
+                    className="filter-chip"
+                    data-active={active}
+                    aria-pressed={active}
+                    onClick={() => toggleCity(city)}
+                  >
+                    {city}
+                  </button>
+                );
+              })
+            ) : (
+              <p className="filter-chips__empty">Город не найден</p>
+            )}
           </div>
         </div>
         <FilterSelect
