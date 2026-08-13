@@ -134,13 +134,11 @@ export function VacancyFiltersPanel({
 
   const selectedCities = selectedFilters.cities ?? [];
   const cityQuery = citySearch.trim().toLowerCase();
-  const visibleCities = cityQuery
-    ? options.cities.filter(
-        (city) =>
-          selectedCities.includes(city) ||
-          city.toLowerCase().includes(cityQuery),
-      )
-    : options.cities;
+  const availableCities = options.cities.filter(
+    (city) =>
+      !selectedCities.includes(city) &&
+      (cityQuery ? city.toLowerCase().includes(cityQuery) : true),
+  );
   const hasActiveFilters = Boolean(
     selectedFilters.title ||
       selectedFilters.project ||
@@ -168,37 +166,45 @@ export function VacancyFiltersPanel({
       <div id={formId} className="filters-form" data-open={isOpen}>
         <div className="filter-field">
           <span>Город</span>
-          {options.cities.length > 12 ? (
+          <div className="city-select">
+            {selectedCities.map((city) => (
+              <span className="city-token" key={city}>
+                {city}
+                <button
+                  type="button"
+                  aria-label={`Убрать город ${city}`}
+                  onClick={() => toggleCity(city)}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
             <input
-              className="city-search"
+              className="city-select__input"
               type="search"
               inputMode="search"
-              placeholder="Поиск города…"
+              placeholder={selectedCities.length ? "Ещё город…" : "Поиск города…"}
               value={citySearch}
               onChange={(event) => setCitySearch(event.target.value)}
               aria-label="Поиск города"
             />
-          ) : null}
-          <div className="filter-chips" role="group" aria-label="Города">
-            {visibleCities.length > 0 ? (
-              visibleCities.map((city) => {
-                const active = selectedCities.includes(city);
-
-                return (
-                  <button
-                    key={city}
-                    type="button"
-                    className="filter-chip"
-                    data-active={active}
-                    aria-pressed={active}
-                    onClick={() => toggleCity(city)}
-                  >
-                    {city}
-                  </button>
-                );
-              })
+          </div>
+          <div className="filter-chips" role="group" aria-label="Доступные города">
+            {availableCities.length > 0 ? (
+              availableCities.map((city) => (
+                <button
+                  key={city}
+                  type="button"
+                  className="filter-chip"
+                  onClick={() => toggleCity(city)}
+                >
+                  {city}
+                </button>
+              ))
             ) : (
-              <p className="filter-chips__empty">Город не найден</p>
+              <p className="filter-chips__empty">
+                {citySearch ? "Город не найден" : "Все города выбраны"}
+              </p>
             )}
           </div>
         </div>
