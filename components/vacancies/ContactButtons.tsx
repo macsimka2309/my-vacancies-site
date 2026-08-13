@@ -15,7 +15,7 @@ export function ContactButtons() {
       </a>
       <a
         className="contact-btn"
-        href={`https://max.ru/${site.max}`}
+        href={`https://web.max.ru/${site.max}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Написать в MAX"
@@ -55,20 +55,21 @@ function MaxIcon() {
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id="maxGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#3D8BFF" />
-          <stop offset="1" stopColor="#7A4DFF" />
+        <linearGradient id="maxGrad" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stopColor="#38B6F5" />
+          <stop offset="0.5" stopColor="#5D6BF0" />
+          <stop offset="1" stopColor="#9B45E8" />
         </linearGradient>
+        <mask id="maxHole">
+          <rect width="24" height="24" fill="#fff" />
+          <circle cx="12.3" cy="10.6" r="3.7" fill="#000" />
+        </mask>
       </defs>
-      <rect width="24" height="24" rx="7" fill="url(#maxGrad)" />
-      <path
-        d="M6.4 16.8V7.6l5.6 6 5.6-6v9.2"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <rect width="24" height="24" rx="6.5" fill="url(#maxGrad)" />
+      <g fill="#fff" mask="url(#maxHole)">
+        <circle cx="12.3" cy="10.6" r="7.2" />
+        <path d="M8.3 15.6c-1.7 2.3-2.1 4.2-1 4.6 1.1.4 3.2-.8 4.8-2.6z" />
+      </g>
     </svg>
   );
 }
