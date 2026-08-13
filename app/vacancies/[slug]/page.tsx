@@ -5,6 +5,7 @@ import { cache } from "react";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { ApplyButton } from "@/components/vacancies/ApplyButton";
+import { ContactButtons } from "@/components/vacancies/ContactButtons";
 import { VacancyTextBlock } from "@/components/vacancies/VacancyTextBlock";
 import { buildJobPostingJsonLd } from "@/lib/vacancy-jsonld";
 import { getVacancyBySlug, type VacancyDetails } from "@/lib/vacancies";
@@ -101,6 +102,7 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
               city: vacancy.city,
             }}
           />
+          <ContactButtons />
         </div>
       </section>
 

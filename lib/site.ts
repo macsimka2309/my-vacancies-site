@@ -9,6 +9,10 @@ type SiteConfig = {
   tagline: string;
   phone: string;
   callbackPromise: string;
+  /** Ник получателя в Telegram (без @). */
+  telegram: string;
+  /** ID получателя в мессенджере MAX. */
+  max: string;
 };
 
 export const site: SiteConfig = {
@@ -28,4 +32,8 @@ export const site: SiteConfig = {
   phone: "",
   /** Обещание обратной связи — микрокопирайт доверия у формы отклика. */
   callbackPromise: "Перезвоним в течение 15 минут",
+  /** Ник получателя в Telegram (без @). */
+  telegram: "HR_Russslan0303",
+  /** ID получателя в мессенджере MAX. */
+  max: "31009229",
 };

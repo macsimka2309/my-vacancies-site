@@ -696,6 +696,47 @@ select {
   gap: 10px;
 }
 
+.contact-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  transition:
+    border-color var(--motion),
+    box-shadow var(--motion),
+    transform var(--motion);
+}
+
+.contact-btn:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.contact-btn:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.contact-btn__icon {
+  flex: none;
+}
+
 .detail-section h2,
 .apply-preview h2 {
   margin: 0 0 14px;
@@ -802,7 +843,7 @@ select {
 }
 
 .site-brand__logo {
-  height: 35px;
+  height: 42px;
   width: auto;
   display: block;
 }

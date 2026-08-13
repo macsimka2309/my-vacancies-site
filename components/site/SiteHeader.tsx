@@ -11,8 +11,8 @@ export function SiteHeader() {
             className="site-brand__logo"
             src="/logo-mark.png"
             alt=""
-            width={28}
-            height={35}
+            width={34}
+            height={42}
           />
           <span className="site-brand__name">{site.name}</span>
         </Link>
