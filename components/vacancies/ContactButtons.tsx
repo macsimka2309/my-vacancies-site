@@ -15,7 +15,7 @@ export function ContactButtons() {
       </a>
       <a
         className="contact-btn"
-        href={`https://web.max.ru/${site.max}`}
+        href={`https://max.ru/${site.max}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Написать в MAX"
