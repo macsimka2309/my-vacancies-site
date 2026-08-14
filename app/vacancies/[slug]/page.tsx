@@ -8,6 +8,7 @@ import { ApplyButton } from "@/components/vacancies/ApplyButton";
 import { ContactButtons } from "@/components/vacancies/ContactButtons";
 import { VacancyTextBlock } from "@/components/vacancies/VacancyTextBlock";
 import { buildJobPostingJsonLd } from "@/lib/vacancy-jsonld";
+import { formatProject } from "@/lib/project";
 import { getVacancyBySlug, type VacancyDetails } from "@/lib/vacancies";
 
 export const dynamic = "force-dynamic";
@@ -71,7 +72,7 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
         </Link>
 
       <section className="detail-hero">
-        <p className="eyebrow">{vacancy.project}</p>
+        <p className="eyebrow">{formatProject(vacancy.project)}</p>
         <h1>
           {vacancy.title} — {vacancy.city}
         </h1>
@@ -131,7 +132,7 @@ function buildVacancyDescription(vacancy: VacancyDetails) {
     .map((line) => line.trim())
     .filter(Boolean)[0];
 
-  const lead = [vacancy.project, vacancy.city, vacancy.salary]
+  const lead = [formatProject(vacancy.project), vacancy.city, vacancy.salary]
     .filter(Boolean)
     .join(" · ");
 

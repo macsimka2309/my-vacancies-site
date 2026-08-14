@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatProject } from "@/lib/project";
 import type { VacancyListItem } from "@/lib/vacancies";
 import { ApplyButton } from "./ApplyButton";
 
@@ -10,7 +11,7 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
   return (
     <article className="vacancy-card">
       <div className="vacancy-card__body">
-        <p className="eyebrow">{vacancy.project}</p>
+        <p className="eyebrow">{formatProject(vacancy.project)}</p>
         <h2>
           {vacancy.title} — {vacancy.city}
         </h2>

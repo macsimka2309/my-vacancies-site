@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { getAttribution } from "@/lib/attribution";
 import { reachGoal } from "@/lib/metrika";
 import { site } from "@/lib/site";
+import { formatProject } from "@/lib/project";
 
 type ApplyVacancy = {
   id: string;
@@ -223,7 +224,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
             ) : (
               <>
                 <div className="apply-modal__header">
-                  <p className="eyebrow">{vacancy.project}</p>
+                  <p className="eyebrow">{formatProject(vacancy.project)}</p>
                   <h2 id={titleId}>Откликнуться</h2>
                   <p className="muted">
                     {vacancy.title}, {vacancy.city}
