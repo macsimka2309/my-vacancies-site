@@ -77,7 +77,9 @@ export function VacancyFiltersPanel({
 
     const query = params.toString();
 
-    router.push(query ? `/?${query}` : "/");
+    // scroll: false — иначе Next.js прокручивает страницу наверх при каждом
+    // изменении фильтра (особенно заметно в мобильной версии).
+    router.push(query ? `/?${query}` : "/", { scroll: false });
   }
 
   // Поле и слайдер меняют значение мгновенно, а навигацию откладываем,
@@ -118,7 +120,7 @@ export function VacancyFiltersPanel({
   function resetFilters() {
     clearTimeout(applyTimer.current);
     setSalaryFrom(0);
-    router.push("/");
+    router.push("/", { scroll: false });
   }
 
   function toggleValue(
