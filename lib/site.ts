@@ -11,7 +11,7 @@ type SiteConfig = {
   callbackPromise: string;
   /** Ник получателя в Telegram (без @). */
   telegram: string;
-  /** ID получателя в мессенджере MAX. */
+  /** Ссылка на профиль-получателя в мессенджере MAX (открывает приложение, если установлено). */
   max: string;
 };
 
@@ -34,6 +34,6 @@ export const site: SiteConfig = {
   callbackPromise: "Перезвоним в течение 15 минут",
   /** Ник получателя в Telegram (без @). */
   telegram: "HR_Russslan0303",
-  /** ID получателя в мессенджере MAX. */
-  max: "31009229",
+  /** Ссылка на профиль-получателя в MAX (universal link — открывает приложение, если установлено). */
+  max: "https://max.ru/u/f9LHodD0cOKBCVZGavwAZXHhEOgBXIZeWI4UJ840qz1RB5a7UCHuMYcuvNg",
 };
