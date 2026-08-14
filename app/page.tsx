@@ -59,8 +59,8 @@ function getFiltersFromSearchParams(
   params: Record<string, string | string[] | undefined>,
 ): VacancyFilters {
   return {
-    title: getSingleParam(params.title),
-    project: getSingleParam(params.project),
+    titles: getMultiParam(params.title),
+    projects: getMultiParam(params.project),
     cities: getMultiParam(params.city),
     salaryBasis: getSalaryBasisParam(params.salaryBasis),
     salaryFrom: getNumberParam(params.salaryFrom),

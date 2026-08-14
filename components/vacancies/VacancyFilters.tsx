@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import type {
@@ -37,7 +36,6 @@ export function VacancyFiltersPanel({
   const [salaryBasis, setSalaryBasis] = useState<SalaryBasis>(
     selectedFilters.salaryBasis ?? "shift",
   );
-  const [citySearch, setCitySearch] = useState("");
   const applyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
@@ -60,12 +58,12 @@ export function VacancyFiltersPanel({
   function applyFilters(next: VacancyFilters) {
     const params = new URLSearchParams();
 
-    if (next.title) {
-      params.set("title", next.title);
+    for (const title of next.titles ?? []) {
+      params.append("title", title);
     }
 
-    if (next.project) {
-      params.set("project", next.project);
+    for (const project of next.projects ?? []) {
+      params.append("project", project);
     }
 
     for (const city of next.cities ?? []) {
@@ -123,25 +121,24 @@ export function VacancyFiltersPanel({
     router.push("/");
   }
 
-  function toggleCity(city: string) {
-    const current = selectedFilters.cities ?? [];
-    const next = current.includes(city)
-      ? current.filter((value) => value !== city)
-      : [...current, city];
+  function toggleValue(
+    key: "titles" | "projects" | "cities",
+    value: string,
+  ) {
+    const current = selectedFilters[key] ?? [];
+    const next = current.includes(value)
+      ? current.filter((item) => item !== value)
+      : [...current, value];
 
-    applyFilters({ ...selectedFilters, cities: next.length ? next : undefined });
+    applyFilters({ ...selectedFilters, [key]: next.length ? next : undefined });
   }
 
+  const selectedTitles = selectedFilters.titles ?? [];
+  const selectedProjects = selectedFilters.projects ?? [];
   const selectedCities = selectedFilters.cities ?? [];
-  const cityQuery = citySearch.trim().toLowerCase();
-  const availableCities = options.cities.filter(
-    (city) =>
-      !selectedCities.includes(city) &&
-      (cityQuery ? city.toLowerCase().includes(cityQuery) : true),
-  );
   const hasActiveFilters = Boolean(
-    selectedFilters.title ||
-      selectedFilters.project ||
+    selectedTitles.length ||
+      selectedProjects.length ||
       selectedCities.length ||
       salaryFrom,
   );
@@ -164,67 +161,26 @@ export function VacancyFiltersPanel({
         <p>{formatVacancyCount(resultCount)}</p>
       </div>
       <div id={formId} className="filters-form" data-open={isOpen}>
-        <div className="filter-field">
-          <span>Город</span>
-          <div className="city-select">
-            {selectedCities.map((city) => (
-              <span className="city-token" key={city}>
-                {city}
-                <button
-                  type="button"
-                  aria-label={`Убрать город ${city}`}
-                  onClick={() => toggleCity(city)}
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-            <input
-              className="city-select__input"
-              type="search"
-              inputMode="search"
-              placeholder={selectedCities.length ? "Ещё город…" : "Поиск города…"}
-              value={citySearch}
-              onChange={(event) => setCitySearch(event.target.value)}
-              aria-label="Поиск города"
-            />
-          </div>
-          <div className="filter-chips" role="group" aria-label="Доступные города">
-            {availableCities.length > 0 ? (
-              availableCities.map((city) => (
-                <button
-                  key={city}
-                  type="button"
-                  className="filter-chip"
-                  onClick={() => toggleCity(city)}
-                >
-                  {city}
-                </button>
-              ))
-            ) : (
-              <p className="filter-chips__empty">
-                {citySearch ? "Город не найден" : "Все города выбраны"}
-              </p>
-            )}
-          </div>
-        </div>
-        <FilterSelect
-          label="Вакансия"
-          placeholder="Все вакансии"
-          options={options.titles}
-          value={selectedFilters.title ?? ""}
-          onChange={(value) =>
-            applyFilters({ ...selectedFilters, title: value || undefined })
-          }
+        <MultiSelectField
+          label="Город"
+          noun="город"
+          options={options.cities}
+          selected={selectedCities}
+          onToggle={(value) => toggleValue("cities", value)}
         />
-        <FilterSelect
+        <MultiSelectField
+          label="Вакансия"
+          noun="вакансию"
+          options={options.titles}
+          selected={selectedTitles}
+          onToggle={(value) => toggleValue("titles", value)}
+        />
+        <MultiSelectField
           label="Проект"
-          placeholder="Все проекты"
+          noun="проект"
           options={options.projects}
-          value={selectedFilters.project ?? ""}
-          onChange={(value) =>
-            applyFilters({ ...selectedFilters, project: value || undefined })
-          }
+          selected={selectedProjects}
+          onToggle={(value) => toggleValue("projects", value)}
         />
         {options.salaryMax.shift > 0 || options.salaryMax.vahta > 0 ? (
           <div className="filter-field salary-filter">
@@ -314,32 +270,80 @@ function formatVacancyCount(count: number) {
   return `Найдено ${count} ${word}`;
 }
 
-type FilterSelectProps = {
+type MultiSelectFieldProps = {
   label: string;
-  placeholder: string;
+  /** Существительное в винительном падеже для плейсхолдеров («город», «вакансию»). */
+  noun: string;
   options: string[];
-  value: string;
-  onChange: (value: string) => void;
+  selected: string[];
+  onToggle: (value: string) => void;
 };
 
-function FilterSelect({
+// Токен-поле с множественным выбором: выбранные значения — чипами в строке
+// поиска, доступные — прокручиваемым списком чипов под ней.
+function MultiSelectField({
   label,
-  placeholder,
+  noun,
   options,
-  value,
-  onChange,
-}: FilterSelectProps) {
+  selected,
+  onToggle,
+}: MultiSelectFieldProps) {
+  const [search, setSearch] = useState("");
+  const query = search.trim().toLowerCase();
+  const available = options.filter(
+    (option) =>
+      !selected.includes(option) &&
+      (query ? option.toLowerCase().includes(query) : true),
+  );
+
   return (
-    <label className="filter-field">
+    <div className="filter-field">
       <span>{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)}>
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
+      <div className="city-select">
+        {selected.map((value) => (
+          <span className="city-token" key={value}>
+            {value}
+            <button
+              type="button"
+              aria-label={`Убрать: ${value}`}
+              onClick={() => onToggle(value)}
+            >
+              ×
+            </button>
+          </span>
         ))}
-      </select>
-    </label>
+        <input
+          className="city-select__input"
+          type="search"
+          inputMode="search"
+          placeholder={selected.length ? "Ещё…" : `Поиск: ${noun}…`}
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          aria-label={`Поиск: ${label}`}
+        />
+      </div>
+      <div
+        className="filter-chips"
+        role="group"
+        aria-label={`Доступные значения: ${label}`}
+      >
+        {available.length > 0 ? (
+          available.map((value) => (
+            <button
+              key={value}
+              type="button"
+              className="filter-chip"
+              onClick={() => onToggle(value)}
+            >
+              {value}
+            </button>
+          ))
+        ) : (
+          <p className="filter-chips__empty">
+            {search ? "Ничего не найдено" : "Все значения выбраны"}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }

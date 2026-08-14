@@ -3,8 +3,8 @@ import { db } from "./db";
 export type SalaryBasis = "shift" | "vahta";
 
 export type VacancyFilters = {
-  title?: string;
-  project?: string;
+  titles?: string[];
+  projects?: string[];
   cities?: string[];
   salaryBasis?: SalaryBasis;
   salaryFrom?: number;
@@ -22,8 +22,8 @@ export async function getActiveVacancies(filters: VacancyFilters = {}) {
   const vacancies = await db.vacancy.findMany({
     where: {
       isActive: true,
-      ...(filters.title ? { title: filters.title } : {}),
-      ...(filters.project ? { project: filters.project } : {}),
+      ...(filters.titles?.length ? { title: { in: filters.titles } } : {}),
+      ...(filters.projects?.length ? { project: { in: filters.projects } } : {}),
       ...(filters.cities?.length ? { city: { in: filters.cities } } : {}),
     },
     orderBy: [
