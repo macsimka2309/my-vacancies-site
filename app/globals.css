@@ -688,6 +688,65 @@ select {
   line-height: 1.4;
 }
 
+/* Способ связи — сегментированный выбор (радиокнопки). */
+.apply-contact {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.apply-contact legend {
+  padding: 0;
+  margin-bottom: 8px;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.apply-contact__options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #eef4f1;
+}
+
+.apply-contact__option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--motion),
+    color var(--motion);
+}
+
+.apply-contact__option[data-active="true"] {
+  background: #ffffff;
+  color: var(--accent-strong);
+  box-shadow: 0 1px 3px rgba(20, 58, 94, 0.1);
+}
+
+.apply-contact__option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.apply-contact__option:focus-within {
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
 .form-message {
   margin: 0;
   border-radius: 14px;

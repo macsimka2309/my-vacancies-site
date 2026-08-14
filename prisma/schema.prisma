@@ -61,6 +61,8 @@ model Application {
   normalizedPhone      String     @map("normalized_phone")
   city                 String?
   age                  Int?
+  preferredContact     String?    @map("preferred_contact")
+  telegramUsername     String?    @map("telegram_username")
   candidateComment     String?    @map("candidate_comment") @db.Text
   trafficSource        String?    @map("traffic_source")
   utmSource            String?    @map("utm_source")

@@ -18,6 +18,14 @@ type ApplyButtonProps = {
   vacancy: ApplyVacancy;
 };
 
+type PreferredContact = "phone" | "telegram" | "max";
+
+const CONTACT_OPTIONS: Array<{ value: PreferredContact; label: string }> = [
+  { value: "phone", label: "Телефон" },
+  { value: "telegram", label: "Telegram" },
+  { value: "max", label: "MAX" },
+];
+
 type SubmitState =
   | {
       type: "idle";
@@ -38,6 +46,9 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [preferredContact, setPreferredContact] =
+    useState<PreferredContact>("phone");
+  const [telegramUsername, setTelegramUsername] = useState("");
   const [consent, setConsent] = useState(false);
   // Honeypot — скрытое поле-ловушка для ботов.
   const [company, setCompany] = useState("");
@@ -148,6 +159,9 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
       body: JSON.stringify({
         name,
         phone,
+        preferredContact,
+        telegramUsername:
+          preferredContact === "telegram" ? telegramUsername : "",
         vacancyId: vacancy.id,
         consent,
         company,
@@ -171,6 +185,8 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
     reachGoal("application_submit");
     setName("");
     setPhone("");
+    setPreferredContact("phone");
+    setTelegramUsername("");
     setConsent(false);
     setSubmitState({
       type: "success",
@@ -273,6 +289,41 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                       }
                     />
                   </label>
+                  <fieldset className="apply-field apply-contact">
+                    <legend>Как удобнее связаться</legend>
+                    <div className="apply-contact__options">
+                      {CONTACT_OPTIONS.map((option) => (
+                        <label
+                          key={option.value}
+                          className="apply-contact__option"
+                          data-active={preferredContact === option.value}
+                        >
+                          <input
+                            type="radio"
+                            name="preferredContact"
+                            value={option.value}
+                            checked={preferredContact === option.value}
+                            onChange={() => setPreferredContact(option.value)}
+                          />
+                          <span>{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                  {preferredContact === "telegram" ? (
+                    <label className="apply-field">
+                      <span>Ник в Telegram</span>
+                      <input
+                        name="telegramUsername"
+                        placeholder="@username"
+                        required
+                        value={telegramUsername}
+                        onChange={(event) =>
+                          setTelegramUsername(event.target.value)
+                        }
+                      />
+                    </label>
+                  ) : null}
                   <p className="apply-trust">
                     <span className="apply-trust__dot" aria-hidden="true" />
                     {site.callbackPromise}

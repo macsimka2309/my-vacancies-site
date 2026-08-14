@@ -4,6 +4,17 @@ type ApplicationTelegramPayload = {
   project: string;
   city: string;
   vacancyTitle: string;
+  preferredContact?: "phone" | "telegram" | "max";
+  telegramUsername?: string;
+};
+
+const CONTACT_LABEL: Record<
+  NonNullable<ApplicationTelegramPayload["preferredContact"]>,
+  string
+> = {
+  phone: "Телефон",
+  telegram: "Telegram",
+  max: "MAX",
 };
 
 export async function sendApplicationTelegramNotification(
@@ -36,14 +47,29 @@ export async function sendApplicationTelegramNotification(
 }
 
 function formatApplicationTelegramMessage(payload: ApplicationTelegramPayload) {
-  return [
+  const lines = [
     "🟢 <b>Новый отклик</b>",
     `👤 Имя: ${escapeTelegramHtml(payload.name)}`,
     `📞 Телефон: ${escapeTelegramHtml(payload.phone)}`,
+  ];
+
+  if (payload.preferredContact) {
+    lines.push(
+      `💬 Способ связи: ${CONTACT_LABEL[payload.preferredContact]}`,
+    );
+  }
+
+  if (payload.preferredContact === "telegram" && payload.telegramUsername) {
+    lines.push(`✈️ Telegram: @${escapeTelegramHtml(payload.telegramUsername)}`);
+  }
+
+  lines.push(
     `🏢 Проект: ${escapeTelegramHtml(payload.project)}`,
     `📍 Город: ${escapeTelegramHtml(payload.city)}`,
     `💼 Вакансия: ${escapeTelegramHtml(payload.vacancyTitle)}`,
-  ].join("\n");
+  );
+
+  return lines.join("\n");
 }
 
 function escapeTelegramHtml(value: string) {

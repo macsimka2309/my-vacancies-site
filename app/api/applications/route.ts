@@ -12,6 +12,8 @@ const RATE_WINDOW_MS = 10 * 60 * 1000;
 const applicationSchema = z.object({
   name: z.string().trim().min(2).max(80),
   phone: z.string().trim().min(1).max(40),
+  preferredContact: z.enum(["phone", "telegram", "max"]).default("phone"),
+  telegramUsername: z.string().trim().max(80).optional(),
   vacancyId: z.string().trim().min(1),
   consent: z.literal(true),
   // Honeypot: настоящие люди это поле не видят и не заполняют.
@@ -87,6 +89,20 @@ export async function POST(request: Request) {
     );
   }
 
+  const { preferredContact } = parsedBody.data;
+  // Ник Telegram: убираем ведущий @ и лишние пробелы; нужен только для Telegram.
+  const telegramUsername =
+    preferredContact === "telegram"
+      ? parsedBody.data.telegramUsername?.trim().replace(/^@+/, "")
+      : undefined;
+
+  if (preferredContact === "telegram" && !telegramUsername) {
+    return NextResponse.json(
+      { error: "Укажите ник в Telegram." },
+      { status: 400 },
+    );
+  }
+
   const vacancy = await db.vacancy.findFirst({
     where: {
       id: parsedBody.data.vacancyId,
@@ -120,6 +136,8 @@ export async function POST(request: Request) {
       phone: parsedBody.data.phone,
       normalizedPhone,
       city: vacancy.city,
+      preferredContact,
+      telegramUsername,
       personalDataConsentAt: new Date(),
       trafficSource: resolveTrafficSource(parsedBody.data),
       utmSource: parsedBody.data.utmSource,
@@ -140,6 +158,8 @@ export async function POST(request: Request) {
       project: vacancy.project,
       city: vacancy.city,
       vacancyTitle: vacancy.title,
+      preferredContact,
+      telegramUsername,
     });
 
     await db.application.update({
