@@ -881,9 +881,6 @@ select {
   gap: 6px;
 }
 
-.contact-buttons[data-variant="compact"] .contact-btn:last-child {
-  padding: 0 8px;
-}
 
 /* Выбор города — первый экран для посетителя без города в ссылке. */
 .city-gate {

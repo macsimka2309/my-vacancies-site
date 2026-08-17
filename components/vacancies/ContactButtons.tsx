@@ -6,8 +6,6 @@ type ContactButtonsProps = {
 };
 
 export function ContactButtons({ variant = "default" }: ContactButtonsProps) {
-  const isCompact = variant === "compact";
-
   return (
     <div className="contact-buttons" data-variant={variant}>
       <a
@@ -19,7 +17,7 @@ export function ContactButtons({ variant = "default" }: ContactButtonsProps) {
         title="Написать в Telegram"
       >
         <TelegramIcon />
-        <span>{isCompact ? "Написать" : "Telegram"}</span>
+        <span>Telegram</span>
       </a>
       <a
         className="contact-btn"
@@ -30,7 +28,7 @@ export function ContactButtons({ variant = "default" }: ContactButtonsProps) {
         title="Написать в MAX"
       >
         <MaxIcon />
-        {isCompact ? null : <span>MAX</span>}
+        <span>MAX</span>
       </a>
     </div>
   );

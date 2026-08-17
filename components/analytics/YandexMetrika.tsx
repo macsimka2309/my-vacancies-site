@@ -3,8 +3,9 @@
 import Script from "next/script";
 
 // Подключение Яндекс.Метрики. Рендерится только если задан METRIKA_ID
-// (см. app/layout.tsx). Webvisor выключен, чтобы не записывать содержимое
-// формы отклика (имя/телефон — персональные данные).
+// (см. app/layout.tsx). Webvisor включён для анализа поведения, но поля формы
+// отклика помечены классом ym-disable-keys — имя, телефон и ник в записи
+// сессий не попадают (персональные данные).
 export function YandexMetrika({ counterId }: { counterId: number }) {
   return (
     <>
@@ -16,7 +17,7 @@ export function YandexMetrika({ counterId }: { counterId: number }) {
           k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
           (window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
           window.__ymCounterId=${counterId};
-          ym(${counterId},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:false});
+          ym(${counterId},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
         `}
       </Script>
       <noscript>

@@ -267,6 +267,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                     <span>Имя</span>
                     <input
                       ref={nameInputRef}
+                      className="ym-disable-keys"
                       autoComplete="name"
                       minLength={2}
                       name="name"
@@ -278,6 +279,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                   <label className="apply-field">
                     <span>Телефон</span>
                     <input
+                      className="ym-disable-keys"
                       autoComplete="tel"
                       inputMode="tel"
                       name="phone"
@@ -314,6 +316,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                     <label className="apply-field">
                       <span>Ник в Telegram</span>
                       <input
+                        className="ym-disable-keys"
                         name="telegramUsername"
                         placeholder="@username"
                         required
