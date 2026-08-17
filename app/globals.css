@@ -142,6 +142,11 @@ select {
 .filters-panel {
   position: sticky;
   top: 20px;
+  /* Не даём «липкой» панели выходить за экран: она прокручивается сама,
+     независимо от списка вакансий (иначе низ панели недостижим). */
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid rgba(33, 160, 56, 0.14);
   border-radius: var(--radius-panel);
   background: rgba(255, 255, 255, 0.96);
@@ -1873,6 +1878,10 @@ select {
 
   .filters-panel {
     position: static;
+    /* На мобиле панель статична, страница прокручивается сама — снимаем
+       ограничение высоты и внутренний скролл. */
+    max-height: none;
+    overflow: visible;
   }
 
   .filters-heading {
