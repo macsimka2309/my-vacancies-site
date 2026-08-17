@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatProject } from "@/lib/project";
 import type { VacancyListItem } from "@/lib/vacancies";
 import { ApplyButton } from "./ApplyButton";
+import { ContactButtons } from "./ContactButtons";
 
 type VacancyCardProps = {
   vacancy: VacancyListItem;
@@ -40,6 +41,7 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
             city: vacancy.city,
           }}
         />
+        <ContactButtons variant="compact" />
         <Link className="secondary-link" href={`/vacancies/${vacancy.slug}`}>
           Подробнее
         </Link>

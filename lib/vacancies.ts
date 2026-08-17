@@ -14,6 +14,8 @@ export type VacancyFilterOptions = {
   titles: string[];
   projects: string[];
   cities: string[];
+  // Города с числом вакансий, по убыванию — для выбора города на главной.
+  cityCounts: Array<{ city: string; count: number }>;
   // Верхняя граница «зарплата от» отдельно по каждому типу.
   salaryMax: Record<SalaryBasis, number>;
 };
@@ -80,8 +82,29 @@ export async function getVacancyFilterOptions(): Promise<VacancyFilterOptions> {
     titles: uniqueSorted(vacancies.map((vacancy) => vacancy.title)),
     projects: uniqueSorted(vacancies.map((vacancy) => vacancy.project)),
     cities: uniqueSorted(vacancies.map((vacancy) => vacancy.city)),
+    cityCounts: countByCity(vacancies.map((vacancy) => vacancy.city)),
     salaryMax: getSalaryMax(vacancies.map((vacancy) => vacancy.salary)),
   };
+}
+
+// Города по числу вакансий (убывание), при равенстве — по алфавиту.
+function countByCity(values: Array<string | null | undefined>) {
+  const counts = new Map<string, number>();
+
+  for (const value of values) {
+    const city = value?.trim();
+
+    if (city) {
+      counts.set(city, (counts.get(city) ?? 0) + 1);
+    }
+  }
+
+  return [...counts.entries()]
+    .map(([city, count]) => ({ city, count }))
+    .sort(
+      (left, right) =>
+        right.count - left.count || left.city.localeCompare(right.city, "ru"),
+    );
 }
 
 const SALARY_ROUND: Record<SalaryBasis, number> = { shift: 500, vahta: 5000 };

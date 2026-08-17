@@ -1,17 +1,25 @@
 import { site } from "@/lib/site";
 
-export function ContactButtons() {
+type ContactButtonsProps = {
+  /** compact — только значки, для карточек в списке. */
+  variant?: "default" | "compact";
+};
+
+export function ContactButtons({ variant = "default" }: ContactButtonsProps) {
+  const isCompact = variant === "compact";
+
   return (
-    <div className="contact-buttons">
+    <div className="contact-buttons" data-variant={variant}>
       <a
         className="contact-btn"
         href={`https://t.me/${site.telegram}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Написать в Telegram"
+        title="Написать в Telegram"
       >
         <TelegramIcon />
-        <span>Telegram</span>
+        <span>{isCompact ? "Написать" : "Telegram"}</span>
       </a>
       <a
         className="contact-btn"
@@ -19,9 +27,10 @@ export function ContactButtons() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Написать в MAX"
+        title="Написать в MAX"
       >
         <MaxIcon />
-        <span>MAX</span>
+        {isCompact ? null : <span>MAX</span>}
       </a>
     </div>
   );

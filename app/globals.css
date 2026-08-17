@@ -869,6 +869,116 @@ select {
   flex: none;
 }
 
+/* Компактный вариант для карточек в списке: не перегружает 100+ карточек. */
+.contact-buttons[data-variant="compact"] {
+  gap: 8px;
+}
+
+.contact-buttons[data-variant="compact"] .contact-btn {
+  min-height: 40px;
+  padding: 0 12px 0 8px;
+  font-size: 14px;
+  gap: 6px;
+}
+
+.contact-buttons[data-variant="compact"] .contact-btn:last-child {
+  padding: 0 8px;
+}
+
+/* Выбор города — первый экран для посетителя без города в ссылке. */
+.city-gate {
+  margin-bottom: 22px;
+  padding: 22px;
+  border: 1px solid rgba(33, 160, 56, 0.14);
+  border-radius: var(--radius-panel);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--shadow-card);
+}
+
+.city-gate h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.city-gate p.muted {
+  margin: 0 0 14px;
+}
+
+.city-gate__search {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--foreground);
+  font-size: 16px;
+}
+
+.city-gate__search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  outline: 0;
+}
+
+.city-gate__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.city-gate__city {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--motion),
+    box-shadow var(--motion),
+    transform var(--motion);
+}
+
+.city-gate__city:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.city-gate__city:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.city-gate__count {
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.city-gate__empty {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .detail-section h2,
 .apply-preview h2 {
   margin: 0 0 14px;

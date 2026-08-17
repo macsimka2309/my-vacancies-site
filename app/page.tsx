@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { CityGate } from "@/components/vacancies/CityGate";
 import { VacancyFiltersPanel } from "@/components/vacancies/VacancyFilters";
 import { VacancyList } from "@/components/vacancies/VacancyList";
 import { site } from "@/lib/site";
@@ -27,6 +28,7 @@ async function VacancyHome({ filters }: { filters: VacancyFilters }) {
     getActiveVacancies(filters),
     getVacancyFilterOptions(),
   ]);
+  const selectedCities = filters.cities ?? [];
 
   return (
     <>
@@ -34,11 +36,20 @@ async function VacancyHome({ filters }: { filters: VacancyFilters }) {
       <main className="page-shell">
         <section className="page-header">
           <p className="eyebrow">{site.tagline}</p>
-          <h1>Вакансии</h1>
+          <h1>
+            {selectedCities.length
+              ? `Вакансии — ${selectedCities.join(", ")}`
+              : "Вакансии"}
+          </h1>
           <p className="muted">
-            Выберите подходящую позицию и посмотрите подробные условия.
+            {selectedCities.length
+              ? "Выберите подходящую позицию и посмотрите подробные условия."
+              : "Работа рядом с домом: доставка, сборка заказов, вахта."}
           </p>
         </section>
+        {selectedCities.length ? null : (
+          <CityGate cityCounts={filterOptions.cityCounts} />
+        )}
         <section className="vacancy-layout">
           <VacancyFiltersPanel
             options={filterOptions}
