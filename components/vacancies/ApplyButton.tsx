@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { getAttribution } from "@/lib/attribution";
 import { reachGoal } from "@/lib/metrika";
-import { site } from "@/lib/site";
+import { getCallbackPromise } from "@/lib/callback";
 import { formatProject } from "@/lib/project";
 
 type ApplyVacancy = {
@@ -58,6 +58,8 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
   });
   const dialogRef = useRef<HTMLElement>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
+  // Модалка рендерится только на клиенте, поэтому расхождения с SSR нет.
+  const callbackPromise = getCallbackPromise();
 
   // Пока модалка открыта — блокируем прокрутку фона.
   useEffect(() => {
@@ -227,7 +229,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                 </span>
                 <h2 id={titleId}>Спасибо, отклик отправлен!</h2>
                 <p className="muted">
-                  {site.callbackPromise}. Держите телефон под рукой.
+                  {callbackPromise}. Держите телефон под рукой.
                 </p>
                 <button
                   className="button-link"
@@ -265,7 +267,10 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                   />
                   <label className="apply-field">
                     <span>
-                      Телефон <em className="apply-field__req">— обязательно</em>
+                      Телефон
+                      <span className="apply-field__req" aria-hidden="true">
+                        *
+                      </span>
                     </span>
                     <input
                       ref={phoneInputRef}
@@ -282,9 +287,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                     />
                   </label>
                   <label className="apply-field">
-                    <span>
-                      Имя <em className="apply-field__opt">— если хотите</em>
-                    </span>
+                    <span>Имя</span>
                     <input
                       className="ym-disable-keys"
                       autoComplete="name"
@@ -316,7 +319,12 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                   </fieldset>
                   {preferredContact === "telegram" ? (
                     <label className="apply-field">
-                      <span>Ник в Telegram</span>
+                      <span>
+                        Ник в Telegram
+                        <span className="apply-field__req" aria-hidden="true">
+                          *
+                        </span>
+                      </span>
                       <input
                         className="ym-disable-keys"
                         name="telegramUsername"
@@ -331,8 +339,9 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                   ) : null}
                   <p className="apply-trust">
                     <span className="apply-trust__dot" aria-hidden="true" />
-                    {site.callbackPromise}
+                    {callbackPromise}
                   </p>
+                  <p className="apply-required-note">* — обязательное поле</p>
                   <label className="apply-consent">
                     <input
                       type="checkbox"
