@@ -23,11 +23,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return <VacancyHome filters={filters} />;
 }
 
-async function VacancyHome({ filters }: { filters: VacancyFilters }) {
-  const [vacancies, filterOptions] = await Promise.all([
-    getActiveVacancies(filters),
-    getVacancyFilterOptions(),
-  ]);
+async function VacancyHome({ filters: rawFilters }: { filters: VacancyFilters }) {
+  const filterOptions = await getVacancyFilterOptions();
+  // Город приходит из рекламы ({region_name} в Директе) и может не совпасть
+  // со справочником — тогда игнорируем его и показываем выбор города.
+  const filters = withKnownCities(rawFilters, filterOptions.cities);
+  const vacancies = await getActiveVacancies(filters);
   const selectedCities = filters.cities ?? [];
 
   return (
@@ -64,6 +65,34 @@ async function VacancyHome({ filters }: { filters: VacancyFilters }) {
       <SiteFooter />
     </>
   );
+}
+
+// Сопоставляет города из ссылки со справочником: без учёта регистра и ё/е.
+// Неизвестные значения отбрасываем — иначе посетитель из рекламы увидел бы
+// пустую страницу вместо списка вакансий.
+function withKnownCities(
+  filters: VacancyFilters,
+  knownCities: string[],
+): VacancyFilters {
+  if (!filters.cities?.length) {
+    return filters;
+  }
+
+  const canonicalByKey = new Map(
+    knownCities.map((city) => [normalizeCityKey(city), city]),
+  );
+  const matched = filters.cities
+    .map((city) => canonicalByKey.get(normalizeCityKey(city)))
+    .filter((city): city is string => Boolean(city));
+
+  return {
+    ...filters,
+    cities: matched.length ? [...new Set(matched)] : undefined,
+  };
+}
+
+function normalizeCityKey(city: string) {
+  return city.trim().toLowerCase().replace(/ё/g, "е").replace(/\s+/g, " ");
 }
 
 function getFiltersFromSearchParams(
