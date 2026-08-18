@@ -693,6 +693,22 @@ select {
   line-height: 1.4;
 }
 
+/* Пометки «обязательно» / «если хотите» у подписей полей. */
+.apply-field__req,
+.apply-field__opt {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.apply-field__req {
+  color: var(--accent-strong);
+}
+
+.apply-field__opt {
+  color: var(--muted);
+}
+
 /* Способ связи — сегментированный выбор (радиокнопки). */
 .apply-contact {
   border: 0;
@@ -881,6 +897,39 @@ select {
   gap: 6px;
 }
 
+
+/* Короткие аргументы рядом с кнопкой отклика. */
+.trust-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trust-points li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.trust-points li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+/* Липкая панель отклика: только на мобиле, где кнопка уезжает при прокрутке. */
+.sticky-cta {
+  display: none;
+}
 
 /* Выбор города — первый экран для посетителя без города в ссылке. */
 .city-gate {
@@ -2007,6 +2056,31 @@ select {
 
   .filters-form[data-open="true"] {
     display: grid;
+  }
+
+  .sticky-cta {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 -4px 16px rgba(20, 58, 94, 0.08);
+  }
+
+  .sticky-cta .apply-button {
+    flex: 1;
+  }
+
+  /* Чтобы липкая панель не перекрывала конец страницы. */
+  .detail-layout {
+    padding-bottom: 84px;
   }
 
   .vacancy-card,

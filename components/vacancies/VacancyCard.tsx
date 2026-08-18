@@ -41,7 +41,10 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
             city: vacancy.city,
           }}
         />
-        <ContactButtons variant="compact" />
+        <ContactButtons
+          variant="compact"
+          vacancy={{ title: vacancy.title, city: vacancy.city }}
+        />
         <Link className="secondary-link" href={`/vacancies/${vacancy.slug}`}>
           Подробнее
         </Link>

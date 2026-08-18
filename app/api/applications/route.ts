@@ -10,7 +10,8 @@ const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 
 const applicationSchema = z.object({
-  name: z.string().trim().min(2).max(80),
+  // Имя необязательно: телефона достаточно, чтобы перезвонить.
+  name: z.string().trim().max(80).optional(),
   phone: z.string().trim().min(1).max(40),
   preferredContact: z.enum(["phone", "telegram", "max"]).default("phone"),
   telegramUsername: z.string().trim().max(80).optional(),
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
       {
         error: consentFailed
           ? "Подтвердите согласие на обработку персональных данных."
-          : "Проверьте имя и телефон.",
+          : "Проверьте номер телефона.",
       },
       { status: 400 },
     );
@@ -90,6 +91,8 @@ export async function POST(request: Request) {
   }
 
   const { preferredContact } = parsedBody.data;
+  // Имя необязательно — в базу и в бот кладём явную заглушку.
+  const candidateName = parsedBody.data.name || "Без имени";
   // Ник Telegram: убираем ведущий @ и лишние пробелы; нужен только для Telegram.
   const telegramUsername =
     preferredContact === "telegram"
@@ -132,7 +135,7 @@ export async function POST(request: Request) {
       },
       vacancyTitleSnapshot: vacancy.title,
       projectSnapshot: vacancy.project,
-      candidateName: parsedBody.data.name,
+      candidateName,
       phone: parsedBody.data.phone,
       normalizedPhone,
       city: vacancy.city,
@@ -153,7 +156,7 @@ export async function POST(request: Request) {
 
   try {
     await sendApplicationTelegramNotification({
-      name: parsedBody.data.name,
+      name: candidateName,
       phone: normalizedPhone,
       project: vacancy.project,
       city: vacancy.city,

@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "mcp__claude-in-chrome__browser_batch"
+      "mcp__claude-in-chrome__browser_batch",
+      "mcp__claude-in-chrome__computer"
     ]
   }
 }

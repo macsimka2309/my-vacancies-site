@@ -57,7 +57,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
     message: "",
   });
   const dialogRef = useRef<HTMLElement>(null);
-  const nameInputRef = useRef<HTMLInputElement>(null);
+  const phoneInputRef = useRef<HTMLInputElement>(null);
 
   // Пока модалка открыта — блокируем прокрутку фона.
   useEffect(() => {
@@ -81,7 +81,7 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
     }
 
     const previouslyFocused = document.activeElement as HTMLElement | null;
-    (nameInputRef.current ?? dialogRef.current)?.focus();
+    (phoneInputRef.current ?? dialogRef.current)?.focus();
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -264,21 +264,11 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                     }}
                   />
                   <label className="apply-field">
-                    <span>Имя</span>
+                    <span>
+                      Телефон <em className="apply-field__req">— обязательно</em>
+                    </span>
                     <input
-                      ref={nameInputRef}
-                      className="ym-disable-keys"
-                      autoComplete="name"
-                      minLength={2}
-                      name="name"
-                      required
-                      value={name}
-                      onChange={(event) => setName(event.target.value)}
-                    />
-                  </label>
-                  <label className="apply-field">
-                    <span>Телефон</span>
-                    <input
+                      ref={phoneInputRef}
                       className="ym-disable-keys"
                       autoComplete="tel"
                       inputMode="tel"
@@ -289,6 +279,18 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                       onChange={(event) =>
                         setPhone(formatPhone(event.target.value))
                       }
+                    />
+                  </label>
+                  <label className="apply-field">
+                    <span>
+                      Имя <em className="apply-field__opt">— если хотите</em>
+                    </span>
+                    <input
+                      className="ym-disable-keys"
+                      autoComplete="name"
+                      name="name"
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
                     />
                   </label>
                   <fieldset className="apply-field apply-contact">
@@ -339,14 +341,15 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                       required
                       onChange={(event) => setConsent(event.target.checked)}
                     />
+                    {/* Галочка остаётся обязательной: согласие на обработку и на
+                        передачу через Telegram (зарубежный сервис) по 152-ФЗ
+                        должно быть явным. Текст сокращён, детали — в политике. */}
                     <span>
-                      Я даю согласие на обработку моих персональных данных (имени и
-                      номера телефона) и соглашаюсь, что мой отклик поступит
-                      работодателю через зарубежный сервис Telegram. С{" "}
+                      Согласен(на) на обработку персональных данных и передачу
+                      отклика нам через Telegram — зарубежный сервис.{" "}
                       <a href="/privacy" target="_blank" rel="noopener noreferrer">
-                        политикой конфиденциальности
-                      </a>{" "}
-                      ознакомлен(а)
+                        Подробнее
+                      </a>
                     </span>
                   </label>
                   {submitState.message ? (

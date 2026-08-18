@@ -1,16 +1,29 @@
 import { site } from "@/lib/site";
 
 type ContactButtonsProps = {
-  /** compact — только значки, для карточек в списке. */
+  /** compact — уменьшенный размер, для карточек в списке. */
   variant?: "default" | "compact";
+  /** Вакансия, чтобы подставить её в первое сообщение. */
+  vacancy?: { title: string; city: string };
 };
 
-export function ContactButtons({ variant = "default" }: ContactButtonsProps) {
+export function ContactButtons({
+  variant = "default",
+  vacancy,
+}: ContactButtonsProps) {
+  // Telegram подставляет текст в поле ввода через ?text= (поддерживается
+  // не всеми клиентами; если нет — просто откроется пустой чат).
+  const telegramHref = vacancy
+    ? `https://t.me/${site.telegram}?text=${encodeURIComponent(
+        `Здравствуйте! Хочу откликнуться на вакансию: ${vacancy.title} — ${vacancy.city}`,
+      )}`
+    : `https://t.me/${site.telegram}`;
+
   return (
     <div className="contact-buttons" data-variant={variant}>
       <a
         className="contact-btn"
-        href={`https://t.me/${site.telegram}`}
+        href={telegramHref}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Написать в Telegram"

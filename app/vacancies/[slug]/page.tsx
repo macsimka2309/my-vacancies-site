@@ -103,14 +103,36 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
               city: vacancy.city,
             }}
           />
-          <ContactButtons />
+          <ContactButtons
+            vacancy={{ title: vacancy.title, city: vacancy.city }}
+          />
         </div>
+        <ul className="trust-points">
+          <li>{formatProject(vacancy.project)}</li>
+          <li>Еженедельные выплаты</li>
+          <li>Без опыта — обучим</li>
+        </ul>
       </section>
 
       <VacancyTextBlock title="Обязанности" text={vacancy.responsibilities} />
       <VacancyTextBlock title="Требования" text={vacancy.requirements} />
       <VacancyTextBlock title="Условия" text={vacancy.conditions} />
       </main>
+      {/* Липкая панель отклика — только на мобиле (см. globals.css). */}
+      <div className="sticky-cta">
+        <ApplyButton
+          vacancy={{
+            id: vacancy.id,
+            title: vacancy.title,
+            project: vacancy.project,
+            city: vacancy.city,
+          }}
+        />
+        <ContactButtons
+          variant="compact"
+          vacancy={{ title: vacancy.title, city: vacancy.city }}
+        />
+      </div>
       <SiteFooter />
     </>
   );
