@@ -6,6 +6,8 @@ type ApplicationTelegramPayload = {
   vacancyTitle: string;
   preferredContact?: "phone" | "telegram" | "max";
   telegramUsername?: string;
+  /** Сработала антиспам-ловушка — отклик всё равно доставляем, но помечаем. */
+  suspectedSpam?: boolean;
 };
 
 const CONTACT_LABEL: Record<
@@ -48,7 +50,9 @@ export async function sendApplicationTelegramNotification(
 
 function formatApplicationTelegramMessage(payload: ApplicationTelegramPayload) {
   const lines = [
-    "🟢 <b>Новый отклик</b>",
+    payload.suspectedSpam
+      ? "🟡 <b>Новый отклик</b> — сработала антиспам-ловушка, проверьте вручную"
+      : "🟢 <b>Новый отклик</b>",
     `👤 Имя: ${escapeTelegramHtml(payload.name)}`,
     `📞 Телефон: ${escapeTelegramHtml(payload.phone)}`,
   ];

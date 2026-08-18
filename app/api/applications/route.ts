@@ -61,9 +61,13 @@ export async function POST(request: Request) {
   const body = await readJsonBody(request);
   const parsedBody = applicationSchema.safeParse(body);
 
-  // Honeypot сработал — тихо «принимаем», ничего не сохраняя и не отправляя.
-  if (parsedBody.success && parsedBody.data.company) {
-    return NextResponse.json({ ok: true });
+  // Honeypot: раньше такой отклик молча выбрасывался. Автозаполнение браузера
+  // подставляло значение живым людям, и отклик терялся навсегда. Теперь
+  // сохраняем и помечаем — пусть рекрутёр решит сам, спам это или нет.
+  const looksLikeBot = Boolean(parsedBody.success && parsedBody.data.company);
+
+  if (looksLikeBot) {
+    console.warn("Honeypot triggered — сохраняем отклик с пометкой.");
   }
 
   if (!parsedBody.success) {
@@ -136,6 +140,9 @@ export async function POST(request: Request) {
       vacancyTitleSnapshot: vacancy.title,
       projectSnapshot: vacancy.project,
       candidateName,
+      candidateComment: looksLikeBot
+        ? "⚠️ Сработала антиспам-ловушка. Возможно, автозаполнение браузера — проверьте вручную."
+        : undefined,
       phone: parsedBody.data.phone,
       normalizedPhone,
       city: vacancy.city,
@@ -163,6 +170,7 @@ export async function POST(request: Request) {
       vacancyTitle: vacancy.title,
       preferredContact,
       telegramUsername,
+      suspectedSpam: looksLikeBot,
     });
 
     await db.application.update({

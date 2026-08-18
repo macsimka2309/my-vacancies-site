@@ -249,12 +249,19 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
                   </p>
                 </div>
                 <form className="apply-form" onSubmit={handleSubmit}>
+                  {/* Ловушка для ботов. Имя поля намеренно бессмысленное:
+                      «company» автозаполнение браузеров подставляет из профиля
+                      даже при autocomplete="off" — из-за этого терялись живые
+                      отклики. data-*-ignore отключают менеджеры паролей. */}
                   <input
                     type="text"
-                    name="company"
+                    name="hp_ref"
                     tabIndex={-1}
                     autoComplete="off"
                     aria-hidden="true"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={company}
                     onChange={(event) => setCompany(event.target.value)}
                     style={{
