@@ -47,7 +47,7 @@ export const site: SiteConfig = {
   callback: {
     fromHour: 9,
     toHour: 21,
-    duringHours: "Перезвоним в течение 30 минут",
+    duringHours: "Перезвоним в течение часа",
     afterHours: "Перезвоним утром, после 9:00",
   },
   /** Ник получателя в Telegram (без @). */
