@@ -70,6 +70,8 @@ model Application {
   utmCampaign          String?    @map("utm_campaign")
   utmContent           String?    @map("utm_content")
   utmTerm              String?    @map("utm_term")
+  /// ClientID Яндекс.Метрики — ключ для выгрузки офлайн-конверсий в Директ.
+  ymClientId           String?    @map("ym_client_id")
   status               LeadStatus @default(NEW)
   responsibleManager   String?    @map("responsible_manager")
   managerComment       String?    @map("manager_comment") @db.Text

@@ -26,6 +26,8 @@ const applicationSchema = z.object({
   utmContent: z.string().max(200).optional(),
   utmTerm: z.string().max(200).optional(),
   referrer: z.string().max(500).optional(),
+  // ClientID Метрики — ключ для выгрузки офлайн-конверсий обратно в Директ.
+  ymClientId: z.string().max(64).optional(),
 });
 
 function resolveTrafficSource(data: {
@@ -89,7 +91,7 @@ export async function POST(request: Request) {
 
   if (!normalizedPhone) {
     return NextResponse.json(
-      { error: "Введите телефон в формате +7 (999) 999-99-99." },
+      { error: "Проверьте номер телефона — кажется, он введён не полностью." },
       { status: 400 },
     );
   }
@@ -155,6 +157,7 @@ export async function POST(request: Request) {
       utmCampaign: parsedBody.data.utmCampaign,
       utmContent: parsedBody.data.utmContent,
       utmTerm: parsedBody.data.utmTerm,
+      ymClientId: parsedBody.data.ymClientId,
     },
     select: {
       id: true,

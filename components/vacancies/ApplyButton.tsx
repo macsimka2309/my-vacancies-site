@@ -405,8 +405,22 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
   );
 }
 
+// Маска +7 применяется ТОЛЬКО к российским номерам. Раньше она навязывалась
+// всем: «+998 90 123 45 67» превращался в «+7 (998) 901-23-45» — валидный,
+// но чужой номер. Заявка выглядела нормальной, а рекрутёр звонил не туда.
 function formatPhone(value: string) {
+  const hasPlus = value.trimStart().startsWith("+");
   const digits = value.replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  if (!isRussianNumber(digits, hasPlus)) {
+    // Иностранный номер не переписываем — оставляем как ввёл человек.
+    return `+${digits.slice(0, 15)}`;
+  }
+
   const nationalDigits = getNationalDigits(digits).slice(0, 10);
   const parts = [
     nationalDigits.slice(0, 3),
@@ -446,4 +460,15 @@ function getNationalDigits(digits: string) {
   }
 
   return digits;
+}
+
+// +7 — Россия и Казахстан, 8 — российская междугородная форма.
+// Ввод с «+» и другим кодом (998, 996, 375, 992…) российским не считаем.
+// Без «+» номер, начинающийся с 9 и не длиннее 10 цифр, — российский мобильный.
+function isRussianNumber(digits: string, hasPlus: boolean) {
+  if (digits.startsWith("7") || digits.startsWith("8")) {
+    return true;
+  }
+
+  return !hasPlus && digits.startsWith("9") && digits.length <= 10;
 }

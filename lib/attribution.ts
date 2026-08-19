@@ -3,6 +3,12 @@
 // дожили до отправки отклика (даже после переходов между страницами).
 
 export type Attribution = {
+  /**
+   * ClientID Яндекс.Метрики. Нужен, чтобы потом выгрузить обратно офлайн-
+   * конверсии («вышел на смену», «отработал 70 часов») и научить Директ
+   * оптимизироваться по деньгам, а не по числу заявок.
+   */
+  ymClientId?: string;
   utmSource?: string;
   utmMedium?: string;
   utmCampaign?: string;
@@ -47,8 +53,42 @@ export function captureAttribution() {
     }
   }
 
+  save(next);
+  captureYmClientId();
+}
+
+// ClientID отдаётся Метрикой асинхронно и только после загрузки счётчика.
+// Счётчик подключается стратегией afterInteractive, поэтому на момент
+// монтирования его может ещё не быть — пробуем несколько раз.
+function captureYmClientId(attempt = 0) {
+  const counterId = window.__ymCounterId;
+
+  if (getAttribution().ymClientId) {
+    return;
+  }
+
+  if (!counterId || typeof window.ym !== "function") {
+    if (attempt < 10) {
+      window.setTimeout(() => captureYmClientId(attempt + 1), 1000);
+    }
+
+    return;
+  }
+
   try {
-    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    window.ym(counterId, "getClientID", (clientId: string) => {
+      if (clientId) {
+        save({ ...getAttribution(), ymClientId: clientId });
+      }
+    });
+  } catch {
+    // счётчик не готов или заблокирован — отклик всё равно отправится
+  }
+}
+
+function save(attribution: Attribution) {
+  try {
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(attribution));
   } catch {
     // sessionStorage недоступен (приватный режим и т.п.) — молча пропускаем
   }
