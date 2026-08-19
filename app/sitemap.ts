@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { site } from "@/lib/site";
 
 // Генерируем на каждый запрос (иначе на сборке нет доступа к БД).
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [

@@ -1,4 +1,8 @@
+import { unstable_cache } from "next/cache";
 import { db } from "./db";
+
+/** Тег для сброса кэша вакансий из админки. */
+export const VACANCIES_CACHE_TAG = "vacancies";
 
 export type SalaryBasis = "shift" | "vahta";
 
@@ -20,32 +24,47 @@ export type VacancyFilterOptions = {
   salaryMax: Record<SalaryBasis, number>;
 };
 
-export async function getActiveVacancies(filters: VacancyFilters = {}) {
-  const vacancies = await db.vacancy.findMany({
-    where: {
-      isActive: true,
-      ...(filters.titles?.length ? { title: { in: filters.titles } } : {}),
-      ...(filters.projects?.length ? { project: { in: filters.projects } } : {}),
-      ...(filters.cities?.length ? { city: { in: filters.cities } } : {}),
-    },
-    orderBy: [
-      {
-        createdAt: "desc",
+// Активных вакансий меньше двух сотен, а фильтры комбинируются десятками
+// способов. Дешевле прочитать список один раз и фильтровать в памяти, чем
+// ходить в базу на каждый заход с каждой комбинацией фильтров.
+// createdAt намеренно не выбираем: он нужен только на детальной странице,
+// а в кэше даты пришлось бы восстанавливать из строк.
+const loadActiveVacancies = unstable_cache(
+  async () =>
+    db.vacancy.findMany({
+      where: {
+        isActive: true,
       },
-    ],
-    select: {
-      id: true,
-      slug: true,
-      title: true,
-      project: true,
-      city: true,
-      workFormat: true,
-      salary: true,
-      schedule: true,
-      address: true,
-      createdAt: true,
-    },
-  });
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        project: true,
+        city: true,
+        workFormat: true,
+        salary: true,
+        schedule: true,
+        address: true,
+      },
+    }),
+  ["active-vacancies"],
+  { tags: [VACANCIES_CACHE_TAG], revalidate: 300 },
+);
+
+export async function getActiveVacancies(filters: VacancyFilters = {}) {
+  const all = await loadActiveVacancies();
+  const vacancies = all.filter(
+    (vacancy) =>
+      (!filters.titles?.length || filters.titles.includes(vacancy.title)) &&
+      (!filters.projects?.length ||
+        filters.projects.includes(vacancy.project)) &&
+      (!filters.cities?.length || filters.cities.includes(vacancy.city)),
+  );
 
   if (!filters.salaryFrom || !filters.salaryBasis) {
     return vacancies;
@@ -61,22 +80,9 @@ export async function getActiveVacancies(filters: VacancyFilters = {}) {
 }
 
 export async function getVacancyFilterOptions(): Promise<VacancyFilterOptions> {
-  const vacancies = await db.vacancy.findMany({
-    where: {
-      isActive: true,
-    },
-    select: {
-      title: true,
-      project: true,
-      city: true,
-      salary: true,
-    },
-    orderBy: [
-      {
-        createdAt: "desc",
-      },
-    ],
-  });
+  // Тот же кэшированный список, что и в getActiveVacancies — второй запрос
+  // в базу за теми же данными не нужен.
+  const vacancies = await loadActiveVacancies();
 
   return {
     titles: uniqueSorted(vacancies.map((vacancy) => vacancy.title)),
@@ -119,19 +125,7 @@ export async function getVacancyBySlug(slug: string) {
 }
 
 export async function getActiveVacancySlugs() {
-  const vacancies = await db.vacancy.findMany({
-    where: {
-      isActive: true,
-    },
-    select: {
-      slug: true,
-    },
-    orderBy: [
-      {
-        createdAt: "desc",
-      },
-    ],
-  });
+  const vacancies = await loadActiveVacancies();
 
   return vacancies.map((vacancy) => vacancy.slug);
 }

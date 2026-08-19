@@ -5,6 +5,7 @@ import {
 } from "@/lib/admin-auth";
 import { db } from "@/lib/db";
 import { getRedirectUrl } from "@/lib/redirect-url";
+import { revalidateVacancies } from "@/lib/revalidate-vacancies";
 
 type PublicationRouteProps = {
   params: Promise<{
@@ -43,6 +44,10 @@ export async function POST(
       isActive,
     },
   });
+
+  if (result.count > 0) {
+    revalidateVacancies();
+  }
 
   return NextResponse.redirect(
     getRedirectUrl(

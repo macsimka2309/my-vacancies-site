@@ -11,7 +11,10 @@ import { buildJobPostingJsonLd } from "@/lib/vacancy-jsonld";
 import { formatProject } from "@/lib/project";
 import { getVacancyBySlug, type VacancyDetails } from "@/lib/vacancies";
 
-export const dynamic = "force-dynamic";
+// Страница вакансии не зависит от параметров запроса, поэтому её можно
+// отдавать из кэша и обновлять раз в 5 минут. При правке из админки кэш
+// сбрасывается принудительно (revalidatePath).
+export const revalidate = 300;
 
 // Один запрос на рендер: и generateMetadata, и сама страница берут из кэша.
 const loadVacancy = cache((slug: string) => getVacancyBySlug(slug));

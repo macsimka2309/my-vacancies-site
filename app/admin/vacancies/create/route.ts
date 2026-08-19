@@ -5,6 +5,7 @@ import {
 } from "@/lib/admin-auth";
 import { db } from "@/lib/db";
 import { getRedirectUrl } from "@/lib/redirect-url";
+import { revalidateVacancies } from "@/lib/revalidate-vacancies";
 import { parseVacancyForm } from "@/lib/vacancy-form";
 
 export async function POST(request: NextRequest) {
@@ -52,6 +53,8 @@ export async function POST(request: NextRequest) {
   await db.vacancy.create({
     data: parsed.data,
   });
+
+  revalidateVacancies(parsed.data.slug);
 
   return NextResponse.redirect(
     getRedirectUrl(request, "/admin/vacancies?result=created"),
