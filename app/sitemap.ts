@@ -2,8 +2,10 @@ import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { site } from "@/lib/site";
 
-// Генерируем на каждый запрос (иначе на сборке нет доступа к БД).
-export const revalidate = 300;
+// Генерируем на каждый запрос: на сборке нет доступа к БД, и при revalidate
+// sitemap пререндерится пустым (остаются только статические маршруты).
+// Сам запрос в базу при этом кэширован в loadActiveVacancies.
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
