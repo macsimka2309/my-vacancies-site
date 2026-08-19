@@ -30,7 +30,11 @@ export function CityGate({ cityCounts }: CityGateProps) {
 
   function selectCity(city: string) {
     reachGoal("city_select", { city });
-    router.push(`/?city=${encodeURIComponent(city)}`, { scroll: false });
+    // Здесь прокрутка вверх нужна, в отличие от фильтров: человек мог уйти
+    // вниз, разыскивая свой город в списке, и после выбора остался бы
+    // где-то посреди результатов. Наверху его встретит заголовок с городом
+    // и сразу под ним — вакансии.
+    router.push(`/?city=${encodeURIComponent(city)}`);
   }
 
   return (
