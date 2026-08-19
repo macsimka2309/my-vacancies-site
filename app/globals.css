@@ -895,6 +895,36 @@ select {
 }
 
 
+/* «Показать все вакансии» под сокращённой витриной. */
+.show-all-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  margin-top: 14px;
+  padding: 12px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    border-color var(--motion),
+    box-shadow var(--motion);
+}
+
+.show-all-link:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+}
+
+.show-all-link:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
 /* Короткие аргументы рядом с кнопкой отклика. */
 .trust-points {
   display: flex;

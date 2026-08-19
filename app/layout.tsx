@@ -31,9 +31,8 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  alternates: {
-    canonical: site.url,
-  },
+  // canonical здесь не задаём: дочерние страницы наследовали бы адрес главной
+  // и считались её дублями. Каждая страница объявляет свой canonical сама.
 };
 
 export default function RootLayout({

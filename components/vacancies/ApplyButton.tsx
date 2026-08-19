@@ -177,10 +177,12 @@ export function ApplyButton({ vacancy }: ApplyButtonProps) {
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setSubmitState({
-        type: "error",
-        message: result?.error ?? "Не удалось отправить отклик.",
-      });
+      const message = result?.error ?? "Не удалось отправить отклик.";
+
+      // Ошибки формы — самая дешёвая точка потерь: человек уже готов
+      // оставить телефон, но что-то не пропускает.
+      reachGoal("form_error", { reason: message });
+      setSubmitState({ type: "error", message });
       return;
     }
 

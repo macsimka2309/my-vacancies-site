@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { reachGoal } from "@/lib/metrika";
 
 const TOP_CITIES_LIMIT = 12;
 
@@ -28,6 +29,7 @@ export function CityGate({ cityCounts }: CityGateProps) {
   }, [cityCounts, query]);
 
   function selectCity(city: string) {
+    reachGoal("city_select", { city });
     router.push(`/?city=${encodeURIComponent(city)}`, { scroll: false });
   }
 

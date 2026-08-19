@@ -1,3 +1,6 @@
+"use client";
+
+import { reachGoal } from "@/lib/metrika";
 import { site } from "@/lib/site";
 
 type ContactButtonsProps = {
@@ -19,6 +22,12 @@ export function ContactButtons({
       )}`
     : `https://t.me/${site.telegram}`;
 
+  // Уход в мессенджер — такой же лид, как заявка, только он не попадает
+  // в базу. Без этих целей мы не знаем, какая реклама их приносит.
+  const goalParams = vacancy
+    ? { vacancy: vacancy.title, city: vacancy.city }
+    : undefined;
+
   return (
     <div className="contact-buttons" data-variant={variant}>
       <a
@@ -28,6 +37,7 @@ export function ContactButtons({
         rel="noopener noreferrer"
         aria-label="Написать в Telegram"
         title="Написать в Telegram"
+        onClick={() => reachGoal("tg_click", goalParams)}
       >
         <TelegramIcon />
         <span>Telegram</span>
@@ -39,6 +49,7 @@ export function ContactButtons({
         rel="noopener noreferrer"
         aria-label="Написать в MAX"
         title="Написать в MAX"
+        onClick={() => reachGoal("max_click", goalParams)}
       >
         <MaxIcon />
         <span>MAX</span>

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { CityGate } from "@/components/vacancies/CityGate";
@@ -12,24 +13,50 @@ import {
 
 export const dynamic = "force-dynamic";
 
+// Все комбинации фильтров (?city=…&title=…) склеиваем к главной,
+// иначе поисковик увидит сотни почти одинаковых страниц.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
 type HomePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
+// Пока город не выбран, показываем короткую витрину: рендерить весь каталог
+// сразу — это мегабайт разметки и десятки экранов прокрутки на мобиле.
+const PREVIEW_LIMIT = 8;
+
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = searchParams ? await searchParams : {};
   const filters = getFiltersFromSearchParams(params);
+  const showAll = getSingleParam(params.all) === "1";
 
-  return <VacancyHome filters={filters} />;
+  return <VacancyHome filters={filters} showAll={showAll} />;
 }
 
-async function VacancyHome({ filters: rawFilters }: { filters: VacancyFilters }) {
+async function VacancyHome({
+  filters: rawFilters,
+  showAll,
+}: {
+  filters: VacancyFilters;
+  showAll: boolean;
+}) {
   const filterOptions = await getVacancyFilterOptions();
   // Город приходит из рекламы ({region_name} в Директе) и может не совпасть
   // со справочником — тогда игнорируем его и показываем выбор города.
   const filters = withKnownCities(rawFilters, filterOptions.cities);
   const vacancies = await getActiveVacancies(filters);
   const selectedCities = filters.cities ?? [];
+  // Сокращаем витрину только когда фильтров нет вовсе: если человек выбрал
+  // город или профессию, он ждёт полный список по своему запросу.
+  const hasFilters = Boolean(
+    selectedCities.length || filters.titles?.length || filters.projects?.length,
+  );
+  const isTrimmed = !hasFilters && !showAll && vacancies.length > PREVIEW_LIMIT;
+  const visibleVacancies = isTrimmed
+    ? vacancies.slice(0, PREVIEW_LIMIT)
+    : vacancies;
 
   return (
     <>
@@ -58,7 +85,12 @@ async function VacancyHome({ filters: rawFilters }: { filters: VacancyFilters })
             selectedFilters={filters}
           />
           <div className="vacancy-results">
-            <VacancyList vacancies={vacancies} />
+            <VacancyList vacancies={visibleVacancies} />
+            {isTrimmed ? (
+              <a className="show-all-link" href="/?all=1">
+                Показать все {vacancies.length} вакансий
+              </a>
+            ) : null}
           </div>
         </section>
       </main>

@@ -8,8 +8,8 @@ declare global {
   }
 }
 
-export function reachGoal(goal: string) {
+export function reachGoal(goal: string, params?: Record<string, string>) {
   if (typeof window !== "undefined" && window.ym && window.__ymCounterId) {
-    window.ym(window.__ymCounterId, "reachGoal", goal);
+    window.ym(window.__ymCounterId, "reachGoal", goal, params);
   }
 }
