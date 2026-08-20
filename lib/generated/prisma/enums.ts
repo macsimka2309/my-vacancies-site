@@ -32,3 +32,11 @@ export const AdminRole = {
 } as const
 
 export type AdminRole = (typeof AdminRole)[keyof typeof AdminRole]
+
+
+export const SalaryPeriod = {
+  MONTH: 'MONTH',
+  VAHTA: 'VAHTA'
+} as const
+
+export type SalaryPeriod = (typeof SalaryPeriod)[keyof typeof SalaryPeriod]

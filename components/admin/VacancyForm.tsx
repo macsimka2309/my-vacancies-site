@@ -1,3 +1,5 @@
+import { describeStructuredSalary, type SalaryPeriod } from "@/lib/salary";
+
 type VacancyFormValues = {
   address: string | null;
   city: string;
@@ -8,6 +10,12 @@ type VacancyFormValues = {
   requirements: string;
   responsibilities: string;
   salary: string | null;
+  salaryShiftMin: number | null;
+  salaryShiftMax: number | null;
+  salaryShiftAvg: number | null;
+  salaryPeriodMin: number | null;
+  salaryPeriodMax: number | null;
+  salaryPeriod: SalaryPeriod | null;
   schedule: string | null;
   slug: string;
   title: string;
@@ -56,9 +64,22 @@ export function VacancyForm({
         />
         <Field
           defaultValue={vacancy?.salary}
+          description={
+            vacancy?.salary
+              ? describeStructuredSalary(vacancy)
+              : "Например: «2650–5300 ₽ за смену · от 100 000 ₽/мес»."
+          }
           label="Зарплата"
           maxLength={120}
           name="salary"
+        />
+        <Field
+          defaultValue={vacancy?.salaryShiftAvg?.toString()}
+          description="Только реальная цифра от партнёра — вилку кандидат читает как обман."
+          inputMode="numeric"
+          label="Средний доход за смену, ₽"
+          name="salaryShiftAvg"
+          placeholder="4200"
         />
         <Field
           defaultValue={vacancy?.schedule}

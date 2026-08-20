@@ -26,6 +26,12 @@ enum AdminRole {
   VACANCY_ADMIN
 }
 
+/// Период, за который назван совокупный доход. Смена считается отдельно.
+enum SalaryPeriod {
+  MONTH
+  VAHTA
+}
+
 model Vacancy {
   id               String        @id @default(cuid())
   slug             String        @unique
@@ -33,7 +39,18 @@ model Vacancy {
   project          String
   city             String
   workFormat       String        @map("work_format")
+  /// Витринный текст зарплаты — то, что видит кандидат. Числа ниже
+  /// выводятся из него при сохранении (lib/salary.ts) и нужны фильтру,
+  /// микроразметке и выгрузке в агрегаторы.
   salary           String?
+  salaryShiftMin   Int?          @map("salary_shift_min")
+  salaryShiftMax   Int?          @map("salary_shift_max")
+  /// Фактический средний доход за смену. Заполняется вручную, когда партнёр
+  /// даёт цифру: вилка «1800–7000 ₽» читается кандидатом как обман.
+  salaryShiftAvg   Int?          @map("salary_shift_avg")
+  salaryPeriodMin  Int?          @map("salary_period_min")
+  salaryPeriodMax  Int?          @map("salary_period_max")
+  salaryPeriod     SalaryPeriod? @map("salary_period")
   schedule         String?
   responsibilities String        @db.Text
   requirements     String        @db.Text

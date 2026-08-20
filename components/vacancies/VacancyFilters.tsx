@@ -8,14 +8,16 @@ import type {
   VacancyFilters,
 } from "@/lib/vacancies";
 
-const SALARY_STEP: Record<SalaryBasis, number> = { shift: 500, vahta: 5000 };
+const SALARY_STEP: Record<SalaryBasis, number> = { shift: 500, period: 5000 };
+// «Период» — совокупный доход за месяц или за вахту: суммы одного порядка,
+// и кандидат сравнивает их между собой, а не со ставкой за смену.
 const SALARY_BASIS_LABEL: Record<SalaryBasis, string> = {
   shift: "За смену",
-  vahta: "За вахту",
+  period: "За месяц/вахту",
 };
 const SALARY_SUFFIX: Record<SalaryBasis, string> = {
   shift: "₽/смена",
-  vahta: "₽/вахта",
+  period: "₽",
 };
 const APPLY_DELAY_MS = 400;
 
@@ -184,11 +186,11 @@ export function VacancyFiltersPanel({
           selected={selectedProjects}
           onToggle={(value) => toggleValue("projects", value)}
         />
-        {options.salaryMax.shift > 0 || options.salaryMax.vahta > 0 ? (
+        {options.salaryMax.shift > 0 || options.salaryMax.period > 0 ? (
           <div className="filter-field salary-filter">
             <span>Зарплата от</span>
             <div className="salary-basis" role="group" aria-label="Тип зарплаты">
-              {(["shift", "vahta"] as const).map((basis) => (
+              {(["shift", "period"] as const).map((basis) => (
                 <button
                   key={basis}
                   type="button"

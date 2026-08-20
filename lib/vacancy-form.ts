@@ -1,3 +1,8 @@
+import { parseSalaryText, type SalaryPeriod } from "./salary";
+
+// Средний доход за смену вводят руками; всё, что выше, — опечатка.
+const MAX_SHIFT_AVG = 100_000;
+
 const REQUIRED_LIMITS = {
   city: 120,
   conditions: 10_000,
@@ -25,6 +30,12 @@ export type VacancyFormData = {
   requirements: string;
   responsibilities: string;
   salary: string | null;
+  salaryShiftMin: number | null;
+  salaryShiftMax: number | null;
+  salaryShiftAvg: number | null;
+  salaryPeriodMin: number | null;
+  salaryPeriodMax: number | null;
+  salaryPeriod: SalaryPeriod | null;
   schedule: string | null;
   slug: string;
   title: string;
@@ -56,6 +67,12 @@ export function parseVacancyForm(
     return { error: "invalid" };
   }
 
+  const salaryShiftAvg = normalizeAmount(formData, "salaryShiftAvg");
+
+  if (salaryShiftAvg === undefined) {
+    return { error: "invalid" };
+  }
+
   const requestedSlug = String(formData.get("slug") ?? "").trim();
   const slug = slugify(
     requestedSlug ||
@@ -77,6 +94,10 @@ export function parseVacancyForm(
       requirements: required.requirements!,
       responsibilities: required.responsibilities!,
       salary: optional.salary ?? null,
+      // Числа выводим из витринной строки, чтобы текст и числа не разошлись:
+      // редактор правит одно поле, а фильтр и разметка получают суммы.
+      ...parseSalaryText(optional.salary),
+      salaryShiftAvg,
       schedule: optional.schedule ?? null,
       slug,
       title: required.title!,
@@ -107,6 +128,22 @@ function normalizeOptional(
   }
 
   return value || null;
+}
+
+// Пустое поле — это null, мусор — ошибка формы: молча обнулять введённое
+// нельзя, иначе редактор не узнает, что цифра не сохранилась.
+function normalizeAmount(formData: FormData, field: string) {
+  const value = String(formData.get(field) ?? "").replace(/\s/g, "");
+
+  if (!value) {
+    return null;
+  }
+
+  const amount = Number(value);
+
+  return Number.isInteger(amount) && amount > 0 && amount <= MAX_SHIFT_AVG
+    ? amount
+    : undefined;
 }
 
 function slugify(value: string) {

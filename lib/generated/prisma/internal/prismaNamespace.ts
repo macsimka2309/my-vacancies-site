@@ -750,6 +750,12 @@ export const VacancyScalarFieldEnum = {
   city: 'city',
   workFormat: 'workFormat',
   salary: 'salary',
+  salaryShiftMin: 'salaryShiftMin',
+  salaryShiftMax: 'salaryShiftMax',
+  salaryShiftAvg: 'salaryShiftAvg',
+  salaryPeriodMin: 'salaryPeriodMin',
+  salaryPeriodMax: 'salaryPeriodMax',
+  salaryPeriod: 'salaryPeriod',
   schedule: 'schedule',
   responsibilities: 'responsibilities',
   requirements: 'requirements',
@@ -774,6 +780,8 @@ export const ApplicationScalarFieldEnum = {
   normalizedPhone: 'normalizedPhone',
   city: 'city',
   age: 'age',
+  preferredContact: 'preferredContact',
+  telegramUsername: 'telegramUsername',
   candidateComment: 'candidateComment',
   trafficSource: 'trafficSource',
   utmSource: 'utmSource',
@@ -781,9 +789,11 @@ export const ApplicationScalarFieldEnum = {
   utmCampaign: 'utmCampaign',
   utmContent: 'utmContent',
   utmTerm: 'utmTerm',
+  ymClientId: 'ymClientId',
   status: 'status',
   responsibleManager: 'responsibleManager',
   managerComment: 'managerComment',
+  personalDataConsentAt: 'personalDataConsentAt',
   telegramSentAt: 'telegramSentAt',
   telegramError: 'telegramError',
   createdAt: 'createdAt',
@@ -868,6 +878,34 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SalaryPeriod'
+ */
+export type EnumSalaryPeriodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SalaryPeriod'>
+    
+
+
+/**
+ * Reference to a field of type 'SalaryPeriod[]'
+ */
+export type ListEnumSalaryPeriodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SalaryPeriod[]'>
+    
+
+
+/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
@@ -885,20 +923,6 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 

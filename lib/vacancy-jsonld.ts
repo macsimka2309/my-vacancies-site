@@ -1,3 +1,4 @@
+import { toJsonLdSalary } from "./salary";
 import { site } from "./site";
 import type { VacancyDetails } from "./vacancies";
 
@@ -39,20 +40,22 @@ export function buildJobPostingJsonLd(vacancy: VacancyDetails) {
     };
   }
 
-  const salary = parseSalaryForJsonLd(vacancy.salary);
+  const salary = toJsonLdSalary(vacancy);
 
   // Лучше не указывать зарплату вовсе, чем указать неверную: раньше сюда
   // уходила минимальная сумма из строки с меткой «в месяц», и «2650–5300 ₽
   // за смену» превращалось в агрегаторе в «2650 ₽/мес».
   if (salary) {
+    const isRange = salary.min !== null && salary.max !== null && salary.min !== salary.max;
+
     jsonLd.baseSalary = {
       "@type": "MonetaryAmount",
       currency: "RUB",
       value: {
         "@type": "QuantitativeValue",
-        ...(salary.min === salary.max
-          ? { value: salary.min }
-          : { minValue: salary.min, maxValue: salary.max }),
+        ...(isRange
+          ? { minValue: salary.min, maxValue: salary.max }
+          : { value: salary.min ?? salary.max }),
         unitText: salary.unitText,
       },
     };
@@ -76,44 +79,6 @@ function detectEmploymentType(vacancy: VacancyDetails) {
   }
 
   return "FULL_TIME";
-}
-
-type JsonLdSalary = { min: number; max: number; unitText: "DAY" | "MONTH" };
-
-// Разбирает строку вида «2650–5300 ₽ за смену · от 106 000 ₽/мес».
-// Период определяем явно; если он неизвестен («по договорённости») —
-// возвращаем null, чтобы не выдумывать данные для поисковика.
-function parseSalaryForJsonLd(value: string | null | undefined): JsonLdSalary | null {
-  if (!value) {
-    return null;
-  }
-
-  for (const segment of value.split(/[·;\n]/)) {
-    const unitText = /смен/i.test(segment)
-      ? ("DAY" as const)
-      : /мес|вахт/i.test(segment)
-        ? ("MONTH" as const)
-        : null;
-
-    if (!unitText) {
-      continue;
-    }
-
-    const amounts = segment
-      .match(/\d[\d\s]*/g)
-      ?.map((amount) => Number(amount.replace(/\D/g, "")))
-      .filter((amount) => Number.isFinite(amount) && amount > 0);
-
-    if (amounts?.length) {
-      return {
-        min: Math.min(...amounts),
-        max: Math.max(...amounts),
-        unitText,
-      };
-    }
-  }
-
-  return null;
 }
 
 function buildDescriptionHtml(vacancy: VacancyDetails) {

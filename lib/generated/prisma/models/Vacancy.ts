@@ -20,8 +20,26 @@ export type VacancyModel = runtime.Types.Result.DefaultSelection<Prisma.$Vacancy
 
 export type AggregateVacancy = {
   _count: VacancyCountAggregateOutputType | null
+  _avg: VacancyAvgAggregateOutputType | null
+  _sum: VacancySumAggregateOutputType | null
   _min: VacancyMinAggregateOutputType | null
   _max: VacancyMaxAggregateOutputType | null
+}
+
+export type VacancyAvgAggregateOutputType = {
+  salaryShiftMin: number | null
+  salaryShiftMax: number | null
+  salaryShiftAvg: number | null
+  salaryPeriodMin: number | null
+  salaryPeriodMax: number | null
+}
+
+export type VacancySumAggregateOutputType = {
+  salaryShiftMin: number | null
+  salaryShiftMax: number | null
+  salaryShiftAvg: number | null
+  salaryPeriodMin: number | null
+  salaryPeriodMax: number | null
 }
 
 export type VacancyMinAggregateOutputType = {
@@ -32,6 +50,12 @@ export type VacancyMinAggregateOutputType = {
   city: string | null
   workFormat: string | null
   salary: string | null
+  salaryShiftMin: number | null
+  salaryShiftMax: number | null
+  salaryShiftAvg: number | null
+  salaryPeriodMin: number | null
+  salaryPeriodMax: number | null
+  salaryPeriod: $Enums.SalaryPeriod | null
   schedule: string | null
   responsibilities: string | null
   requirements: string | null
@@ -51,6 +75,12 @@ export type VacancyMaxAggregateOutputType = {
   city: string | null
   workFormat: string | null
   salary: string | null
+  salaryShiftMin: number | null
+  salaryShiftMax: number | null
+  salaryShiftAvg: number | null
+  salaryPeriodMin: number | null
+  salaryPeriodMax: number | null
+  salaryPeriod: $Enums.SalaryPeriod | null
   schedule: string | null
   responsibilities: string | null
   requirements: string | null
@@ -70,6 +100,12 @@ export type VacancyCountAggregateOutputType = {
   city: number
   workFormat: number
   salary: number
+  salaryShiftMin: number
+  salaryShiftMax: number
+  salaryShiftAvg: number
+  salaryPeriodMin: number
+  salaryPeriodMax: number
+  salaryPeriod: number
   schedule: number
   responsibilities: number
   requirements: number
@@ -83,6 +119,22 @@ export type VacancyCountAggregateOutputType = {
 }
 
 
+export type VacancyAvgAggregateInputType = {
+  salaryShiftMin?: true
+  salaryShiftMax?: true
+  salaryShiftAvg?: true
+  salaryPeriodMin?: true
+  salaryPeriodMax?: true
+}
+
+export type VacancySumAggregateInputType = {
+  salaryShiftMin?: true
+  salaryShiftMax?: true
+  salaryShiftAvg?: true
+  salaryPeriodMin?: true
+  salaryPeriodMax?: true
+}
+
 export type VacancyMinAggregateInputType = {
   id?: true
   slug?: true
@@ -91,6 +143,12 @@ export type VacancyMinAggregateInputType = {
   city?: true
   workFormat?: true
   salary?: true
+  salaryShiftMin?: true
+  salaryShiftMax?: true
+  salaryShiftAvg?: true
+  salaryPeriodMin?: true
+  salaryPeriodMax?: true
+  salaryPeriod?: true
   schedule?: true
   responsibilities?: true
   requirements?: true
@@ -110,6 +168,12 @@ export type VacancyMaxAggregateInputType = {
   city?: true
   workFormat?: true
   salary?: true
+  salaryShiftMin?: true
+  salaryShiftMax?: true
+  salaryShiftAvg?: true
+  salaryPeriodMin?: true
+  salaryPeriodMax?: true
+  salaryPeriod?: true
   schedule?: true
   responsibilities?: true
   requirements?: true
@@ -129,6 +193,12 @@ export type VacancyCountAggregateInputType = {
   city?: true
   workFormat?: true
   salary?: true
+  salaryShiftMin?: true
+  salaryShiftMax?: true
+  salaryShiftAvg?: true
+  salaryPeriodMin?: true
+  salaryPeriodMax?: true
+  salaryPeriod?: true
   schedule?: true
   responsibilities?: true
   requirements?: true
@@ -179,6 +249,18 @@ export type VacancyAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: VacancyAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: VacancySumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: VacancyMinAggregateInputType
@@ -209,6 +291,8 @@ export type VacancyGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: VacancyCountAggregateInputType | true
+  _avg?: VacancyAvgAggregateInputType
+  _sum?: VacancySumAggregateInputType
   _min?: VacancyMinAggregateInputType
   _max?: VacancyMaxAggregateInputType
 }
@@ -221,6 +305,12 @@ export type VacancyGroupByOutputType = {
   city: string
   workFormat: string
   salary: string | null
+  salaryShiftMin: number | null
+  salaryShiftMax: number | null
+  salaryShiftAvg: number | null
+  salaryPeriodMin: number | null
+  salaryPeriodMax: number | null
+  salaryPeriod: $Enums.SalaryPeriod | null
   schedule: string | null
   responsibilities: string
   requirements: string
@@ -231,6 +321,8 @@ export type VacancyGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: VacancyCountAggregateOutputType | null
+  _avg: VacancyAvgAggregateOutputType | null
+  _sum: VacancySumAggregateOutputType | null
   _min: VacancyMinAggregateOutputType | null
   _max: VacancyMaxAggregateOutputType | null
 }
@@ -261,6 +353,12 @@ export type VacancyWhereInput = {
   city?: Prisma.StringFilter<"Vacancy"> | string
   workFormat?: Prisma.StringFilter<"Vacancy"> | string
   salary?: Prisma.StringNullableFilter<"Vacancy"> | string | null
+  salaryShiftMin?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryShiftMax?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryShiftAvg?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryPeriodMin?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryPeriodMax?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryPeriod?: Prisma.EnumSalaryPeriodNullableFilter<"Vacancy"> | $Enums.SalaryPeriod | null
   schedule?: Prisma.StringNullableFilter<"Vacancy"> | string | null
   responsibilities?: Prisma.StringFilter<"Vacancy"> | string
   requirements?: Prisma.StringFilter<"Vacancy"> | string
@@ -281,6 +379,12 @@ export type VacancyOrderByWithRelationInput = {
   city?: Prisma.SortOrder
   workFormat?: Prisma.SortOrder
   salary?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryShiftMin?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryShiftMax?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryShiftAvg?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryPeriodMin?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryPeriodMax?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryPeriod?: Prisma.SortOrderInput | Prisma.SortOrder
   schedule?: Prisma.SortOrderInput | Prisma.SortOrder
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
@@ -304,6 +408,12 @@ export type VacancyWhereUniqueInput = Prisma.AtLeast<{
   city?: Prisma.StringFilter<"Vacancy"> | string
   workFormat?: Prisma.StringFilter<"Vacancy"> | string
   salary?: Prisma.StringNullableFilter<"Vacancy"> | string | null
+  salaryShiftMin?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryShiftMax?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryShiftAvg?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryPeriodMin?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryPeriodMax?: Prisma.IntNullableFilter<"Vacancy"> | number | null
+  salaryPeriod?: Prisma.EnumSalaryPeriodNullableFilter<"Vacancy"> | $Enums.SalaryPeriod | null
   schedule?: Prisma.StringNullableFilter<"Vacancy"> | string | null
   responsibilities?: Prisma.StringFilter<"Vacancy"> | string
   requirements?: Prisma.StringFilter<"Vacancy"> | string
@@ -324,6 +434,12 @@ export type VacancyOrderByWithAggregationInput = {
   city?: Prisma.SortOrder
   workFormat?: Prisma.SortOrder
   salary?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryShiftMin?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryShiftMax?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryShiftAvg?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryPeriodMin?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryPeriodMax?: Prisma.SortOrderInput | Prisma.SortOrder
+  salaryPeriod?: Prisma.SortOrderInput | Prisma.SortOrder
   schedule?: Prisma.SortOrderInput | Prisma.SortOrder
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
@@ -334,8 +450,10 @@ export type VacancyOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.VacancyCountOrderByAggregateInput
+  _avg?: Prisma.VacancyAvgOrderByAggregateInput
   _max?: Prisma.VacancyMaxOrderByAggregateInput
   _min?: Prisma.VacancyMinOrderByAggregateInput
+  _sum?: Prisma.VacancySumOrderByAggregateInput
 }
 
 export type VacancyScalarWhereWithAggregatesInput = {
@@ -349,6 +467,12 @@ export type VacancyScalarWhereWithAggregatesInput = {
   city?: Prisma.StringWithAggregatesFilter<"Vacancy"> | string
   workFormat?: Prisma.StringWithAggregatesFilter<"Vacancy"> | string
   salary?: Prisma.StringNullableWithAggregatesFilter<"Vacancy"> | string | null
+  salaryShiftMin?: Prisma.IntNullableWithAggregatesFilter<"Vacancy"> | number | null
+  salaryShiftMax?: Prisma.IntNullableWithAggregatesFilter<"Vacancy"> | number | null
+  salaryShiftAvg?: Prisma.IntNullableWithAggregatesFilter<"Vacancy"> | number | null
+  salaryPeriodMin?: Prisma.IntNullableWithAggregatesFilter<"Vacancy"> | number | null
+  salaryPeriodMax?: Prisma.IntNullableWithAggregatesFilter<"Vacancy"> | number | null
+  salaryPeriod?: Prisma.EnumSalaryPeriodNullableWithAggregatesFilter<"Vacancy"> | $Enums.SalaryPeriod | null
   schedule?: Prisma.StringNullableWithAggregatesFilter<"Vacancy"> | string | null
   responsibilities?: Prisma.StringWithAggregatesFilter<"Vacancy"> | string
   requirements?: Prisma.StringWithAggregatesFilter<"Vacancy"> | string
@@ -368,6 +492,12 @@ export type VacancyCreateInput = {
   city: string
   workFormat: string
   salary?: string | null
+  salaryShiftMin?: number | null
+  salaryShiftMax?: number | null
+  salaryShiftAvg?: number | null
+  salaryPeriodMin?: number | null
+  salaryPeriodMax?: number | null
+  salaryPeriod?: $Enums.SalaryPeriod | null
   schedule?: string | null
   responsibilities: string
   requirements: string
@@ -388,6 +518,12 @@ export type VacancyUncheckedCreateInput = {
   city: string
   workFormat: string
   salary?: string | null
+  salaryShiftMin?: number | null
+  salaryShiftMax?: number | null
+  salaryShiftAvg?: number | null
+  salaryPeriodMin?: number | null
+  salaryPeriodMax?: number | null
+  salaryPeriod?: $Enums.SalaryPeriod | null
   schedule?: string | null
   responsibilities: string
   requirements: string
@@ -408,6 +544,12 @@ export type VacancyUpdateInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   workFormat?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  salaryShiftMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftAvg?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriod?: Prisma.NullableEnumSalaryPeriodFieldUpdateOperationsInput | $Enums.SalaryPeriod | null
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
@@ -428,6 +570,12 @@ export type VacancyUncheckedUpdateInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   workFormat?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  salaryShiftMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftAvg?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriod?: Prisma.NullableEnumSalaryPeriodFieldUpdateOperationsInput | $Enums.SalaryPeriod | null
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
@@ -448,6 +596,12 @@ export type VacancyCreateManyInput = {
   city: string
   workFormat: string
   salary?: string | null
+  salaryShiftMin?: number | null
+  salaryShiftMax?: number | null
+  salaryShiftAvg?: number | null
+  salaryPeriodMin?: number | null
+  salaryPeriodMax?: number | null
+  salaryPeriod?: $Enums.SalaryPeriod | null
   schedule?: string | null
   responsibilities: string
   requirements: string
@@ -467,6 +621,12 @@ export type VacancyUpdateManyMutationInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   workFormat?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  salaryShiftMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftAvg?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriod?: Prisma.NullableEnumSalaryPeriodFieldUpdateOperationsInput | $Enums.SalaryPeriod | null
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
@@ -486,6 +646,12 @@ export type VacancyUncheckedUpdateManyInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   workFormat?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  salaryShiftMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftAvg?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriod?: Prisma.NullableEnumSalaryPeriodFieldUpdateOperationsInput | $Enums.SalaryPeriod | null
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
@@ -505,6 +671,12 @@ export type VacancyCountOrderByAggregateInput = {
   city?: Prisma.SortOrder
   workFormat?: Prisma.SortOrder
   salary?: Prisma.SortOrder
+  salaryShiftMin?: Prisma.SortOrder
+  salaryShiftMax?: Prisma.SortOrder
+  salaryShiftAvg?: Prisma.SortOrder
+  salaryPeriodMin?: Prisma.SortOrder
+  salaryPeriodMax?: Prisma.SortOrder
+  salaryPeriod?: Prisma.SortOrder
   schedule?: Prisma.SortOrder
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
@@ -516,6 +688,14 @@ export type VacancyCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type VacancyAvgOrderByAggregateInput = {
+  salaryShiftMin?: Prisma.SortOrder
+  salaryShiftMax?: Prisma.SortOrder
+  salaryShiftAvg?: Prisma.SortOrder
+  salaryPeriodMin?: Prisma.SortOrder
+  salaryPeriodMax?: Prisma.SortOrder
+}
+
 export type VacancyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   slug?: Prisma.SortOrder
@@ -524,6 +704,12 @@ export type VacancyMaxOrderByAggregateInput = {
   city?: Prisma.SortOrder
   workFormat?: Prisma.SortOrder
   salary?: Prisma.SortOrder
+  salaryShiftMin?: Prisma.SortOrder
+  salaryShiftMax?: Prisma.SortOrder
+  salaryShiftAvg?: Prisma.SortOrder
+  salaryPeriodMin?: Prisma.SortOrder
+  salaryPeriodMax?: Prisma.SortOrder
+  salaryPeriod?: Prisma.SortOrder
   schedule?: Prisma.SortOrder
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
@@ -543,6 +729,12 @@ export type VacancyMinOrderByAggregateInput = {
   city?: Prisma.SortOrder
   workFormat?: Prisma.SortOrder
   salary?: Prisma.SortOrder
+  salaryShiftMin?: Prisma.SortOrder
+  salaryShiftMax?: Prisma.SortOrder
+  salaryShiftAvg?: Prisma.SortOrder
+  salaryPeriodMin?: Prisma.SortOrder
+  salaryPeriodMax?: Prisma.SortOrder
+  salaryPeriod?: Prisma.SortOrder
   schedule?: Prisma.SortOrder
   responsibilities?: Prisma.SortOrder
   requirements?: Prisma.SortOrder
@@ -552,6 +744,14 @@ export type VacancyMinOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type VacancySumOrderByAggregateInput = {
+  salaryShiftMin?: Prisma.SortOrder
+  salaryShiftMax?: Prisma.SortOrder
+  salaryShiftAvg?: Prisma.SortOrder
+  salaryPeriodMin?: Prisma.SortOrder
+  salaryPeriodMax?: Prisma.SortOrder
 }
 
 export type VacancyScalarRelationFilter = {
@@ -565,6 +765,18 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableEnumSalaryPeriodFieldUpdateOperationsInput = {
+  set?: $Enums.SalaryPeriod | null
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -597,6 +809,12 @@ export type VacancyCreateWithoutApplicationsInput = {
   city: string
   workFormat: string
   salary?: string | null
+  salaryShiftMin?: number | null
+  salaryShiftMax?: number | null
+  salaryShiftAvg?: number | null
+  salaryPeriodMin?: number | null
+  salaryPeriodMax?: number | null
+  salaryPeriod?: $Enums.SalaryPeriod | null
   schedule?: string | null
   responsibilities: string
   requirements: string
@@ -616,6 +834,12 @@ export type VacancyUncheckedCreateWithoutApplicationsInput = {
   city: string
   workFormat: string
   salary?: string | null
+  salaryShiftMin?: number | null
+  salaryShiftMax?: number | null
+  salaryShiftAvg?: number | null
+  salaryPeriodMin?: number | null
+  salaryPeriodMax?: number | null
+  salaryPeriod?: $Enums.SalaryPeriod | null
   schedule?: string | null
   responsibilities: string
   requirements: string
@@ -651,6 +875,12 @@ export type VacancyUpdateWithoutApplicationsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   workFormat?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  salaryShiftMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftAvg?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriod?: Prisma.NullableEnumSalaryPeriodFieldUpdateOperationsInput | $Enums.SalaryPeriod | null
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
@@ -670,6 +900,12 @@ export type VacancyUncheckedUpdateWithoutApplicationsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   workFormat?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  salaryShiftMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryShiftAvg?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriodMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  salaryPeriod?: Prisma.NullableEnumSalaryPeriodFieldUpdateOperationsInput | $Enums.SalaryPeriod | null
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responsibilities?: Prisma.StringFieldUpdateOperationsInput | string
   requirements?: Prisma.StringFieldUpdateOperationsInput | string
@@ -720,6 +956,12 @@ export type VacancySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   city?: boolean
   workFormat?: boolean
   salary?: boolean
+  salaryShiftMin?: boolean
+  salaryShiftMax?: boolean
+  salaryShiftAvg?: boolean
+  salaryPeriodMin?: boolean
+  salaryPeriodMax?: boolean
+  salaryPeriod?: boolean
   schedule?: boolean
   responsibilities?: boolean
   requirements?: boolean
@@ -741,6 +983,12 @@ export type VacancySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   city?: boolean
   workFormat?: boolean
   salary?: boolean
+  salaryShiftMin?: boolean
+  salaryShiftMax?: boolean
+  salaryShiftAvg?: boolean
+  salaryPeriodMin?: boolean
+  salaryPeriodMax?: boolean
+  salaryPeriod?: boolean
   schedule?: boolean
   responsibilities?: boolean
   requirements?: boolean
@@ -760,6 +1008,12 @@ export type VacancySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   city?: boolean
   workFormat?: boolean
   salary?: boolean
+  salaryShiftMin?: boolean
+  salaryShiftMax?: boolean
+  salaryShiftAvg?: boolean
+  salaryPeriodMin?: boolean
+  salaryPeriodMax?: boolean
+  salaryPeriod?: boolean
   schedule?: boolean
   responsibilities?: boolean
   requirements?: boolean
@@ -779,6 +1033,12 @@ export type VacancySelectScalar = {
   city?: boolean
   workFormat?: boolean
   salary?: boolean
+  salaryShiftMin?: boolean
+  salaryShiftMax?: boolean
+  salaryShiftAvg?: boolean
+  salaryPeriodMin?: boolean
+  salaryPeriodMax?: boolean
+  salaryPeriod?: boolean
   schedule?: boolean
   responsibilities?: boolean
   requirements?: boolean
@@ -790,7 +1050,7 @@ export type VacancySelectScalar = {
   updatedAt?: boolean
 }
 
-export type VacancyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "project" | "city" | "workFormat" | "salary" | "schedule" | "responsibilities" | "requirements" | "conditions" | "address" | "contactComment" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["vacancy"]>
+export type VacancyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "project" | "city" | "workFormat" | "salary" | "salaryShiftMin" | "salaryShiftMax" | "salaryShiftAvg" | "salaryPeriodMin" | "salaryPeriodMax" | "salaryPeriod" | "schedule" | "responsibilities" | "requirements" | "conditions" | "address" | "contactComment" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["vacancy"]>
 export type VacancyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   applications?: boolean | Prisma.Vacancy$applicationsArgs<ExtArgs>
   _count?: boolean | Prisma.VacancyCountOutputTypeDefaultArgs<ExtArgs>
@@ -810,7 +1070,22 @@ export type $VacancyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     project: string
     city: string
     workFormat: string
+    /**
+     * Витринный текст зарплаты — то, что видит кандидат. Числа ниже
+     * выводятся из него при сохранении (lib/salary.ts) и нужны фильтру,
+     * микроразметке и выгрузке в агрегаторы.
+     */
     salary: string | null
+    salaryShiftMin: number | null
+    salaryShiftMax: number | null
+    /**
+     * Фактический средний доход за смену. Заполняется вручную, когда партнёр
+     * даёт цифру: вилка «1800–7000 ₽» читается кандидатом как обман.
+     */
+    salaryShiftAvg: number | null
+    salaryPeriodMin: number | null
+    salaryPeriodMax: number | null
+    salaryPeriod: $Enums.SalaryPeriod | null
     schedule: string | null
     responsibilities: string
     requirements: string
@@ -1251,6 +1526,12 @@ export interface VacancyFieldRefs {
   readonly city: Prisma.FieldRef<"Vacancy", 'String'>
   readonly workFormat: Prisma.FieldRef<"Vacancy", 'String'>
   readonly salary: Prisma.FieldRef<"Vacancy", 'String'>
+  readonly salaryShiftMin: Prisma.FieldRef<"Vacancy", 'Int'>
+  readonly salaryShiftMax: Prisma.FieldRef<"Vacancy", 'Int'>
+  readonly salaryShiftAvg: Prisma.FieldRef<"Vacancy", 'Int'>
+  readonly salaryPeriodMin: Prisma.FieldRef<"Vacancy", 'Int'>
+  readonly salaryPeriodMax: Prisma.FieldRef<"Vacancy", 'Int'>
+  readonly salaryPeriod: Prisma.FieldRef<"Vacancy", 'SalaryPeriod'>
   readonly schedule: Prisma.FieldRef<"Vacancy", 'String'>
   readonly responsibilities: Prisma.FieldRef<"Vacancy", 'String'>
   readonly requirements: Prisma.FieldRef<"Vacancy", 'String'>

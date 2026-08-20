@@ -142,7 +142,13 @@ function getFiltersFromSearchParams(
 function getSalaryBasisParam(value: string | string[] | undefined) {
   const param = getSingleParam(value);
 
-  return param === "shift" || param === "vahta" ? param : undefined;
+  if (param === "shift" || param === "period") {
+    return param;
+  }
+
+  // Пока фильтр «за период» считал только вахту, ссылки писались как
+  // salaryBasis=vahta — сохранённые и расшаренные ссылки должны работать.
+  return param === "vahta" ? "period" : undefined;
 }
 
 function getMultiParam(value: string | string[] | undefined) {

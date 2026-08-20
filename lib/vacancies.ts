@@ -1,10 +1,11 @@
 import { unstable_cache } from "next/cache";
 import { db } from "./db";
+import { getSalaryCeiling, type SalaryBasis, type StructuredSalary } from "./salary";
 
 /** Тег для сброса кэша вакансий из админки. */
 export const VACANCIES_CACHE_TAG = "vacancies";
 
-export type SalaryBasis = "shift" | "vahta";
+export type { SalaryBasis } from "./salary";
 
 export type VacancyFilters = {
   titles?: string[];
@@ -48,6 +49,12 @@ const loadActiveVacancies = unstable_cache(
         city: true,
         workFormat: true,
         salary: true,
+        salaryShiftMin: true,
+        salaryShiftMax: true,
+        salaryShiftAvg: true,
+        salaryPeriodMin: true,
+        salaryPeriodMax: true,
+        salaryPeriod: true,
         schedule: true,
         address: true,
       },
@@ -71,11 +78,12 @@ export async function getActiveVacancies(filters: VacancyFilters = {}) {
   }
 
   const basis = filters.salaryBasis;
+  const threshold = filters.salaryFrom;
 
   return vacancies.filter((vacancy) => {
-    const amount = parseSalary(vacancy.salary)[basis];
+    const amount = getSalaryCeiling(vacancy, basis);
 
-    return amount !== null && amount >= filters.salaryFrom!;
+    return amount !== null && amount >= threshold;
   });
 }
 
@@ -89,7 +97,7 @@ export async function getVacancyFilterOptions(): Promise<VacancyFilterOptions> {
     projects: uniqueSorted(vacancies.map((vacancy) => vacancy.project)),
     cities: uniqueSorted(vacancies.map((vacancy) => vacancy.city)),
     cityCounts: countByCity(vacancies.map((vacancy) => vacancy.city)),
-    salaryMax: getSalaryMax(vacancies.map((vacancy) => vacancy.salary)),
+    salaryMax: getSalaryMax(vacancies),
   };
 }
 
@@ -113,7 +121,7 @@ function countByCity(values: Array<string | null | undefined>) {
     );
 }
 
-const SALARY_ROUND: Record<SalaryBasis, number> = { shift: 500, vahta: 5000 };
+const SALARY_ROUND: Record<SalaryBasis, number> = { shift: 500, period: 5000 };
 
 export async function getVacancyBySlug(slug: string) {
   return db.vacancy.findFirst({
@@ -140,57 +148,22 @@ function uniqueSorted(values: Array<string | null | undefined>) {
   );
 }
 
-// Верхняя граница «зарплата от» по каждому типу: максимум по подборке,
-// округлённый вверх (смена — до 500, вахта — до 5000). 0 — если тип нигде не указан.
+// Верхняя граница «зарплата от» по каждому основанию: максимум по подборке,
+// округлённый вверх (смена — до 500, период — до 5000). 0 — если по этому
+// основанию сумм нет вовсе, тогда фильтр скрывается.
 function getSalaryMax(
-  values: Array<string | null | undefined>,
+  vacancies: StructuredSalary[],
 ): Record<SalaryBasis, number> {
-  const result: Record<SalaryBasis, number> = { shift: 0, vahta: 0 };
+  const result: Record<SalaryBasis, number> = { shift: 0, period: 0 };
 
-  for (const basis of ["shift", "vahta"] as const) {
-    const amounts = values
-      .map((value) => parseSalary(value)[basis])
+  for (const basis of ["shift", "period"] as const) {
+    const amounts = vacancies
+      .map((vacancy) => getSalaryCeiling(vacancy, basis))
       .filter((value): value is number => value !== null);
 
     if (amounts.length > 0) {
       const step = SALARY_ROUND[basis];
       result[basis] = Math.ceil(Math.max(...amounts) / step) * step;
-    }
-  }
-
-  return result;
-}
-
-// Разбор строки зарплаты вида «4000–6000 ₽ за смену · от 110 000 ₽ за вахту»
-// на максимальную сумму по каждому типу (смена / вахта).
-function parseSalary(
-  value: string | null | undefined,
-): Record<SalaryBasis, number | null> {
-  const result: Record<SalaryBasis, number | null> = {
-    shift: null,
-    vahta: null,
-  };
-
-  if (!value) {
-    return result;
-  }
-
-  for (const segment of value.split(/[·;\n]/)) {
-    const amounts = segment
-      .match(/\d[\d\s]*/g)
-      ?.map((amount) => Number(amount.replace(/\D/g, "")))
-      .filter((amount) => Number.isFinite(amount) && amount > 0);
-
-    if (!amounts?.length) {
-      continue;
-    }
-
-    const amount = Math.max(...amounts);
-
-    if (/смен/i.test(segment)) {
-      result.shift = amount;
-    } else if (/вахт/i.test(segment)) {
-      result.vahta = amount;
     }
   }
 

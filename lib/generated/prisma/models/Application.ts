@@ -44,6 +44,8 @@ export type ApplicationMinAggregateOutputType = {
   normalizedPhone: string | null
   city: string | null
   age: number | null
+  preferredContact: string | null
+  telegramUsername: string | null
   candidateComment: string | null
   trafficSource: string | null
   utmSource: string | null
@@ -51,9 +53,11 @@ export type ApplicationMinAggregateOutputType = {
   utmCampaign: string | null
   utmContent: string | null
   utmTerm: string | null
+  ymClientId: string | null
   status: $Enums.LeadStatus | null
   responsibleManager: string | null
   managerComment: string | null
+  personalDataConsentAt: Date | null
   telegramSentAt: Date | null
   telegramError: string | null
   createdAt: Date | null
@@ -70,6 +74,8 @@ export type ApplicationMaxAggregateOutputType = {
   normalizedPhone: string | null
   city: string | null
   age: number | null
+  preferredContact: string | null
+  telegramUsername: string | null
   candidateComment: string | null
   trafficSource: string | null
   utmSource: string | null
@@ -77,9 +83,11 @@ export type ApplicationMaxAggregateOutputType = {
   utmCampaign: string | null
   utmContent: string | null
   utmTerm: string | null
+  ymClientId: string | null
   status: $Enums.LeadStatus | null
   responsibleManager: string | null
   managerComment: string | null
+  personalDataConsentAt: Date | null
   telegramSentAt: Date | null
   telegramError: string | null
   createdAt: Date | null
@@ -96,6 +104,8 @@ export type ApplicationCountAggregateOutputType = {
   normalizedPhone: number
   city: number
   age: number
+  preferredContact: number
+  telegramUsername: number
   candidateComment: number
   trafficSource: number
   utmSource: number
@@ -103,9 +113,11 @@ export type ApplicationCountAggregateOutputType = {
   utmCampaign: number
   utmContent: number
   utmTerm: number
+  ymClientId: number
   status: number
   responsibleManager: number
   managerComment: number
+  personalDataConsentAt: number
   telegramSentAt: number
   telegramError: number
   createdAt: number
@@ -132,6 +144,8 @@ export type ApplicationMinAggregateInputType = {
   normalizedPhone?: true
   city?: true
   age?: true
+  preferredContact?: true
+  telegramUsername?: true
   candidateComment?: true
   trafficSource?: true
   utmSource?: true
@@ -139,9 +153,11 @@ export type ApplicationMinAggregateInputType = {
   utmCampaign?: true
   utmContent?: true
   utmTerm?: true
+  ymClientId?: true
   status?: true
   responsibleManager?: true
   managerComment?: true
+  personalDataConsentAt?: true
   telegramSentAt?: true
   telegramError?: true
   createdAt?: true
@@ -158,6 +174,8 @@ export type ApplicationMaxAggregateInputType = {
   normalizedPhone?: true
   city?: true
   age?: true
+  preferredContact?: true
+  telegramUsername?: true
   candidateComment?: true
   trafficSource?: true
   utmSource?: true
@@ -165,9 +183,11 @@ export type ApplicationMaxAggregateInputType = {
   utmCampaign?: true
   utmContent?: true
   utmTerm?: true
+  ymClientId?: true
   status?: true
   responsibleManager?: true
   managerComment?: true
+  personalDataConsentAt?: true
   telegramSentAt?: true
   telegramError?: true
   createdAt?: true
@@ -184,6 +204,8 @@ export type ApplicationCountAggregateInputType = {
   normalizedPhone?: true
   city?: true
   age?: true
+  preferredContact?: true
+  telegramUsername?: true
   candidateComment?: true
   trafficSource?: true
   utmSource?: true
@@ -191,9 +213,11 @@ export type ApplicationCountAggregateInputType = {
   utmCampaign?: true
   utmContent?: true
   utmTerm?: true
+  ymClientId?: true
   status?: true
   responsibleManager?: true
   managerComment?: true
+  personalDataConsentAt?: true
   telegramSentAt?: true
   telegramError?: true
   createdAt?: true
@@ -297,6 +321,8 @@ export type ApplicationGroupByOutputType = {
   normalizedPhone: string
   city: string | null
   age: number | null
+  preferredContact: string | null
+  telegramUsername: string | null
   candidateComment: string | null
   trafficSource: string | null
   utmSource: string | null
@@ -304,9 +330,11 @@ export type ApplicationGroupByOutputType = {
   utmCampaign: string | null
   utmContent: string | null
   utmTerm: string | null
+  ymClientId: string | null
   status: $Enums.LeadStatus
   responsibleManager: string | null
   managerComment: string | null
+  personalDataConsentAt: Date | null
   telegramSentAt: Date | null
   telegramError: string | null
   createdAt: Date
@@ -346,6 +374,8 @@ export type ApplicationWhereInput = {
   normalizedPhone?: Prisma.StringFilter<"Application"> | string
   city?: Prisma.StringNullableFilter<"Application"> | string | null
   age?: Prisma.IntNullableFilter<"Application"> | number | null
+  preferredContact?: Prisma.StringNullableFilter<"Application"> | string | null
+  telegramUsername?: Prisma.StringNullableFilter<"Application"> | string | null
   candidateComment?: Prisma.StringNullableFilter<"Application"> | string | null
   trafficSource?: Prisma.StringNullableFilter<"Application"> | string | null
   utmSource?: Prisma.StringNullableFilter<"Application"> | string | null
@@ -353,9 +383,11 @@ export type ApplicationWhereInput = {
   utmCampaign?: Prisma.StringNullableFilter<"Application"> | string | null
   utmContent?: Prisma.StringNullableFilter<"Application"> | string | null
   utmTerm?: Prisma.StringNullableFilter<"Application"> | string | null
+  ymClientId?: Prisma.StringNullableFilter<"Application"> | string | null
   status?: Prisma.EnumLeadStatusFilter<"Application"> | $Enums.LeadStatus
   responsibleManager?: Prisma.StringNullableFilter<"Application"> | string | null
   managerComment?: Prisma.StringNullableFilter<"Application"> | string | null
+  personalDataConsentAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   telegramSentAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   telegramError?: Prisma.StringNullableFilter<"Application"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
@@ -374,6 +406,8 @@ export type ApplicationOrderByWithRelationInput = {
   normalizedPhone?: Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   age?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredContact?: Prisma.SortOrderInput | Prisma.SortOrder
+  telegramUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   candidateComment?: Prisma.SortOrderInput | Prisma.SortOrder
   trafficSource?: Prisma.SortOrderInput | Prisma.SortOrder
   utmSource?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -381,9 +415,11 @@ export type ApplicationOrderByWithRelationInput = {
   utmCampaign?: Prisma.SortOrderInput | Prisma.SortOrder
   utmContent?: Prisma.SortOrderInput | Prisma.SortOrder
   utmTerm?: Prisma.SortOrderInput | Prisma.SortOrder
+  ymClientId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   responsibleManager?: Prisma.SortOrderInput | Prisma.SortOrder
   managerComment?: Prisma.SortOrderInput | Prisma.SortOrder
+  personalDataConsentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   telegramSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   telegramError?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -405,6 +441,8 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   normalizedPhone?: Prisma.StringFilter<"Application"> | string
   city?: Prisma.StringNullableFilter<"Application"> | string | null
   age?: Prisma.IntNullableFilter<"Application"> | number | null
+  preferredContact?: Prisma.StringNullableFilter<"Application"> | string | null
+  telegramUsername?: Prisma.StringNullableFilter<"Application"> | string | null
   candidateComment?: Prisma.StringNullableFilter<"Application"> | string | null
   trafficSource?: Prisma.StringNullableFilter<"Application"> | string | null
   utmSource?: Prisma.StringNullableFilter<"Application"> | string | null
@@ -412,9 +450,11 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   utmCampaign?: Prisma.StringNullableFilter<"Application"> | string | null
   utmContent?: Prisma.StringNullableFilter<"Application"> | string | null
   utmTerm?: Prisma.StringNullableFilter<"Application"> | string | null
+  ymClientId?: Prisma.StringNullableFilter<"Application"> | string | null
   status?: Prisma.EnumLeadStatusFilter<"Application"> | $Enums.LeadStatus
   responsibleManager?: Prisma.StringNullableFilter<"Application"> | string | null
   managerComment?: Prisma.StringNullableFilter<"Application"> | string | null
+  personalDataConsentAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   telegramSentAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   telegramError?: Prisma.StringNullableFilter<"Application"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
@@ -433,6 +473,8 @@ export type ApplicationOrderByWithAggregationInput = {
   normalizedPhone?: Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   age?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredContact?: Prisma.SortOrderInput | Prisma.SortOrder
+  telegramUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   candidateComment?: Prisma.SortOrderInput | Prisma.SortOrder
   trafficSource?: Prisma.SortOrderInput | Prisma.SortOrder
   utmSource?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -440,9 +482,11 @@ export type ApplicationOrderByWithAggregationInput = {
   utmCampaign?: Prisma.SortOrderInput | Prisma.SortOrder
   utmContent?: Prisma.SortOrderInput | Prisma.SortOrder
   utmTerm?: Prisma.SortOrderInput | Prisma.SortOrder
+  ymClientId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   responsibleManager?: Prisma.SortOrderInput | Prisma.SortOrder
   managerComment?: Prisma.SortOrderInput | Prisma.SortOrder
+  personalDataConsentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   telegramSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   telegramError?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -467,6 +511,8 @@ export type ApplicationScalarWhereWithAggregatesInput = {
   normalizedPhone?: Prisma.StringWithAggregatesFilter<"Application"> | string
   city?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   age?: Prisma.IntNullableWithAggregatesFilter<"Application"> | number | null
+  preferredContact?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
+  telegramUsername?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   candidateComment?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   trafficSource?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   utmSource?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
@@ -474,9 +520,11 @@ export type ApplicationScalarWhereWithAggregatesInput = {
   utmCampaign?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   utmContent?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   utmTerm?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
+  ymClientId?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   status?: Prisma.EnumLeadStatusWithAggregatesFilter<"Application"> | $Enums.LeadStatus
   responsibleManager?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   managerComment?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
+  personalDataConsentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Application"> | Date | string | null
   telegramSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Application"> | Date | string | null
   telegramError?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
@@ -492,6 +540,8 @@ export type ApplicationCreateInput = {
   normalizedPhone: string
   city?: string | null
   age?: number | null
+  preferredContact?: string | null
+  telegramUsername?: string | null
   candidateComment?: string | null
   trafficSource?: string | null
   utmSource?: string | null
@@ -499,9 +549,11 @@ export type ApplicationCreateInput = {
   utmCampaign?: string | null
   utmContent?: string | null
   utmTerm?: string | null
+  ymClientId?: string | null
   status?: $Enums.LeadStatus
   responsibleManager?: string | null
   managerComment?: string | null
+  personalDataConsentAt?: Date | string | null
   telegramSentAt?: Date | string | null
   telegramError?: string | null
   createdAt?: Date | string
@@ -520,6 +572,8 @@ export type ApplicationUncheckedCreateInput = {
   normalizedPhone: string
   city?: string | null
   age?: number | null
+  preferredContact?: string | null
+  telegramUsername?: string | null
   candidateComment?: string | null
   trafficSource?: string | null
   utmSource?: string | null
@@ -527,9 +581,11 @@ export type ApplicationUncheckedCreateInput = {
   utmCampaign?: string | null
   utmContent?: string | null
   utmTerm?: string | null
+  ymClientId?: string | null
   status?: $Enums.LeadStatus
   responsibleManager?: string | null
   managerComment?: string | null
+  personalDataConsentAt?: Date | string | null
   telegramSentAt?: Date | string | null
   telegramError?: string | null
   createdAt?: Date | string
@@ -546,6 +602,8 @@ export type ApplicationUpdateInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -553,9 +611,11 @@ export type ApplicationUpdateInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -574,6 +634,8 @@ export type ApplicationUncheckedUpdateInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -581,9 +643,11 @@ export type ApplicationUncheckedUpdateInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -601,6 +665,8 @@ export type ApplicationCreateManyInput = {
   normalizedPhone: string
   city?: string | null
   age?: number | null
+  preferredContact?: string | null
+  telegramUsername?: string | null
   candidateComment?: string | null
   trafficSource?: string | null
   utmSource?: string | null
@@ -608,9 +674,11 @@ export type ApplicationCreateManyInput = {
   utmCampaign?: string | null
   utmContent?: string | null
   utmTerm?: string | null
+  ymClientId?: string | null
   status?: $Enums.LeadStatus
   responsibleManager?: string | null
   managerComment?: string | null
+  personalDataConsentAt?: Date | string | null
   telegramSentAt?: Date | string | null
   telegramError?: string | null
   createdAt?: Date | string
@@ -626,6 +694,8 @@ export type ApplicationUpdateManyMutationInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -633,9 +703,11 @@ export type ApplicationUpdateManyMutationInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -652,6 +724,8 @@ export type ApplicationUncheckedUpdateManyInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -659,9 +733,11 @@ export type ApplicationUncheckedUpdateManyInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -688,6 +764,8 @@ export type ApplicationCountOrderByAggregateInput = {
   normalizedPhone?: Prisma.SortOrder
   city?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  preferredContact?: Prisma.SortOrder
+  telegramUsername?: Prisma.SortOrder
   candidateComment?: Prisma.SortOrder
   trafficSource?: Prisma.SortOrder
   utmSource?: Prisma.SortOrder
@@ -695,9 +773,11 @@ export type ApplicationCountOrderByAggregateInput = {
   utmCampaign?: Prisma.SortOrder
   utmContent?: Prisma.SortOrder
   utmTerm?: Prisma.SortOrder
+  ymClientId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   responsibleManager?: Prisma.SortOrder
   managerComment?: Prisma.SortOrder
+  personalDataConsentAt?: Prisma.SortOrder
   telegramSentAt?: Prisma.SortOrder
   telegramError?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -718,6 +798,8 @@ export type ApplicationMaxOrderByAggregateInput = {
   normalizedPhone?: Prisma.SortOrder
   city?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  preferredContact?: Prisma.SortOrder
+  telegramUsername?: Prisma.SortOrder
   candidateComment?: Prisma.SortOrder
   trafficSource?: Prisma.SortOrder
   utmSource?: Prisma.SortOrder
@@ -725,9 +807,11 @@ export type ApplicationMaxOrderByAggregateInput = {
   utmCampaign?: Prisma.SortOrder
   utmContent?: Prisma.SortOrder
   utmTerm?: Prisma.SortOrder
+  ymClientId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   responsibleManager?: Prisma.SortOrder
   managerComment?: Prisma.SortOrder
+  personalDataConsentAt?: Prisma.SortOrder
   telegramSentAt?: Prisma.SortOrder
   telegramError?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -744,6 +828,8 @@ export type ApplicationMinOrderByAggregateInput = {
   normalizedPhone?: Prisma.SortOrder
   city?: Prisma.SortOrder
   age?: Prisma.SortOrder
+  preferredContact?: Prisma.SortOrder
+  telegramUsername?: Prisma.SortOrder
   candidateComment?: Prisma.SortOrder
   trafficSource?: Prisma.SortOrder
   utmSource?: Prisma.SortOrder
@@ -751,9 +837,11 @@ export type ApplicationMinOrderByAggregateInput = {
   utmCampaign?: Prisma.SortOrder
   utmContent?: Prisma.SortOrder
   utmTerm?: Prisma.SortOrder
+  ymClientId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   responsibleManager?: Prisma.SortOrder
   managerComment?: Prisma.SortOrder
+  personalDataConsentAt?: Prisma.SortOrder
   telegramSentAt?: Prisma.SortOrder
   telegramError?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -811,14 +899,6 @@ export type ApplicationUncheckedUpdateManyWithoutVacancyNestedInput = {
   deleteMany?: Prisma.ApplicationScalarWhereInput | Prisma.ApplicationScalarWhereInput[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type EnumLeadStatusFieldUpdateOperationsInput = {
   set?: $Enums.LeadStatus
 }
@@ -850,6 +930,8 @@ export type ApplicationCreateWithoutVacancyInput = {
   normalizedPhone: string
   city?: string | null
   age?: number | null
+  preferredContact?: string | null
+  telegramUsername?: string | null
   candidateComment?: string | null
   trafficSource?: string | null
   utmSource?: string | null
@@ -857,9 +939,11 @@ export type ApplicationCreateWithoutVacancyInput = {
   utmCampaign?: string | null
   utmContent?: string | null
   utmTerm?: string | null
+  ymClientId?: string | null
   status?: $Enums.LeadStatus
   responsibleManager?: string | null
   managerComment?: string | null
+  personalDataConsentAt?: Date | string | null
   telegramSentAt?: Date | string | null
   telegramError?: string | null
   createdAt?: Date | string
@@ -876,6 +960,8 @@ export type ApplicationUncheckedCreateWithoutVacancyInput = {
   normalizedPhone: string
   city?: string | null
   age?: number | null
+  preferredContact?: string | null
+  telegramUsername?: string | null
   candidateComment?: string | null
   trafficSource?: string | null
   utmSource?: string | null
@@ -883,9 +969,11 @@ export type ApplicationUncheckedCreateWithoutVacancyInput = {
   utmCampaign?: string | null
   utmContent?: string | null
   utmTerm?: string | null
+  ymClientId?: string | null
   status?: $Enums.LeadStatus
   responsibleManager?: string | null
   managerComment?: string | null
+  personalDataConsentAt?: Date | string | null
   telegramSentAt?: Date | string | null
   telegramError?: string | null
   createdAt?: Date | string
@@ -932,6 +1020,8 @@ export type ApplicationScalarWhereInput = {
   normalizedPhone?: Prisma.StringFilter<"Application"> | string
   city?: Prisma.StringNullableFilter<"Application"> | string | null
   age?: Prisma.IntNullableFilter<"Application"> | number | null
+  preferredContact?: Prisma.StringNullableFilter<"Application"> | string | null
+  telegramUsername?: Prisma.StringNullableFilter<"Application"> | string | null
   candidateComment?: Prisma.StringNullableFilter<"Application"> | string | null
   trafficSource?: Prisma.StringNullableFilter<"Application"> | string | null
   utmSource?: Prisma.StringNullableFilter<"Application"> | string | null
@@ -939,9 +1029,11 @@ export type ApplicationScalarWhereInput = {
   utmCampaign?: Prisma.StringNullableFilter<"Application"> | string | null
   utmContent?: Prisma.StringNullableFilter<"Application"> | string | null
   utmTerm?: Prisma.StringNullableFilter<"Application"> | string | null
+  ymClientId?: Prisma.StringNullableFilter<"Application"> | string | null
   status?: Prisma.EnumLeadStatusFilter<"Application"> | $Enums.LeadStatus
   responsibleManager?: Prisma.StringNullableFilter<"Application"> | string | null
   managerComment?: Prisma.StringNullableFilter<"Application"> | string | null
+  personalDataConsentAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   telegramSentAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   telegramError?: Prisma.StringNullableFilter<"Application"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
@@ -957,6 +1049,8 @@ export type ApplicationCreateWithoutAuditLogsInput = {
   normalizedPhone: string
   city?: string | null
   age?: number | null
+  preferredContact?: string | null
+  telegramUsername?: string | null
   candidateComment?: string | null
   trafficSource?: string | null
   utmSource?: string | null
@@ -964,9 +1058,11 @@ export type ApplicationCreateWithoutAuditLogsInput = {
   utmCampaign?: string | null
   utmContent?: string | null
   utmTerm?: string | null
+  ymClientId?: string | null
   status?: $Enums.LeadStatus
   responsibleManager?: string | null
   managerComment?: string | null
+  personalDataConsentAt?: Date | string | null
   telegramSentAt?: Date | string | null
   telegramError?: string | null
   createdAt?: Date | string
@@ -984,6 +1080,8 @@ export type ApplicationUncheckedCreateWithoutAuditLogsInput = {
   normalizedPhone: string
   city?: string | null
   age?: number | null
+  preferredContact?: string | null
+  telegramUsername?: string | null
   candidateComment?: string | null
   trafficSource?: string | null
   utmSource?: string | null
@@ -991,9 +1089,11 @@ export type ApplicationUncheckedCreateWithoutAuditLogsInput = {
   utmCampaign?: string | null
   utmContent?: string | null
   utmTerm?: string | null
+  ymClientId?: string | null
   status?: $Enums.LeadStatus
   responsibleManager?: string | null
   managerComment?: string | null
+  personalDataConsentAt?: Date | string | null
   telegramSentAt?: Date | string | null
   telegramError?: string | null
   createdAt?: Date | string
@@ -1025,6 +1125,8 @@ export type ApplicationUpdateWithoutAuditLogsInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1032,9 +1134,11 @@ export type ApplicationUpdateWithoutAuditLogsInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1052,6 +1156,8 @@ export type ApplicationUncheckedUpdateWithoutAuditLogsInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1059,9 +1165,11 @@ export type ApplicationUncheckedUpdateWithoutAuditLogsInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1077,6 +1185,8 @@ export type ApplicationCreateManyVacancyInput = {
   normalizedPhone: string
   city?: string | null
   age?: number | null
+  preferredContact?: string | null
+  telegramUsername?: string | null
   candidateComment?: string | null
   trafficSource?: string | null
   utmSource?: string | null
@@ -1084,9 +1194,11 @@ export type ApplicationCreateManyVacancyInput = {
   utmCampaign?: string | null
   utmContent?: string | null
   utmTerm?: string | null
+  ymClientId?: string | null
   status?: $Enums.LeadStatus
   responsibleManager?: string | null
   managerComment?: string | null
+  personalDataConsentAt?: Date | string | null
   telegramSentAt?: Date | string | null
   telegramError?: string | null
   createdAt?: Date | string
@@ -1102,6 +1214,8 @@ export type ApplicationUpdateWithoutVacancyInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1109,9 +1223,11 @@ export type ApplicationUpdateWithoutVacancyInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1128,6 +1244,8 @@ export type ApplicationUncheckedUpdateWithoutVacancyInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1135,9 +1253,11 @@ export type ApplicationUncheckedUpdateWithoutVacancyInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1154,6 +1274,8 @@ export type ApplicationUncheckedUpdateManyWithoutVacancyInput = {
   normalizedPhone?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  preferredContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   candidateComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trafficSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmSource?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1161,9 +1283,11 @@ export type ApplicationUncheckedUpdateManyWithoutVacancyInput = {
   utmCampaign?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmContent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   utmTerm?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ymClientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus
   responsibleManager?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  personalDataConsentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   telegramError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1211,6 +1335,8 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   normalizedPhone?: boolean
   city?: boolean
   age?: boolean
+  preferredContact?: boolean
+  telegramUsername?: boolean
   candidateComment?: boolean
   trafficSource?: boolean
   utmSource?: boolean
@@ -1218,9 +1344,11 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   utmCampaign?: boolean
   utmContent?: boolean
   utmTerm?: boolean
+  ymClientId?: boolean
   status?: boolean
   responsibleManager?: boolean
   managerComment?: boolean
+  personalDataConsentAt?: boolean
   telegramSentAt?: boolean
   telegramError?: boolean
   createdAt?: boolean
@@ -1240,6 +1368,8 @@ export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   normalizedPhone?: boolean
   city?: boolean
   age?: boolean
+  preferredContact?: boolean
+  telegramUsername?: boolean
   candidateComment?: boolean
   trafficSource?: boolean
   utmSource?: boolean
@@ -1247,9 +1377,11 @@ export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   utmCampaign?: boolean
   utmContent?: boolean
   utmTerm?: boolean
+  ymClientId?: boolean
   status?: boolean
   responsibleManager?: boolean
   managerComment?: boolean
+  personalDataConsentAt?: boolean
   telegramSentAt?: boolean
   telegramError?: boolean
   createdAt?: boolean
@@ -1267,6 +1399,8 @@ export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   normalizedPhone?: boolean
   city?: boolean
   age?: boolean
+  preferredContact?: boolean
+  telegramUsername?: boolean
   candidateComment?: boolean
   trafficSource?: boolean
   utmSource?: boolean
@@ -1274,9 +1408,11 @@ export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   utmCampaign?: boolean
   utmContent?: boolean
   utmTerm?: boolean
+  ymClientId?: boolean
   status?: boolean
   responsibleManager?: boolean
   managerComment?: boolean
+  personalDataConsentAt?: boolean
   telegramSentAt?: boolean
   telegramError?: boolean
   createdAt?: boolean
@@ -1294,6 +1430,8 @@ export type ApplicationSelectScalar = {
   normalizedPhone?: boolean
   city?: boolean
   age?: boolean
+  preferredContact?: boolean
+  telegramUsername?: boolean
   candidateComment?: boolean
   trafficSource?: boolean
   utmSource?: boolean
@@ -1301,16 +1439,18 @@ export type ApplicationSelectScalar = {
   utmCampaign?: boolean
   utmContent?: boolean
   utmTerm?: boolean
+  ymClientId?: boolean
   status?: boolean
   responsibleManager?: boolean
   managerComment?: boolean
+  personalDataConsentAt?: boolean
   telegramSentAt?: boolean
   telegramError?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vacancyId" | "vacancyTitleSnapshot" | "projectSnapshot" | "candidateName" | "phone" | "normalizedPhone" | "city" | "age" | "candidateComment" | "trafficSource" | "utmSource" | "utmMedium" | "utmCampaign" | "utmContent" | "utmTerm" | "status" | "responsibleManager" | "managerComment" | "telegramSentAt" | "telegramError" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
+export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vacancyId" | "vacancyTitleSnapshot" | "projectSnapshot" | "candidateName" | "phone" | "normalizedPhone" | "city" | "age" | "preferredContact" | "telegramUsername" | "candidateComment" | "trafficSource" | "utmSource" | "utmMedium" | "utmCampaign" | "utmContent" | "utmTerm" | "ymClientId" | "status" | "responsibleManager" | "managerComment" | "personalDataConsentAt" | "telegramSentAt" | "telegramError" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vacancy?: boolean | Prisma.VacancyDefaultArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Application$auditLogsArgs<ExtArgs>
@@ -1339,6 +1479,8 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     normalizedPhone: string
     city: string | null
     age: number | null
+    preferredContact: string | null
+    telegramUsername: string | null
     candidateComment: string | null
     trafficSource: string | null
     utmSource: string | null
@@ -1346,9 +1488,14 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     utmCampaign: string | null
     utmContent: string | null
     utmTerm: string | null
+    /**
+     * ClientID Яндекс.Метрики — ключ для выгрузки офлайн-конверсий в Директ.
+     */
+    ymClientId: string | null
     status: $Enums.LeadStatus
     responsibleManager: string | null
     managerComment: string | null
+    personalDataConsentAt: Date | null
     telegramSentAt: Date | null
     telegramError: string | null
     createdAt: Date
@@ -1787,6 +1934,8 @@ export interface ApplicationFieldRefs {
   readonly normalizedPhone: Prisma.FieldRef<"Application", 'String'>
   readonly city: Prisma.FieldRef<"Application", 'String'>
   readonly age: Prisma.FieldRef<"Application", 'Int'>
+  readonly preferredContact: Prisma.FieldRef<"Application", 'String'>
+  readonly telegramUsername: Prisma.FieldRef<"Application", 'String'>
   readonly candidateComment: Prisma.FieldRef<"Application", 'String'>
   readonly trafficSource: Prisma.FieldRef<"Application", 'String'>
   readonly utmSource: Prisma.FieldRef<"Application", 'String'>
@@ -1794,9 +1943,11 @@ export interface ApplicationFieldRefs {
   readonly utmCampaign: Prisma.FieldRef<"Application", 'String'>
   readonly utmContent: Prisma.FieldRef<"Application", 'String'>
   readonly utmTerm: Prisma.FieldRef<"Application", 'String'>
+  readonly ymClientId: Prisma.FieldRef<"Application", 'String'>
   readonly status: Prisma.FieldRef<"Application", 'LeadStatus'>
   readonly responsibleManager: Prisma.FieldRef<"Application", 'String'>
   readonly managerComment: Prisma.FieldRef<"Application", 'String'>
+  readonly personalDataConsentAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly telegramSentAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly telegramError: Prisma.FieldRef<"Application", 'String'>
   readonly createdAt: Prisma.FieldRef<"Application", 'DateTime'>

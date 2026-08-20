@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client.ts";
+import { parseSalaryText } from "../lib/salary.ts";
 import { vacancySeeds } from "./seed-data.ts";
 
 function createPrismaClient() {
@@ -19,12 +20,15 @@ const prisma = createPrismaClient();
 
 async function main() {
   for (const vacancy of vacancySeeds) {
+    // Числа выводим из витринной строки — тем же разбором, что и админка.
+    const data = { ...vacancy, ...parseSalaryText(vacancy.salary) };
+
     await prisma.vacancy.upsert({
       where: {
         slug: vacancy.slug,
       },
-      update: vacancy,
-      create: vacancy,
+      update: data,
+      create: data,
     });
   }
 
