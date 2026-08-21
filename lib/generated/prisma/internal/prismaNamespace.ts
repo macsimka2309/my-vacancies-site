@@ -756,6 +756,7 @@ export const VacancyScalarFieldEnum = {
   salaryPeriodMin: 'salaryPeriodMin',
   salaryPeriodMax: 'salaryPeriodMax',
   salaryPeriod: 'salaryPeriod',
+  validThrough: 'validThrough',
   schedule: 'schedule',
   responsibilities: 'responsibilities',
   requirements: 'requirements',
@@ -906,13 +907,6 @@ export type ListEnumSalaryPeriodFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -923,6 +917,13 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

@@ -1,4 +1,9 @@
 import { describeStructuredSalary, type SalaryPeriod } from "@/lib/salary";
+import {
+  getValidThrough,
+  toDateInputValue,
+  VALID_THROUGH_DAYS,
+} from "@/lib/vacancy-validity";
 
 type VacancyFormValues = {
   address: string | null;
@@ -16,6 +21,8 @@ type VacancyFormValues = {
   salaryPeriodMin: number | null;
   salaryPeriodMax: number | null;
   salaryPeriod: SalaryPeriod | null;
+  validThrough: Date | null;
+  updatedAt: Date;
   schedule: string | null;
   slug: string;
   title: string;
@@ -80,6 +87,17 @@ export function VacancyForm({
           label="Средний доход за смену, ₽"
           name="salaryShiftAvg"
           placeholder="4200"
+        />
+        <Field
+          defaultValue={
+            vacancy?.validThrough
+              ? toDateInputValue(vacancy.validThrough)
+              : undefined
+          }
+          description={describeValidThrough(vacancy)}
+          label="Действительна до"
+          name="validThrough"
+          type="date"
         />
         <Field
           defaultValue={vacancy?.schedule}
@@ -150,6 +168,22 @@ export function VacancyForm({
       </div>
     </form>
   );
+}
+
+// Поле почти всегда пустое, поэтому подсказка объясняет, что будет без него:
+// иначе «пусто» читается как «срока нет», а он есть и считается сам.
+function describeValidThrough(vacancy?: VacancyFormValues) {
+  if (!vacancy) {
+    return `Можно не заполнять: срок посчитается сам — ${VALID_THROUGH_DAYS} дней от последней правки.`;
+  }
+
+  if (vacancy.validThrough) {
+    return "Задано вручную. Очистите поле, чтобы срок снова продлевался при каждой правке.";
+  }
+
+  const until = toDateInputValue(getValidThrough(vacancy));
+
+  return `Сейчас действует до ${until} — ${VALID_THROUGH_DAYS} дней от последней правки. Каждое сохранение продлевает срок.`;
 }
 
 export function VacancyFormMessage({ result }: { result?: string }) {

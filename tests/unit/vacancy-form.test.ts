@@ -76,4 +76,35 @@ describe("parseVacancyForm", () => {
       });
     }
   });
+
+  // Пустое поле — не «срока нет», а «считается от updatedAt автоматически».
+  it("пустой срок действия — это null", () => {
+    expect(parseVacancyForm(buildForm({ validThrough: "" }))).toMatchObject({
+      data: { validThrough: null },
+    });
+  });
+
+  it("принимает дату срока действия", () => {
+    const parsed = parseVacancyForm(buildForm({ validThrough: nextMonth() }));
+
+    expect(parsed).toMatchObject({
+      data: { validThrough: new Date(`${nextMonth()}T00:00:00.000Z`) },
+    });
+  });
+
+  it("отвергает срок в прошлом и дальше года", () => {
+    for (const value of ["2020-01-01", "2199-01-01", "не дата", "2026-13-45"]) {
+      expect(parseVacancyForm(buildForm({ validThrough: value }))).toEqual({
+        error: "invalid",
+      });
+    }
+  });
 });
+
+function nextMonth() {
+  const date = new Date();
+
+  date.setUTCDate(date.getUTCDate() + 30);
+
+  return date.toISOString().slice(0, 10);
+}

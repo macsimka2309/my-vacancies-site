@@ -1,6 +1,8 @@
+import { getRegionByCity } from "./regions";
 import { toJsonLdSalary } from "./salary";
 import { site } from "./site";
 import type { VacancyDetails } from "./vacancies";
+import { getValidThrough } from "./vacancy-validity";
 
 // Собирает объект schema.org/JobPosting для микроразметки вакансии.
 // Помогает попаданию в блок «Вакансии» Яндекса и Google Jobs.
@@ -14,11 +16,23 @@ export function buildJobPostingJsonLd(vacancy: VacancyDetails) {
     title: vacancy.title,
     description,
     datePosted: vacancy.createdAt.toISOString(),
+    // Без срока объявление отбраковывается при импорте в агрегаторы
+    // и выпадает из блока вакансий. Подробности — в vacancy-validity.ts.
+    validThrough: getValidThrough(vacancy).toISOString(),
+    // Постоянный номер объявления. Без него агрегатор не сможет сопоставить
+    // повторную выгрузку с уже загруженным и заведёт дубль вместо правки.
+    identifier: {
+      "@type": "PropertyValue",
+      name: site.name,
+      value: vacancy.id,
+    },
     employmentType: detectEmploymentType(vacancy),
     hiringOrganization: {
       "@type": "Organization",
       name: site.name,
       sameAs: site.url,
+      url: site.url,
+      logo: `${site.url}/logo-mark.png`,
     },
     directApply: true,
   };
@@ -30,14 +44,40 @@ export function buildJobPostingJsonLd(vacancy: VacancyDetails) {
       name: "Россия",
     };
   } else {
+    const addressRegion = getRegionByCity(vacancy.city);
+
     jsonLd.jobLocation = {
       "@type": "Place",
       address: {
         "@type": "PostalAddress",
         addressLocality: vacancy.city,
+        // Регион знаем не для всякого города; выдумывать его нельзя —
+        // неверный увёл бы вакансию не в ту региональную выдачу.
+        ...(addressRegion ? { addressRegion } : {}),
+        ...(vacancy.address ? { streetAddress: vacancy.address } : {}),
         addressCountry: "RU",
       },
     };
+  }
+
+  // «Опыт не требуется» — наш сильнейший оффер, и у агрегаторов под него есть
+  // отдельный фильтр. Ставим только там, где это написано в самой вакансии:
+  // молчание о требованиях не означает, что опыт не нужен.
+  if (detectNoExperienceRequired(vacancy)) {
+    jsonLd.experienceRequirements = {
+      "@type": "OccupationalExperienceRequirements",
+      monthsOfExperience: 0,
+    };
+  }
+
+  if (vacancy.schedule) {
+    jsonLd.workHours = vacancy.schedule;
+  }
+
+  const jobBenefits = buildJobBenefits(vacancy);
+
+  if (jobBenefits) {
+    jsonLd.jobBenefits = jobBenefits;
   }
 
   const salary = toJsonLdSalary(vacancy);
@@ -79,6 +119,26 @@ function detectEmploymentType(vacancy: VacancyDetails) {
   }
 
   return "FULL_TIME";
+}
+
+// В блоке «Условия» лежит ровно то, что schema.org называет jobBenefits:
+// еженедельные выплаты, бонусы, возмещение налога. Отдаём как есть, без
+// маркеров списка — придумывать за вакансию нечего.
+function buildJobBenefits(vacancy: VacancyDetails) {
+  return vacancy.conditions
+    .split("\n")
+    .map((line) => line.replace(/^[•\-–—*]\s*/, "").trim())
+    .filter(Boolean)
+    .join("; ");
+}
+
+function detectNoExperienceRequired(vacancy: VacancyDetails) {
+  const haystack =
+    `${vacancy.title} ${vacancy.requirements} ${vacancy.conditions}`.toLowerCase();
+
+  return /опыт не требуется|без опыта|не требуется опыт|опыта не требует|обучим/.test(
+    haystack,
+  );
 }
 
 function buildDescriptionHtml(vacancy: VacancyDetails) {

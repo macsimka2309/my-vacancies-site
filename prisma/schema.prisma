@@ -51,6 +51,9 @@ model Vacancy {
   salaryPeriodMin  Int?          @map("salary_period_min")
   salaryPeriodMax  Int?          @map("salary_period_max")
   salaryPeriod     SalaryPeriod? @map("salary_period")
+  /// Дата, до которой объявление действительно. Пусто — считается сама:
+  /// updatedAt + 60 дней, см. lib/vacancy-validity.ts.
+  validThrough     DateTime?     @map("valid_through") @db.Date
   schedule         String?
   responsibilities String        @db.Text
   requirements     String        @db.Text

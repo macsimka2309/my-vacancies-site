@@ -87,6 +87,7 @@ export const VacancyScalarFieldEnum = {
   salaryPeriodMin: 'salaryPeriodMin',
   salaryPeriodMax: 'salaryPeriodMax',
   salaryPeriod: 'salaryPeriod',
+  validThrough: 'validThrough',
   schedule: 'schedule',
   responsibilities: 'responsibilities',
   requirements: 'requirements',

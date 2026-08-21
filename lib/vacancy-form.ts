@@ -36,6 +36,7 @@ export type VacancyFormData = {
   salaryPeriodMin: number | null;
   salaryPeriodMax: number | null;
   salaryPeriod: SalaryPeriod | null;
+  validThrough: Date | null;
   schedule: string | null;
   slug: string;
   title: string;
@@ -73,6 +74,12 @@ export function parseVacancyForm(
     return { error: "invalid" };
   }
 
+  const validThrough = normalizeDate(formData, "validThrough");
+
+  if (validThrough === undefined) {
+    return { error: "invalid" };
+  }
+
   const requestedSlug = String(formData.get("slug") ?? "").trim();
   const slug = slugify(
     requestedSlug ||
@@ -98,6 +105,7 @@ export function parseVacancyForm(
       // редактор правит одно поле, а фильтр и разметка получают суммы.
       ...parseSalaryText(optional.salary),
       salaryShiftAvg,
+      validThrough,
       schedule: optional.schedule ?? null,
       slug,
       title: required.title!,
@@ -144,6 +152,30 @@ function normalizeAmount(formData: FormData, field: string) {
   return Number.isInteger(amount) && amount > 0 && amount <= MAX_SHIFT_AVG
     ? amount
     : undefined;
+}
+
+// Пустое поле — срок считается от updatedAt автоматически. Дата в прошлом
+// или дальше года — почти наверняка опечатка: закрытую вакансию снимают
+// с публикации, а не датируют задним числом.
+function normalizeDate(formData: FormData, field: string) {
+  const value = String(formData.get(field) ?? "").trim();
+
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+
+  if (Number.isNaN(date.getTime())) {
+    return undefined;
+  }
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const limit = new Date(today);
+  limit.setUTCFullYear(limit.getUTCFullYear() + 1);
+
+  return date >= today && date <= limit ? date : undefined;
 }
 
 function slugify(value: string) {
