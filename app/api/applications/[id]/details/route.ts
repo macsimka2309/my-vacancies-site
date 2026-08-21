@@ -17,7 +17,7 @@ type DetailsRouteProps = {
 export async function POST(request: Request, { params }: DetailsRouteProps) {
   const ip = getClientIp(request);
 
-  if (!rateLimit(`details:${ip}`, RATE_LIMIT, RATE_WINDOW_MS).ok) {
+  if (!(await rateLimit(`details:${ip}`, RATE_LIMIT, RATE_WINDOW_MS)).ok) {
     return NextResponse.json({ ok: true });
   }
 

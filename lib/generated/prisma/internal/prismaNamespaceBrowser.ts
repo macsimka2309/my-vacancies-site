@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Vacancy: 'Vacancy',
   Application: 'Application',
+  RateLimit: 'RateLimit',
   AdminUser: 'AdminUser',
   ApplicationAuditLog: 'ApplicationAuditLog'
 } as const
@@ -133,6 +134,15 @@ export const ApplicationScalarFieldEnum = {
 } as const
 
 export type ApplicationScalarFieldEnum = (typeof ApplicationScalarFieldEnum)[keyof typeof ApplicationScalarFieldEnum]
+
+
+export const RateLimitScalarFieldEnum = {
+  key: 'key',
+  count: 'count',
+  resetAt: 'resetAt'
+} as const
+
+export type RateLimitScalarFieldEnum = (typeof RateLimitScalarFieldEnum)[keyof typeof RateLimitScalarFieldEnum]
 
 
 export const AdminUserScalarFieldEnum = {

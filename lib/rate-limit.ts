@@ -1,47 +1,88 @@
-// Простой in-memory rate limiter (fixed window). Достаточно для одного
-// инстанса приложения: защищает форму отклика от спама/ботов по IP.
+import { db } from "./db";
 
-type Window = {
-  count: number;
-  resetAt: number;
-};
-
-const store = new Map<string, Window>();
-
+/**
+ * Ограничитель частоты запросов по IP (fixed window).
+ *
+ * Окна лежат в базе, а не в памяти процесса. В памяти они обнулялись при
+ * каждом перезапуске контейнера — то есть при каждом деплое, — а при
+ * нескольких репликах приложения защита формы исчезала вовсе: у каждой
+ * реплики был свой счёт, и фактический лимит умножался на их число.
+ */
 export type RateLimitResult = {
   ok: boolean;
   retryAfter: number; // секунды до сброса окна
 };
 
-export function rateLimit(
+const ALLOWED: RateLimitResult = { ok: true, retryAfter: 0 };
+
+/** Раз в сотню обращений подчищаем протухшие окна, чтобы таблица не росла. */
+const CLEANUP_CHANCE = 0.01;
+
+type WindowRow = {
+  count: number;
+  reset_at: Date;
+};
+
+export async function rateLimit(
   key: string,
   limit: number,
   windowMs: number,
-): RateLimitResult {
-  const now = Date.now();
+): Promise<RateLimitResult> {
+  const resetAt = new Date(Date.now() + windowMs);
 
-  // Опортунистическая чистка протухших окон, чтобы карта не росла бесконечно.
-  if (store.size > 5000) {
-    for (const [k, w] of store) {
-      if (now > w.resetAt) {
-        store.delete(k);
-      }
+  try {
+    // Одним запросом: заводим окно, продлеваем протухшее или увеличиваем
+    // счётчик. Атомарность нужна, чтобы два одновременных запроса не
+    // прочитали одно и то же значение и не записали его дважды.
+    const rows = await db.$queryRaw<WindowRow[]>`
+      INSERT INTO "rate_limits" ("key", "count", "reset_at")
+      VALUES (${key}, 1, ${resetAt})
+      ON CONFLICT ("key") DO UPDATE SET
+        "count" = CASE
+          WHEN "rate_limits"."reset_at" <= now() THEN 1
+          ELSE "rate_limits"."count" + 1
+        END,
+        "reset_at" = CASE
+          WHEN "rate_limits"."reset_at" <= now() THEN ${resetAt}
+          ELSE "rate_limits"."reset_at"
+        END
+      RETURNING "count", "reset_at"
+    `;
+
+    if (Math.random() < CLEANUP_CHANCE) {
+      await cleanupExpired();
     }
+
+    const row = rows[0];
+
+    if (!row || row.count <= limit) {
+      return ALLOWED;
+    }
+
+    const retryAfter = Math.ceil((row.reset_at.getTime() - Date.now()) / 1000);
+
+    return { ok: false, retryAfter: Math.max(retryAfter, 1) };
+  } catch (error) {
+    // Пропускаем. Ограничитель — не главная защита, и падение базы не должно
+    // превращаться в отказ обслуживания для живых людей: запрос, ради
+    // которого он вызван, всё равно упрётся в ту же недоступную базу.
+    console.error(
+      "Rate limit недоступен, пропускаем запрос:",
+      error instanceof Error ? error.message : error,
+    );
+
+    return ALLOWED;
   }
+}
 
-  const current = store.get(key);
-
-  if (!current || now > current.resetAt) {
-    store.set(key, { count: 1, resetAt: now + windowMs });
-    return { ok: true, retryAfter: 0 };
+async function cleanupExpired() {
+  try {
+    await db.$executeRaw`
+      DELETE FROM "rate_limits" WHERE "reset_at" < now() - interval '1 hour'
+    `;
+  } catch {
+    // Уборка не обязана удаваться: строки протухшие, места занимают мало.
   }
-
-  if (current.count >= limit) {
-    return { ok: false, retryAfter: Math.ceil((current.resetAt - now) / 1000) };
-  }
-
-  current.count += 1;
-  return { ok: true, retryAfter: 0 };
 }
 
 export function getClientIp(request: Request): string {

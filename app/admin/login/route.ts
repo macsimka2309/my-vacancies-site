@@ -14,7 +14,7 @@ const LOGIN_WINDOW_MS = 10 * 60 * 1000;
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
 
-  if (!rateLimit(`login:${ip}`, LOGIN_LIMIT, LOGIN_WINDOW_MS).ok) {
+  if (!(await rateLimit(`login:${ip}`, LOGIN_LIMIT, LOGIN_WINDOW_MS)).ok) {
     return NextResponse.redirect(
       getRedirectUrl(request, "/admin?login=throttled"),
       303,

@@ -54,7 +54,7 @@ function resolveTrafficSource(data: {
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const limit = rateLimit(`apply:${ip}`, RATE_LIMIT, RATE_WINDOW_MS);
+  const limit = await rateLimit(`apply:${ip}`, RATE_LIMIT, RATE_WINDOW_MS);
 
   if (!limit.ok) {
     return NextResponse.json(
