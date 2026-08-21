@@ -18,6 +18,16 @@ import { getVacancyBySlug } from "@/lib/vacancies";
 // сбрасывается принудительно (revalidatePath).
 export const revalidate = 300;
 
+// Пустой список — сознательно: на сборке нет доступа к базе, перечислить
+// адреса заранее нельзя (на этом уже обожглись с sitemap). Но без самой
+// функции Next считает маршрут полностью динамическим и отдаёт `no-store`
+// вопреки `revalidate` выше: страницы рендерились заново на каждый запрос,
+// включая каждый обход роботом. С ней страницы генерируются по первому
+// запросу и дальше живут в ISR-кэше.
+export async function generateStaticParams() {
+  return [];
+}
+
 // Один запрос на рендер: и generateMetadata, и сама страница берут из кэша.
 const loadVacancy = cache((slug: string) => getVacancyBySlug(slug));
 
