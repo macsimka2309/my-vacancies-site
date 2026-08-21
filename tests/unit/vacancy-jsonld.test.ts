@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getRegionByCity } from "@/lib/regions";
+import { getCityIn, getRegionByCity } from "@/lib/cities";
 import { buildJobPostingJsonLd } from "@/lib/vacancy-jsonld";
 import { getValidThrough, VALID_THROUGH_DAYS } from "@/lib/vacancy-validity";
 import type { VacancyDetails } from "@/lib/vacancies";

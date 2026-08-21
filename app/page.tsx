@@ -4,7 +4,13 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { CityGate } from "@/components/vacancies/CityGate";
 import { VacancyFiltersPanel } from "@/components/vacancies/VacancyFilters";
 import { VacancyList } from "@/components/vacancies/VacancyList";
+import { buildCatalogDescription, buildCatalogTitle } from "@/lib/meta";
 import { site } from "@/lib/site";
+import {
+  buildOrganizationJsonLd,
+  buildVacancyListJsonLd,
+  buildWebSiteJsonLd,
+} from "@/lib/site-jsonld";
 import {
   getActiveVacancies,
   getVacancyFilterOptions,
@@ -13,15 +19,36 @@ import {
 
 export const dynamic = "force-dynamic";
 
-// Все комбинации фильтров (?city=…&title=…) склеиваем к главной,
-// иначе поисковик увидит сотни почти одинаковых страниц.
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-};
-
 type HomePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export async function generateMetadata({
+  searchParams,
+}: HomePageProps): Promise<Metadata> {
+  const params = searchParams ? await searchParams : {};
+  const filterOptions = await getVacancyFilterOptions();
+  const filters = withKnownCities(
+    getFiltersFromSearchParams(params),
+    filterOptions.cities,
+  );
+  const vacancies = await getActiveVacancies(filters);
+  const catalog = {
+    cities: filters.cities ?? [],
+    cityCount: filterOptions.cities.length,
+    vacancyCount: vacancies.length,
+  };
+
+  return {
+    // absolute — заголовок сам называет бренд там, где это уместно;
+    // шаблон «— Работа Рядом» съедал бы знаки у ключевых слов.
+    title: { absolute: buildCatalogTitle(catalog) },
+    description: buildCatalogDescription(catalog),
+    // Все комбинации фильтров (?city=…&title=…) склеиваем к главной,
+    // иначе поисковик увидит сотни почти одинаковых страниц.
+    alternates: { canonical: "/" },
+  };
+}
 
 // Пока город не выбран, показываем короткую витрину: рендерить весь каталог
 // сразу — это мегабайт разметки и десятки экранов прокрутки на мобиле.
@@ -62,6 +89,18 @@ async function VacancyHome({
     <>
       <SiteHeader />
       <main className="page-shell">
+        {/* Кто мы и что за список показываем — до этого витрина не сообщала
+            поисковику ни организации, ни того, что это перечень вакансий. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              buildOrganizationJsonLd(),
+              buildWebSiteJsonLd(),
+              buildVacancyListJsonLd(visibleVacancies),
+            ]),
+          }}
+        />
         <section className="page-header">
           <p className="eyebrow">{site.tagline}</p>
           <h1>

@@ -1,4 +1,4 @@
-import { getRegionByCity } from "./regions";
+import { getRegionByCity } from "./cities";
 import { toJsonLdSalary } from "./salary";
 import { site } from "./site";
 import type { VacancyDetails } from "./vacancies";

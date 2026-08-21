@@ -7,9 +7,11 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { ApplyButton } from "@/components/vacancies/ApplyButton";
 import { ContactButtons } from "@/components/vacancies/ContactButtons";
 import { VacancyTextBlock } from "@/components/vacancies/VacancyTextBlock";
+import { buildVacancyDescription, buildVacancyTitle } from "@/lib/meta";
+import { buildBreadcrumbJsonLd } from "@/lib/site-jsonld";
 import { buildJobPostingJsonLd } from "@/lib/vacancy-jsonld";
 import { formatProject } from "@/lib/project";
-import { getVacancyBySlug, type VacancyDetails } from "@/lib/vacancies";
+import { getVacancyBySlug } from "@/lib/vacancies";
 
 // Страница вакансии не зависит от параметров запроса, поэтому её можно
 // отдавать из кэша и обновлять раз в 5 минут. При правке из админки кэш
@@ -39,7 +41,9 @@ export async function generateMetadata({
   const description = buildVacancyDescription(vacancy);
 
   return {
-    title,
+    // absolute — чтобы к заголовку не приклеивался шаблон «— Работа Рядом»:
+    // с ним строка выходила за 60 знаков, и обрезался месячный доход.
+    title: { absolute: title },
     description,
     alternates: { canonical: `/vacancies/${vacancy.slug}` },
     openGraph: {
@@ -60,6 +64,15 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
   }
 
   const jobPostingJsonLd = buildJobPostingJsonLd(vacancy);
+  // Уровень города появится вместе с городскими страницами (п. 12):
+  // сейчас `?city=…` канонизируется на главную.
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Вакансии", path: "/" },
+    {
+      name: `${vacancy.title} — ${vacancy.city}`,
+      path: `/vacancies/${vacancy.slug}`,
+    },
+  ]);
 
   return (
     <>
@@ -69,6 +82,10 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
         <Link className="back-link" href="/">
           Назад к вакансиям
@@ -141,29 +158,3 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
   );
 }
 
-function buildVacancyTitle(vacancy: VacancyDetails) {
-  const parts = [vacancy.title, vacancy.city];
-
-  if (vacancy.salary) {
-    parts.push(vacancy.salary);
-  }
-
-  return parts.join(" — ");
-}
-
-function buildVacancyDescription(vacancy: VacancyDetails) {
-  const firstResponsibility = vacancy.responsibilities
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)[0];
-
-  const lead = [formatProject(vacancy.project), vacancy.city, vacancy.salary]
-    .filter(Boolean)
-    .join(" · ");
-
-  const description = [lead, firstResponsibility].filter(Boolean).join(". ");
-
-  return description.length > 300
-    ? `${description.slice(0, 297)}...`
-    : description;
-}
