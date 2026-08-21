@@ -506,8 +506,44 @@ select {
   flex: 1 1 320px;
 }
 
-.vacancy-card__actions .secondary-link {
-  margin-left: auto;
+/* «Подробнее» живёт в ряду с форматом и графиком и выглядит так же:
+   та же рамка, тот же радиус, та же высота — отличается только цветом. */
+.vacancy-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.vacancy-card__facts .vacancy-meta {
+  flex: 1 1 auto;
+}
+
+.vacancy-card__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(51, 63, 72, 0.035);
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    border-color var(--motion),
+    color var(--motion);
+}
+
+.vacancy-card__more:hover {
+  border-color: rgba(33, 160, 56, 0.4);
+}
+
+.vacancy-card__more:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .vacancy-card h2 {
@@ -811,6 +847,10 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.contact-btn__label--short {
+  display: none;
 }
 
 .contact-btn {
@@ -2254,6 +2294,46 @@ select {
   }
 
   .inline-apply__submit {
+    width: 100%;
+  }
+
+  /* Мессенджеры и звонок — в один ряд: тремя кнопками в столбик карточка
+     растягивалась, а сами кнопки читались как список, а не как выбор. */
+  .contact-buttons,
+  .contact-buttons[data-variant="compact"] {
+    flex-wrap: nowrap;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .contact-buttons .contact-btn,
+  .contact-buttons[data-variant="compact"] .contact-btn {
+    flex: 1 1 0;
+    justify-content: center;
+    min-width: 0;
+    padding: 0 8px;
+    gap: 5px;
+    font-size: 13px;
+  }
+
+  .contact-btn__icon {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* На узком экране «Позвонить» не помещается втроём — показываем короткую
+     подпись. Полное название остаётся в aria-label самой ссылки. */
+  .contact-btn__label--full {
+    display: none;
+  }
+
+  .contact-btn__label--short {
+    display: inline;
+  }
+
+  .vacancy-card__facts .vacancy-meta,
+  .vacancy-card__more {
     width: 100%;
   }
 }

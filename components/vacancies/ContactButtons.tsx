@@ -41,7 +41,14 @@ export function ContactButtons({
           onClick={() => reachGoal("call_click", goalParams)}
         >
           <PhoneIcon />
-          <span>Позвонить</span>
+          {/* Втроём в один ряд на мобиле «Позвонить» не помещается.
+              Подписи скрыты от скринридеров — им читается aria-label. */}
+          <span className="contact-btn__label--full" aria-hidden="true">
+            Позвонить
+          </span>
+          <span className="contact-btn__label--short" aria-hidden="true">
+            Звонок
+          </span>
         </a>
       ) : null}
       <a

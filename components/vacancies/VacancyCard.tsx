@@ -19,18 +19,26 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
         {vacancy.salary ? (
           <p className="vacancy-salary">{vacancy.salary}</p>
         ) : null}
-        <dl className="vacancy-meta" aria-label="Краткая информация о вакансии">
-          <div>
-            <dt>Формат</dt>
-            <dd>{vacancy.workFormat}</dd>
-          </div>
-          {vacancy.schedule ? (
+        {/* «Подробнее» стоит в одном ряду с форматом и графиком: это такая
+            же справочная информация о вакансии, а не действие наравне
+            с откликом. */}
+        <div className="vacancy-card__facts">
+          <dl className="vacancy-meta" aria-label="Краткая информация о вакансии">
             <div>
-              <dt>График</dt>
-              <dd>{vacancy.schedule}</dd>
+              <dt>Формат</dt>
+              <dd>{vacancy.workFormat}</dd>
             </div>
-          ) : null}
-        </dl>
+            {vacancy.schedule ? (
+              <div>
+                <dt>График</dt>
+                <dd>{vacancy.schedule}</dd>
+              </div>
+            ) : null}
+          </dl>
+          <Link className="vacancy-card__more" href={`/vacancies/${vacancy.slug}`}>
+            Подробнее
+          </Link>
+        </div>
       </div>
       <div className="vacancy-card__actions">
         <InlineApplyForm
@@ -45,9 +53,6 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
           variant="compact"
           vacancy={{ title: vacancy.title, city: vacancy.city }}
         />
-        <Link className="secondary-link" href={`/vacancies/${vacancy.slug}`}>
-          Подробнее
-        </Link>
       </div>
     </article>
   );
