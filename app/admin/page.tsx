@@ -1,4 +1,5 @@
 import { AdminMenu } from "@/components/admin/AdminMenu";
+import { getTrafficSourceLabel } from "@/lib/application-source";
 import {
   type AdminRole,
   canManageApplications,
@@ -38,6 +39,7 @@ type ApplicationSearchRow = {
   status: string;
   telegramError: string | null;
   telegramSentAt: Date | null;
+  trafficSource: string | null;
   [key: string]: unknown;
 };
 
@@ -170,6 +172,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <p className="muted">
             Найдено: {filteredApplications.length} из {applications.length}
           </p>
+          <a className="admin-save" href="/admin/applications/new">
+            Создать отклик
+          </a>
         </div>
 
         <AdminResultMessage params={params} />
@@ -196,6 +201,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 <th>Кандидат</th>
                 <th>Вакансия</th>
                 <th>Город</th>
+                <th>Источник</th>
                 <th>Статус</th>
                 <th>Примечание</th>
                 <th>Telegram</th>
@@ -220,6 +226,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                       <span>{application.projectSnapshot}</span>
                     </td>
                     <td>{application.city ?? "Не указан"}</td>
+                    <td>{getTrafficSourceLabel(application.trafficSource)}</td>
                     <td>
                       <select
                         aria-label={`Статус отклика ${application.candidateName}`}
@@ -349,6 +356,16 @@ function AdminResultMessage({
       text: "Изменения сохранены.",
       tone: "success",
     };
+  } else if (getSingleParam(params.created) === "1") {
+    message = {
+      text: "Отклик создан.",
+      tone: "success",
+    };
+  } else if (getSingleParam(params.created) === "duplicate") {
+    message = {
+      text: "Отклик создан. Такой номер уже был в базе — проверьте, не дубль ли это.",
+      tone: "error",
+    };
   } else if (getSingleParam(params.note) === "too-long") {
     message = {
       text: "Примечание не должно быть длиннее 2000 символов.",
@@ -389,6 +406,9 @@ function applicationMatchesQuery(
   const searchableValues = [
     ...Object.values(application),
     getLeadStatusLabel(application.status),
+    // Ищем и по подписи источника: в базе лежит «manual:telegram»,
+    // а менеджер набирает «telegram» или «вручную».
+    getTrafficSourceLabel(application.trafficSource),
     getTelegramStatus(application),
     formatDate(application.createdAt),
   ];
