@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeRuPhone } from "@/lib/phone";
+import { formatPhone, normalizeRuPhone } from "@/lib/phone";
 
 describe("normalizeRuPhone", () => {
   it("нормализует 10 цифр в +7…", () => {
@@ -43,5 +43,33 @@ describe("normalizeRuPhone", () => {
 
   it("отклоняет неизвестный код страны", () => {
     expect(normalizeRuPhone("+441234567890")).toBeNull();
+  });
+});
+
+// Маска ввода. До п.18 она молча переписывала иностранный номер под +7:
+// «+998 90 123 45 67» превращался в валидный, но чужой российский номер.
+// Раньше функция жила внутри клиентского компонента и не тестировалась.
+describe("formatPhone", () => {
+  it("собирает российский номер в читаемый вид", () => {
+    expect(formatPhone("9991234567")).toBe("+7 (999) 123-45-67");
+    expect(formatPhone("89991234567")).toBe("+7 (999) 123-45-67");
+    expect(formatPhone("+79991234567")).toBe("+7 (999) 123-45-67");
+  });
+
+  it("форматирует по мере ввода", () => {
+    expect(formatPhone("9")).toBe("+7 (9");
+    expect(formatPhone("999")).toBe("+7 (999)");
+    expect(formatPhone("999123")).toBe("+7 (999) 123");
+    expect(formatPhone("99912345")).toBe("+7 (999) 123-45");
+  });
+
+  it("не переписывает иностранный номер под +7", () => {
+    expect(formatPhone("+998901234567")).toBe("+998901234567");
+    expect(formatPhone("+375291234567")).toBe("+375291234567");
+  });
+
+  it("пустая строка остаётся пустой", () => {
+    expect(formatPhone("")).toBe("");
+    expect(formatPhone("абв")).toBe("");
   });
 });

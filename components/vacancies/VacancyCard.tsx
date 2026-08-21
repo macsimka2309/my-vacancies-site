@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatProject } from "@/lib/project";
 import type { VacancyListItem } from "@/lib/vacancies";
-import { ApplyButton } from "./ApplyButton";
+import { InlineApplyForm } from "./InlineApplyForm";
 import { ContactButtons } from "./ContactButtons";
 
 type VacancyCardProps = {
@@ -33,7 +33,7 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
         </dl>
       </div>
       <div className="vacancy-card__actions">
-        <ApplyButton
+        <InlineApplyForm
           vacancy={{
             id: vacancy.id,
             title: vacancy.title,

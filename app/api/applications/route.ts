@@ -13,7 +13,10 @@ const applicationSchema = z.object({
   // Имя необязательно: телефона достаточно, чтобы перезвонить.
   name: z.string().trim().max(80).optional(),
   phone: z.string().trim().min(1).max(40),
-  preferredContact: z.enum(["phone", "telegram", "max"]).default("phone"),
+  // Необязательно и без значения по умолчанию: первый шаг формы спрашивает
+  // только телефон, а канал связи человек выбирает уже на экране «Спасибо».
+  // С default("phone") поле выглядело заполненным, и второй шаг его не менял.
+  preferredContact: z.enum(["phone", "telegram", "max"]).optional(),
   telegramUsername: z.string().trim().max(80).optional(),
   vacancyId: z.string().trim().min(1),
   consent: z.literal(true),
@@ -96,7 +99,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { preferredContact } = parsedBody.data;
+  const preferredContact = parsedBody.data.preferredContact ?? null;
   // Имя необязательно — в базу и в бот кладём явную заглушку.
   const candidateName = parsedBody.data.name || "Без имени";
   // Ник Telegram: убираем ведущий @ и лишние пробелы; нужен только для Telegram.
@@ -171,7 +174,7 @@ export async function POST(request: Request) {
       project: vacancy.project,
       city: vacancy.city,
       vacancyTitle: vacancy.title,
-      preferredContact,
+      preferredContact: preferredContact ?? undefined,
       telegramUsername,
       suspectedSpam: looksLikeBot,
     });

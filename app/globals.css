@@ -2249,3 +2249,92 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Встроенная форма отклика (п. 7): телефон прямо в карточке, без модалки.
+   Сначала показываем одно поле — согласие и обещание звонка появляются,
+   когда человек взялся за телефон. */
+.inline-apply {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.inline-apply__row {
+  display: flex;
+  gap: 8px;
+}
+
+.inline-apply__phone {
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: 16px; /* меньше 16px — iOS зумит страницу при фокусе */
+}
+
+.inline-apply__phone:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.inline-apply__submit {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.inline-apply__consent,
+.inline-apply__trust {
+  margin: 0;
+}
+
+.inline-apply[data-variant="compact"] .inline-apply__consent {
+  font-size: 12px;
+}
+
+.inline-apply__done {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0;
+  color: var(--accent-strong, var(--accent));
+  font-weight: 600;
+}
+
+.inline-apply__hint {
+  margin: 0;
+  font-size: 13px;
+}
+
+.inline-apply__details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.inline-apply__details input[type="text"],
+.inline-apply__details input:not([type]) {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: 16px;
+}
+
+@media (max-width: 720px) {
+  /* На узком экране кнопка под полем: рядом они сжимаются до нечитаемого. */
+  .inline-apply__row {
+    flex-direction: column;
+  }
+
+  .inline-apply__submit {
+    width: 100%;
+  }
+}

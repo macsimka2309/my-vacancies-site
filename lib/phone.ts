@@ -47,3 +47,70 @@ export function normalizeRuPhone(value: string) {
 
   return null;
 }
+
+/**
+ * Маска телефона. Российский номер приводим к читаемому виду, иностранный
+ * оставляем как ввели: раньше маска молча переписывала «+998 90 …» в
+ * валидный, но чужой российский номер (п. 18).
+ */
+export function formatPhone(value: string) {
+  const hasPlus = value.trimStart().startsWith("+");
+  const digits = value.replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  if (!isRussianNumber(digits, hasPlus)) {
+    // Иностранный номер не переписываем — оставляем как ввёл человек.
+    return `+${digits.slice(0, 15)}`;
+  }
+
+  const nationalDigits = getNationalDigits(digits).slice(0, 10);
+  const parts = [
+    nationalDigits.slice(0, 3),
+    nationalDigits.slice(3, 6),
+    nationalDigits.slice(6, 8),
+    nationalDigits.slice(8, 10),
+  ];
+
+  if (!nationalDigits) {
+    return "";
+  }
+
+  let formattedPhone = `+7 (${parts[0]}`;
+
+  if (parts[0].length === 3) {
+    formattedPhone += ")";
+  }
+
+  if (parts[1]) {
+    formattedPhone += ` ${parts[1]}`;
+  }
+
+  if (parts[2]) {
+    formattedPhone += `-${parts[2]}`;
+  }
+
+  if (parts[3]) {
+    formattedPhone += `-${parts[3]}`;
+  }
+
+  return formattedPhone;
+}
+
+function getNationalDigits(digits: string) {
+  if (digits.startsWith("7") || digits.startsWith("8")) {
+    return digits.slice(1);
+  }
+
+  return digits;
+}
+
+function isRussianNumber(digits: string, hasPlus: boolean) {
+  if (digits.startsWith("7") || digits.startsWith("8")) {
+    return true;
+  }
+
+  return !hasPlus && digits.startsWith("9") && digits.length <= 10;
+}

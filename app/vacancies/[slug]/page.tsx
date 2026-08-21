@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { ApplyButton } from "@/components/vacancies/ApplyButton";
+import { InlineApplyForm } from "@/components/vacancies/InlineApplyForm";
 import { ContactButtons } from "@/components/vacancies/ContactButtons";
 import { VacancyTextBlock } from "@/components/vacancies/VacancyTextBlock";
 import { buildVacancyDescription, buildVacancyTitle } from "@/lib/meta";
@@ -124,8 +124,9 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
             </div>
           ) : null}
         </dl>
-        <div className="detail-actions">
-          <ApplyButton
+        <div className="detail-actions" id="apply">
+          <InlineApplyForm
+            variant="expanded"
             vacancy={{
               id: vacancy.id,
               title: vacancy.title,
@@ -150,14 +151,11 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
       </main>
       {/* Липкая панель отклика — только на мобиле (см. globals.css). */}
       <div className="sticky-cta">
-        <ApplyButton
-          vacancy={{
-            id: vacancy.id,
-            title: vacancy.title,
-            project: vacancy.project,
-            city: vacancy.city,
-          }}
-        />
+        {/* Не форма, а якорь к ней: поле с согласием растянуло бы липкую
+            панель на треть экрана ровно в момент прокрутки. */}
+        <a className="button-link apply-button" href="#apply">
+          Откликнуться
+        </a>
         <ContactButtons
           variant="compact"
           vacancy={{ title: vacancy.title, city: vacancy.city }}
