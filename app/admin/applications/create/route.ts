@@ -4,6 +4,10 @@ import {
   getAdminSessionFromRequest,
 } from "@/lib/admin-auth";
 import { parseManualApplicationForm } from "@/lib/application-form";
+import {
+  checkDuplicateByPhone,
+  getInitialStatus,
+} from "@/lib/application-duplicate";
 import { toTrafficSource } from "@/lib/application-source";
 import { db } from "@/lib/db";
 import { getRedirectUrl } from "@/lib/redirect-url";
@@ -55,25 +59,15 @@ export async function POST(request: NextRequest) {
   }
 
   // Дубль не блокируем — человек может откликнуться повторно на другую
-  // вакансию, — но показываем менеджеру, что такой номер уже есть.
-  const duplicate = await db.application.findFirst({
-    where: {
-      normalizedPhone: parsed.data.normalizedPhone,
-    },
-    orderBy: [
-      {
-        createdAt: "desc",
-      },
-    ],
-    select: {
-      id: true,
-    },
-  });
+  // вакансию, — но заводим со статусом «Дубль» и говорим об этом менеджеру.
+  // Правило то же, что для откликов с сайта: один модуль на оба пути.
+  const duplicate = await checkDuplicateByPhone(parsed.data.normalizedPhone);
 
   const application = await db.application.create({
     data: {
       candidateComment: parsed.data.candidateComment,
       candidateName: parsed.data.candidateName,
+      status: getInitialStatus(duplicate),
       city: vacancy.city,
       normalizedPhone: parsed.data.normalizedPhone,
       // Согласие подтвердил менеджер — момент подтверждения и фиксируем.
@@ -103,14 +97,14 @@ export async function POST(request: NextRequest) {
       adminUserId: session.userId,
       applicationId: application.id,
       newManagerComment: `Отклик заведён вручную. Источник: ${parsed.data.source}.`,
-      newStatus: "NEW",
+      newStatus: getInitialStatus(duplicate),
     },
   });
 
   return NextResponse.redirect(
     getRedirectUrl(
       request,
-      duplicate
+      duplicate.isDuplicate
         ? "/admin?created=duplicate"
         : "/admin?created=1",
     ),

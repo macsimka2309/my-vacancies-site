@@ -8,6 +8,13 @@ type ApplicationTelegramPayload = {
   telegramUsername?: string;
   /** Сработала антиспам-ловушка — отклик всё равно доставляем, но помечаем. */
   suspectedSpam?: boolean;
+  /** Телефон уже был в базе. Показываем прошлый отклик, чтобы менеджер
+      не звонил второй раз вслепую. */
+  previousApplication?: {
+    createdAt: Date;
+    statusLabel: string;
+    vacancyTitle: string;
+  };
 };
 
 const CONTACT_LABEL: Record<
@@ -48,11 +55,11 @@ export async function sendApplicationTelegramNotification(
   }
 }
 
-function formatApplicationTelegramMessage(payload: ApplicationTelegramPayload) {
+export function formatApplicationTelegramMessage(
+  payload: ApplicationTelegramPayload,
+) {
   const lines = [
-    payload.suspectedSpam
-      ? "🟡 <b>Новый отклик</b> — сработала антиспам-ловушка, проверьте вручную"
-      : "🟢 <b>Новый отклик</b>",
+    buildHeadline(payload),
     `👤 Имя: ${escapeTelegramHtml(payload.name)}`,
     `📞 Телефон: ${escapeTelegramHtml(payload.phone)}`,
   ];
@@ -73,7 +80,40 @@ function formatApplicationTelegramMessage(payload: ApplicationTelegramPayload) {
     `💼 Вакансия: ${escapeTelegramHtml(payload.vacancyTitle)}`,
   );
 
+  if (payload.previousApplication) {
+    const previous = payload.previousApplication;
+
+    lines.push(
+      `↩️ Прошлый отклик: ${formatDate(previous.createdAt)} · ` +
+        `${escapeTelegramHtml(previous.vacancyTitle)} · ` +
+        `${escapeTelegramHtml(previous.statusLabel)}`,
+    );
+  }
+
   return lines.join("\n");
+}
+
+// Ловушка тревожнее дубля, поэтому при совпадении показываем её.
+function buildHeadline(payload: ApplicationTelegramPayload) {
+  if (payload.suspectedSpam) {
+    return "🟡 <b>Новый отклик</b> — сработала антиспам-ловушка, проверьте вручную";
+  }
+
+  if (payload.previousApplication) {
+    return "🔁 <b>Повторный отклик</b> — телефон уже есть в базе, заведён как дубль";
+  }
+
+  return "🟢 <b>Новый отклик</b>";
+}
+
+function formatDate(value: Date) {
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Moscow",
+  }).format(value);
 }
 
 function escapeTelegramHtml(value: string) {

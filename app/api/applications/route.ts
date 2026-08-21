@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import {
+  checkDuplicateByPhone,
+  getInitialStatus,
+} from "@/lib/application-duplicate";
 import { db } from "@/lib/db";
+import { getLeadStatusLabel } from "@/lib/lead-status";
 import { normalizeRuPhone } from "@/lib/phone";
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { sendApplicationTelegramNotification } from "@/lib/telegram";
@@ -135,6 +140,10 @@ export async function POST(request: Request) {
     );
   }
 
+  // Повторный отклик заводим сразу как дубль: иначе менеджер узнавал об этом
+  // только когда звонил, то есть после потраченного звонка.
+  const duplicate = await checkDuplicateByPhone(normalizedPhone);
+
   const application = await db.application.create({
     data: {
       vacancy: {
@@ -144,6 +153,7 @@ export async function POST(request: Request) {
       },
       vacancyTitleSnapshot: vacancy.title,
       projectSnapshot: vacancy.project,
+      status: getInitialStatus(duplicate),
       candidateName,
       candidateComment: looksLikeBot
         ? "⚠️ Сработала антиспам-ловушка. Возможно, автозаполнение браузера — проверьте вручную."
@@ -177,6 +187,13 @@ export async function POST(request: Request) {
       preferredContact: preferredContact ?? undefined,
       telegramUsername,
       suspectedSpam: looksLikeBot,
+      previousApplication: duplicate.previous
+        ? {
+            createdAt: duplicate.previous.createdAt,
+            statusLabel: getLeadStatusLabel(duplicate.previous.status),
+            vacancyTitle: duplicate.previous.vacancyTitle,
+          }
+        : undefined,
     });
 
     await db.application.update({
