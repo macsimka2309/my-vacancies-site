@@ -459,10 +459,13 @@ select {
 }
 
 .vacancy-card {
+  /* Одна колонка: с формой в боковой колонке ширину задавал самый длинный
+     текст — согласие. Пока его не было, колонка была узкой; стоило начать
+     вводить телефон, она раздувалась и пережимала заголовок с зарплатой. */
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 24px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
   border: 1px solid rgba(33, 160, 56, 0.16);
   border-radius: var(--radius-card);
   background: var(--surface);
@@ -486,9 +489,25 @@ select {
 }
 
 .vacancy-card__actions {
-  display: grid;
-  min-width: 156px;
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  /* start, а не center: когда под телефоном появляется согласие, форма
+     растёт вниз и не сдвигает соседние кнопки. */
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(33, 160, 56, 0.12);
+}
+
+.vacancy-card__actions .inline-apply {
+  /* Ширина задана флексом, а не содержимым: появление согласия меняет
+     только высоту, поэтому карточка не переверстывается по горизонтали. */
+  flex: 1 1 320px;
+}
+
+.vacancy-card__actions .secondary-link {
+  margin-left: auto;
 }
 
 .vacancy-card h2 {
@@ -783,6 +802,8 @@ select {
 .detail-actions {
   display: flex;
   flex-wrap: wrap;
+  /* Как и в карточке: форма растёт вниз, соседние кнопки остаются на месте. */
+  align-items: flex-start;
   gap: 10px;
 }
 
@@ -2153,6 +2174,9 @@ select {
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  /* Поле ввода телефона шире этого просто не нужно: на широком экране
+     оно растягивалось почти на всю карточку и выглядело нелепо. */
+  max-width: 460px;
 }
 
 .inline-apply__row {
