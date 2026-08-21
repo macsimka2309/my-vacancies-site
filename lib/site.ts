@@ -22,6 +22,8 @@ type SiteConfig = {
   telegram: string;
   /** Ссылка на профиль-получателя в мессенджере MAX (открывает приложение, если установлено). */
   max: string;
+  /** Ключ IndexNow. Публичный по устройству протокола — он же лежит в public/. */
+  indexNowKey: string;
 };
 
 export const site: SiteConfig = {
@@ -54,4 +56,11 @@ export const site: SiteConfig = {
   telegram: "HR_Russslan0303",
   /** Ссылка на профиль-получателя в MAX (universal link — открывает приложение, если установлено). */
   max: "https://max.ru/u/f9LHodD0cOKBCVZGavwAZXHhEOgBXIZeWI4UJ840qz1RB5a7UCHuMYcuvNg",
+  /**
+   * Ключ IndexNow — им поисковик проверяет, что сайтом владеем мы.
+   * Не секрет: файл с этим же значением лежит в public/ и открыт всем,
+   * так протокол и устроен. При смене ключа переименовать и файл —
+   * расхождение ловит тест tests/unit/indexnow.test.ts.
+   */
+  indexNowKey: "dae0cfa8658c78d1e623c56be5a0294f",
 };

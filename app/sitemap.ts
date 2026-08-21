@@ -7,17 +7,20 @@ import { site } from "@/lib/site";
 // Сам запрос в базу при этом кэширован в loadActiveVacancies.
 export const dynamic = "force-dynamic";
 
+// Дата последней правки политики. Меняется руками вместе с текстом.
+const PRIVACY_UPDATED_AT = new Date("2026-08-19T00:00:00.000Z");
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticRoutes: MetadataRoute.Sitemap = [
+  const buildStaticRoutes = (homeUpdatedAt: Date): MetadataRoute.Sitemap => [
     {
       url: site.url,
-      lastModified: new Date(),
+      lastModified: homeUpdatedAt,
       changeFrequency: "daily",
       priority: 1,
     },
     {
       url: `${site.url}/privacy`,
-      lastModified: new Date(),
+      lastModified: PRIVACY_UPDATED_AT,
       changeFrequency: "yearly",
       priority: 0.3,
     },
@@ -36,9 +39,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    return [...staticRoutes, ...vacancyRoutes];
+    // Главная — это витрина вакансий, поэтому её дата изменения — дата
+    // последней правки каталога. Раньше здесь стояло время генерации ответа:
+    // страница на каждый запрос сообщала «только что изменилась», и такому
+    // сигналу робот перестаёт верить.
+    const latestVacancyUpdate = vacancies.reduce<Date | null>(
+      (latest, vacancy) =>
+        !latest || vacancy.updatedAt > latest ? vacancy.updatedAt : latest,
+      null,
+    );
+
+    return [
+      ...buildStaticRoutes(latestVacancyUpdate ?? PRIVACY_UPDATED_AT),
+      ...vacancyRoutes,
+    ];
   } catch {
     // Если БД недоступна — отдаём хотя бы статические маршруты.
-    return staticRoutes;
+    return buildStaticRoutes(PRIVACY_UPDATED_AT);
   }
 }

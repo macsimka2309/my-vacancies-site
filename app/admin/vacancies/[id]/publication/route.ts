@@ -46,7 +46,19 @@ export async function POST(
   });
 
   if (result.count > 0) {
-    revalidateVacancies();
+    // Адрес нужен именно здесь: снятая с публикации вакансия начинает отдавать
+    // 404, и чем быстрее поисковик это увидит, тем меньше мёртвых ссылок
+    // в выдаче.
+    const vacancy = await db.vacancy.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        slug: true,
+      },
+    });
+
+    await revalidateVacancies(vacancy?.slug);
   }
 
   return NextResponse.redirect(

@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     data: parsed.data,
   });
 
-  revalidateVacancies(parsed.data.slug);
+  await revalidateVacancies(parsed.data.slug);
 
   return NextResponse.redirect(
     getRedirectUrl(request, "/admin/vacancies?result=created"),

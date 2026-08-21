@@ -71,7 +71,7 @@ export async function POST(
   });
 
   if (result.count > 0) {
-    revalidateVacancies(parsed.data.slug);
+    await revalidateVacancies(parsed.data.slug);
   }
 
   return NextResponse.redirect(
