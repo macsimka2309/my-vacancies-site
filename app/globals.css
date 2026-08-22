@@ -835,12 +835,18 @@ select {
   gap: 18px;
 }
 
+/* На детальной странице форма и запасные каналы идут друг под другом:
+   в одну строку кнопки вставали справа от формы, а согласие с обещанием
+   звонка висели под полем — блок читался рваной буквой «Г». */
 .detail-actions {
   display: flex;
-  flex-wrap: wrap;
-  /* Как и в карточке: форма растёт вниз, соседние кнопки остаются на месте. */
+  flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: 16px;
+}
+
+.inline-apply[data-variant="expanded"] {
+  max-width: 620px;
 }
 
 .contact-buttons {
@@ -935,7 +941,9 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 18px;
-  margin: 16px 0 0;
+  /* Отступ побольше: рядом с обещанием звонка два маркированных ряда
+     подряд читались как один сбивчивый список. */
+  margin: 24px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -2335,5 +2343,23 @@ select {
   .vacancy-card__facts .vacancy-meta,
   .vacancy-card__more {
     width: 100%;
+  }
+
+  /* В липкой панели рядом с «Откликнуться» три подписанные кнопки
+     не помещаются — MAX уезжал за край экрана. Оставляем значки:
+     название канала читается скринридером из aria-label ссылки. */
+  .sticky-cta .contact-buttons {
+    flex: 0 0 auto;
+    width: auto;
+    gap: 8px;
+  }
+
+  .sticky-cta .contact-btn {
+    flex: 0 0 auto;
+    padding: 0 10px;
+  }
+
+  .sticky-cta .contact-btn span {
+    display: none;
   }
 }

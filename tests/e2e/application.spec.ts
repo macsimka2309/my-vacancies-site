@@ -31,16 +31,27 @@ test.describe("Отклик на вакансию", () => {
     await expect(consent).toBeVisible();
   });
 
+  // Кнопку не гасим — иначе на детальной странице она выглядит сломанной
+  // ещё до действий человека. Отсекает штатная проверка браузера.
   test("нельзя отправить без согласия", async ({ page }) => {
     await page.goto("/");
 
     const form = page.locator("form.inline-apply").first();
+    const consent = form.locator('input[type="checkbox"]');
 
     await form.getByPlaceholder("Ваш телефон").fill("9991234567");
 
-    await expect(
-      form.getByRole("button", { name: "Откликнуться" }),
-    ).toBeDisabled();
+    const submit = form.getByRole("button", { name: "Откликнуться" });
+
+    await expect(submit).toBeEnabled();
+    await submit.click();
+
+    // Форма не ушла: браузер требует отметить согласие.
+    await expect(consent).toBeVisible();
+    expect(
+      await consent.evaluate((el: HTMLInputElement) => el.validity.valueMissing),
+    ).toBe(true);
+    await expect(page.locator(".inline-apply--done")).toHaveCount(0);
   });
 
   test("успешная отправка, имя спрашивается после", async ({ page }) => {

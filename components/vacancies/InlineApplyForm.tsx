@@ -162,9 +162,13 @@ export function InlineApplyForm({
           onFocus={engage}
           onChange={(event) => form.setPhone(formatPhone(event.target.value))}
         />
+        {/* Кнопку не гасим из-за неотмеченного согласия: на детальной
+            странице согласие видно сразу, и главная кнопка выглядела
+            сломанной ещё до того, как человек что-то сделал. Пустое поле
+            и неотмеченную галочку отсекает штатная проверка браузера. */}
         <button
           className="button-link inline-apply__submit"
-          disabled={form.isSubmitting || (showConsent && !form.consent)}
+          disabled={form.isSubmitting}
           type="submit"
         >
           {form.isSubmitting ? "Отправляем" : "Откликнуться"}
