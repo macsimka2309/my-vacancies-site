@@ -102,3 +102,25 @@ export function buildBreadcrumbJsonLd(crumbs: Crumb[]) {
     })),
   };
 }
+
+/**
+ * Блок вопросов и ответов. Даёт расширенный сниппет в выдаче и первый
+ * пригодный для цитирования фрагмент на сайте (частично закрывает п. 38
+ * для этих страниц).
+ */
+export function buildFaqJsonLd(
+  items: Array<{ question: string; answer: string }>,
+) {
+  return {
+    "@context": "https://schema.org/",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+}

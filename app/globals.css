@@ -2363,3 +2363,81 @@ select {
     display: none;
   }
 }
+
+/* Лендинги под интенты (п. 13). */
+.intent-lead {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--foreground);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.intent-faq {
+  margin: 26px 0 30px;
+  padding: 22px 24px;
+  border: 1px solid rgba(33, 160, 56, 0.14);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.intent-faq h2 {
+  margin: 0 0 14px;
+  font-size: 20px;
+}
+
+.intent-faq dl {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+}
+
+.intent-faq dt {
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.intent-faq dd {
+  max-width: 74ch;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.intent-list-heading {
+  margin: 0 0 14px;
+  font-size: 20px;
+}
+
+.intent-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.intent-links a {
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: #ffffff;
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.intent-links a:hover {
+  border-color: rgba(33, 160, 56, 0.4);
+}
+
+@media (max-width: 720px) {
+  .intent-lead {
+    font-size: 16px;
+  }
+
+  .intent-faq {
+    padding: 18px 16px;
+  }
+}

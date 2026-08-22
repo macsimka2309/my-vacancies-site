@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { db } from "./db";
+import type { IntentMatch, IntentStats } from "./intents";
 import { getSalaryCeiling, type SalaryBasis, type StructuredSalary } from "./salary";
 
 /** Тег для сброса кэша вакансий из админки. */
@@ -177,3 +178,116 @@ export type VacancyListItem = Awaited<
 export type VacancyDetails = NonNullable<
   Awaited<ReturnType<typeof getVacancyBySlug>>
 >;
+
+// Отбор под лендинги интентов (п. 13). Фильтруем в базе, а не в общем
+// кэшированном списке: под «без опыта» и «ежедневные выплаты» нужны тексты
+// требований и условий, а тянуть их в список витрины ради этого дорого.
+const INTENT_WHERE: Record<IntentMatch, object> = {
+  vahta: { title: { contains: "вахт", mode: "insensitive" } },
+  noExperience: {
+    OR: [
+      { requirements: { contains: "опыт не требуется", mode: "insensitive" } },
+      { requirements: { contains: "без опыта", mode: "insensitive" } },
+      { conditions: { contains: "обучим", mode: "insensitive" } },
+      { requirements: { contains: "обучим", mode: "insensitive" } },
+    ],
+  },
+  ownCar: {
+    OR: [
+      { requirements: { contains: "личный автомобиль", mode: "insensitive" } },
+      {
+        requirements: {
+          contains: "автомобиль с большим багажником",
+          mode: "insensitive",
+        },
+      },
+    ],
+  },
+  dailyPayout: { conditions: { contains: "ежедневн", mode: "insensitive" } },
+};
+
+const loadIntentVacancies = unstable_cache(
+  async (match: IntentMatch) =>
+    db.vacancy.findMany({
+      where: {
+        isActive: true,
+        ...INTENT_WHERE[match],
+      },
+      orderBy: [{ createdAt: "desc" }],
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        project: true,
+        city: true,
+        workFormat: true,
+        salary: true,
+        salaryShiftMin: true,
+        salaryShiftMax: true,
+        salaryShiftAvg: true,
+        salaryPeriodMin: true,
+        salaryPeriodMax: true,
+        salaryPeriod: true,
+        schedule: true,
+        address: true,
+      },
+    }),
+  ["intent-vacancies"],
+  { tags: [VACANCIES_CACHE_TAG], revalidate: 300 },
+);
+
+export async function getIntentVacancies(match: IntentMatch) {
+  return loadIntentVacancies(match);
+}
+
+/**
+ * Цифры для текста лендинга. Считаются из той же подборки, что показана
+ * ниже на странице, — иначе текст и список разошлись бы.
+ */
+export async function getIntentStats(
+  match: IntentMatch,
+): Promise<IntentStats> {
+  const [vacancies, all] = await Promise.all([
+    loadIntentVacancies(match),
+    loadActiveVacancies(),
+  ]);
+
+  return {
+    count: vacancies.length,
+    total: all.length,
+    cities: new Set(vacancies.map((item) => item.city)).size,
+    ...bounds(
+      vacancies.map((item) => [item.salaryShiftMin, item.salaryShiftMax]),
+      "shift",
+    ),
+    ...bounds(
+      vacancies.map((item) => [item.salaryPeriodMin, item.salaryPeriodMax]),
+      "period",
+    ),
+  };
+}
+
+/**
+ * Границы дохода по подборке.
+ *
+ * Берём именно диапазон, а не максимум: «доход до 11 000 ₽» — это верх
+ * самой щедрой вакансии в наборе, и читается он как обещание, которого
+ * никто не давал. Там, где у вакансии названа только верхняя сумма
+ * («до 5 000 ₽»), она же считается её нижней границей.
+ */
+function bounds<K extends "shift" | "period">(
+  pairs: Array<[number | null, number | null]>,
+  key: K,
+) {
+  const lows = pairs
+    .map(([min, max]) => min ?? max)
+    .filter((value): value is number => value !== null);
+  const highs = pairs
+    .map(([min, max]) => max ?? min)
+    .filter((value): value is number => value !== null);
+
+  return {
+    [`${key}Low`]: lows.length ? Math.min(...lows) : null,
+    [`${key}High`]: highs.length ? Math.max(...highs) : null,
+  } as Record<`${K}Low` | `${K}High`, number | null>;
+}

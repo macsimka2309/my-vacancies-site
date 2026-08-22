@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
+import { INTENT_SLUGS } from "@/lib/intents";
 import { site } from "@/lib/site";
 
 // Генерируем на каждый запрос: на сборке нет доступа к БД, и при revalidate
@@ -24,6 +25,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    // Лендинги под интенты (п. 13). Дата берётся от главной: их содержимое
+    // считается из каталога и меняется вместе с ним.
+    ...INTENT_SLUGS.map((slug) => ({
+      url: `${site.url}/${slug}`,
+      lastModified: homeUpdatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
   ];
 
   try {

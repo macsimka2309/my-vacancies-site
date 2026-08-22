@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getIntent, INTENT_SLUGS } from "@/lib/intents";
 import { site } from "@/lib/site";
 
 export function SiteFooter() {
@@ -11,6 +12,15 @@ export function SiteFooter() {
           <p className="site-footer__name">{site.legalName}</p>
           {site.inn ? <p className="muted">ИНН {site.inn}</p> : null}
         </div>
+        {/* Подборки во всех подвалах: без ссылок изнутри сайта поисковик
+            добирается до них только через карту сайта. */}
+        <nav className="site-footer__links" aria-label="Подборки вакансий">
+          {INTENT_SLUGS.map((slug) => (
+            <Link key={slug} href={`/${slug}`}>
+              {getIntent(slug)!.h1}
+            </Link>
+          ))}
+        </nav>
         <nav className="site-footer__links" aria-label="Правовая информация">
           <Link href="/privacy">Политика конфиденциальности</Link>
           {site.email ? (
