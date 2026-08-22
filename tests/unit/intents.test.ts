@@ -8,7 +8,6 @@ import {
 function buildStats(overrides: Partial<IntentStats> = {}): IntentStats {
   return {
     count: 10,
-    total: 169,
     cities: 10,
     shiftLow: 2240,
     shiftHigh: 6000,
@@ -87,17 +86,32 @@ describe("лендинги под интенты", () => {
   });
 
   it("согласует числительные с существительными", () => {
-    const one = getIntent("vahta")!.lead(buildStats({ count: 1, cities: 1 }));
-    const few = getIntent("vahta")!.lead(buildStats({ count: 3, cities: 2 }));
+    const one = getIntent("vahta")!.lead(buildStats({ cities: 1 }));
+    const few = getIntent("vahta")!.lead(buildStats({ cities: 2 }));
 
-    expect(one).toContain("1 вакансия в 1 городе");
-    expect(few).toContain("3 вакансии в 2 городах");
+    expect(one).toContain("в 1 городе");
+    expect(few).toContain("в 2 городах");
+  });
+
+  // Лендинг описывает работу, а не наш каталог: «159 из 169» — разговор
+  // про внутреннее устройство сайта, человеку он ничего не говорит.
+  it("не ссылается на размер каталога", () => {
+    for (const slug of INTENT_SLUGS) {
+      const intent = getIntent(slug)!;
+      const text = [
+        intent.lead(buildStats()),
+        ...intent.faq(buildStats()).map((item) => item.answer),
+      ].join(" ");
+
+      expect(text).not.toMatch(/из \d+/);
+      expect(text).not.toContain("каталог");
+    }
   });
 
   // Страница про ежедневные выплаты не должна обещать их всем.
   it("не обещает ежедневные выплаты всем", () => {
     const intent = getIntent("ezhednevnye-vyplaty")!;
-    const stats = buildStats({ count: 107 });
+    const stats = buildStats();
 
     expect(intent.lead(stats)).toContain("базовый режим — выплаты раз в неделю");
     expect(intent.faq(stats)[0].answer).toMatch(/^Нет\./);

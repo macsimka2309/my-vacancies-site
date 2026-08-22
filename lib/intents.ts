@@ -28,7 +28,6 @@ export type IntentMatch =
 
 export type IntentStats = {
   count: number;
-  total: number;
   cities: number;
   shiftLow: number | null;
   shiftHigh: number | null;
@@ -68,8 +67,9 @@ const INTENTS: Intent[] = [
       "Вахта курьером с бесплатным проживанием и компенсацией проезда. Выплаты еженедельно, авансы по средам. Опыт не нужен, оформим медкнижку.",
     lead: (stats) =>
       `Вахта — это работа сменами в другом городе, где компания берёт на себя жильё и дорогу. ` +
-      `${vacancyCount(stats.count)} в ${cityCount(stats.cities)}` +
-      `${formatShift(stats)}${formatPeriod(stats)}.`,
+      `Опыт не нужен, медицинскую книжку помогут оформить` +
+      `${formatShift(stats)}${formatPeriod(stats)}. ` +
+      `Сейчас набираем в ${cityCount(stats.cities)}.`,
     faq: () => [
       {
         question: "Что оплачивает компания?",
@@ -106,12 +106,14 @@ const INTENTS: Intent[] = [
     description:
       "Вакансии курьера и сборщика заказов, где опыт не требуется: учат на месте. Возраст от 18 лет, выплаты каждую неделю.",
     lead: (stats) =>
-      `Опыт не нужен: ${vacancyCount(stats.count)} из ${stats.total} прямо указывают, что научат на месте. ` +
-      `Нужны возраст от 18 лет, смартфон и документы${formatShift(stats)}.`,
-    faq: (stats) => [
+      `Курьером и сборщиком заказов берут без опыта — всему учат на месте, ` +
+      `и первые смены проходят с наставником. Нужны возраст от 18 лет, ` +
+      `смартфон и документы${formatShift(stats)}. Выплаты каждую неделю.`,
+    faq: () => [
       {
         question: "Правда берут совсем без опыта?",
-        answer: `Да. ${capitalize(vacancyCount(stats.count))} из ${stats.total} в каталоге прямо указывают, что опыт не требуется — обучение проходит на месте.`,
+        answer:
+          "Да. В описаниях вакансий это сказано прямо: опыт не требуется, обучение проходит на месте.",
       },
       {
         question: "Что нужно, кроме желания работать?",
@@ -140,7 +142,8 @@ const INTENTS: Intent[] = [
       "Вакансии курьера с личным автомобилем: права категории B, опыт не нужен. Доплаты за перепробег и вес, возмещение налога самозанятым.",
     lead: (stats) =>
       `Нужны права категории B и личный автомобиль — опыт работы курьером не требуется. ` +
-      `${vacancyCount(stats.count)} в ${cityCount(stats.cities)}${formatShift(stats)}.`,
+      `Оплата складывается из часов и заказов, к ней идут доплаты за перепробег ` +
+      `и за вес${formatShift(stats)}. Набираем в ${cityCount(stats.cities)}.`,
     faq: () => [
       {
         question: "Какие требования к автомобилю?",
@@ -174,13 +177,14 @@ const INTENTS: Intent[] = [
     description:
       "Вакансии, где новичкам доступны ежедневные выплаты. Базовый режим — еженедельный. Опыт не нужен, возраст от 18 лет.",
     lead: (stats) =>
-      `Сразу честно: базовый режим — выплаты раз в неделю. Ежедневные доступны новичкам, ` +
-      `и таких вакансий ${stats.count} из ${stats.total}${formatShift(stats)}. ` +
+      `Сразу честно: базовый режим — выплаты раз в неделю. Ежедневные доступны ` +
+      `новичкам и не на каждой вакансии${formatShift(stats)}. ` +
       `Условия по конкретной вакансии подтвердим при звонке.`,
-    faq: (stats) => [
+    faq: () => [
       {
         question: "Всем ли платят каждый день?",
-        answer: `Нет. Базовый режим — еженедельные выплаты. Ежедневные возможны для новичков, и об этом сказано в ${stats.count} вакансиях из ${stats.total}.`,
+        answer:
+          "Нет. Базовый режим — еженедельные выплаты. Ежедневные возможны для новичков и не на каждой вакансии — уточните это при звонке.",
       },
       {
         question: "Нужна ли самозанятость?",
@@ -190,24 +194,13 @@ const INTENTS: Intent[] = [
       {
         question: "Нужен ли опыт?",
         answer:
-          "Нет. Практически везде в каталоге опыт не требуется — обучают на месте.",
+          "Нет. Почти на всех вакансиях опыт не требуется — обучают на месте.",
       },
     ],
     emptyText:
       "Сейчас вакансий с ежедневными выплатами нет — посмотрите остальные.",
   },
 ];
-
-function vacancyCount(count: number) {
-  const words: Record<string, string> = {
-    one: "вакансия",
-    few: "вакансии",
-    many: "вакансий",
-    other: "вакансии",
-  };
-
-  return `${count} ${words[new Intl.PluralRules("ru-RU").select(count)] ?? words.other}`;
-}
 
 function cityCount(count: number) {
   const words: Record<string, string> = {
@@ -247,8 +240,4 @@ function formatRange(
 
 function format(value: number) {
   return new Intl.NumberFormat("ru-RU").format(value);
-}
-
-function capitalize(value: string) {
-  return value.charAt(0).toLocaleUpperCase("ru-RU") + value.slice(1);
 }

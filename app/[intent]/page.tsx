@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { VacancyList } from "@/components/vacancies/VacancyList";
 import { getIntent, INTENT_SLUGS } from "@/lib/intents";
+import { site } from "@/lib/site";
 import {
   buildBreadcrumbJsonLd,
   buildFaqJsonLd,
@@ -106,7 +107,7 @@ export default async function IntentPage({ params }: IntentPageProps) {
         </Link>
 
         <section className="page-header">
-          <p className="eyebrow">{stats.count} из {stats.total} вакансий</p>
+          <p className="eyebrow">{site.tagline}</p>
           <h1>{intent.h1}</h1>
           {/* Прямой ответ первым абзацем: его читает человек за первые
               секунды, и его же цитируют поиск и ассистенты. */}
@@ -132,7 +133,7 @@ export default async function IntentPage({ params }: IntentPageProps) {
               <VacancyList vacancies={visibleVacancies} />
               {isTrimmed ? (
                 <a className="show-all-link" href="/?all=1">
-                  Смотреть все {stats.total} вакансий каталога
+                  Посмотреть все вакансии
                 </a>
               ) : null}
             </>

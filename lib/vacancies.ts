@@ -247,14 +247,10 @@ export async function getIntentVacancies(match: IntentMatch) {
 export async function getIntentStats(
   match: IntentMatch,
 ): Promise<IntentStats> {
-  const [vacancies, all] = await Promise.all([
-    loadIntentVacancies(match),
-    loadActiveVacancies(),
-  ]);
+  const vacancies = await loadIntentVacancies(match);
 
   return {
     count: vacancies.length,
-    total: all.length,
     cities: new Set(vacancies.map((item) => item.city)).size,
     ...bounds(
       vacancies.map((item) => [item.salaryShiftMin, item.salaryShiftMax]),
