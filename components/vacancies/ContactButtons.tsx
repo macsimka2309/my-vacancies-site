@@ -30,27 +30,10 @@ export function ContactButtons({
 
   return (
     <div className="contact-buttons" data-variant={variant}>
-      {/* Звонок первым: части аудитории проще позвонить самим, чем ждать
-          обратного звонка. На мобиле это одно нажатие. */}
-      {site.phone ? (
-        <a
-          className="contact-btn"
-          href={`tel:${site.phone.replace(/[^\d+]/g, "")}`}
-          aria-label="Позвонить"
-          title={`Позвонить: ${site.phone}`}
-          onClick={() => reachGoal("call_click", goalParams)}
-        >
-          <PhoneIcon />
-          {/* Втроём в один ряд на мобиле «Позвонить» не помещается.
-              Подписи скрыты от скринридеров — им читается aria-label. */}
-          <span className="contact-btn__label--full" aria-hidden="true">
-            Позвонить
-          </span>
-          <span className="contact-btn__label--short" aria-hidden="true">
-            Звонок
-          </span>
-        </a>
-      ) : null}
+      {/* Запасной канал, а не равный вариант: главное действие — оставить
+          телефон в форме. Кнопки мессенджеров перетягивали нажатия на себя,
+          потому что нажать легче, чем набрать номер. */}
+      <span className="contact-buttons__label">или напишите</span>
       <a
         className="contact-btn"
         href={telegramHref}
@@ -76,24 +59,6 @@ export function ContactButtons({
         <span>MAX</span>
       </a>
     </div>
-  );
-}
-
-function PhoneIcon() {
-  return (
-    <svg
-      className="contact-btn__icon"
-      viewBox="0 0 24 24"
-      width="22"
-      height="22"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="12" fill="#21a038" />
-      <path
-        d="M17.6 15.4l-2-.9a.9.9 0 0 0-1 .2l-.8.9a7.7 7.7 0 0 1-3.4-3.4l.9-.8a.9.9 0 0 0 .2-1l-.9-2a.9.9 0 0 0-1-.5l-1.7.4a1 1 0 0 0-.8 1c.2 4.6 3.9 8.3 8.5 8.5a1 1 0 0 0 1-.8l.4-1.7a.9.9 0 0 0-.5-1z"
-        fill="#fff"
-      />
-    </svg>
   );
 }
 

@@ -849,10 +849,19 @@ select {
   max-width: 620px;
 }
 
+/* Запасной канал, а не равный вариант: в один ряд с формой они забирали
+   нажатия себе — нажать легче, чем набрать номер. Поэтому мельче, тише
+   и с подписью, которая объясняет их роль. */
 .contact-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-buttons__label {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .contact-btn__label--short {
@@ -862,15 +871,15 @@ select {
 .contact-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 16px 0 10px;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px 0 8px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface);
   color: var(--foreground);
   font-weight: 600;
-  font-size: 15px;
+  font-size: 13px;
   text-decoration: none;
   transition:
     border-color var(--motion),
@@ -892,6 +901,8 @@ select {
 
 .contact-btn__icon {
   flex: none;
+  width: 18px;
+  height: 18px;
 }
 
 /* Компактный вариант для карточек в списке: не перегружает 100+ карточек. */
@@ -1139,9 +1150,14 @@ select {
 }
 
 .site-header {
+  /* Липкая: звонок перенесён сюда из карточек, и он должен оставаться
+     под рукой при прокрутке, а не уезжать после первого экрана. */
+  position: sticky;
+  top: 0;
+  z-index: 50;
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(6px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
 }
 
 .site-header__inner {
@@ -1181,13 +1197,30 @@ select {
 }
 
 .site-header__phone {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(33, 160, 56, 0.28);
+  border-radius: 14px;
+  background: rgba(33, 160, 56, 0.07);
   color: var(--accent-strong);
   font-weight: 700;
   white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background var(--motion),
+    border-color var(--motion);
 }
 
 .site-header__phone:hover {
-  color: var(--accent);
+  border-color: rgba(33, 160, 56, 0.5);
+  background: rgba(33, 160, 56, 0.12);
+}
+
+.site-header__phone-icon {
+  flex: 0 0 auto;
 }
 
 .site-footer {
@@ -2251,7 +2284,15 @@ select {
 
 .inline-apply__submit {
   flex: 0 0 auto;
+  min-height: 50px;
+  padding: 0 26px;
+  font-size: 17px;
   white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(33, 160, 56, 0.24);
+}
+
+.inline-apply__phone {
+  min-height: 50px;
 }
 
 .inline-apply__consent,
@@ -2305,39 +2346,24 @@ select {
     width: 100%;
   }
 
-  /* Мессенджеры и звонок — в один ряд: тремя кнопками в столбик карточка
-     растягивалась, а сами кнопки читались как список, а не как выбор. */
+  /* Подпись и две кнопки помещаются в строку: третьей, «Позвонить»,
+     здесь больше нет — она уехала в шапку. */
   .contact-buttons,
   .contact-buttons[data-variant="compact"] {
-    flex-wrap: nowrap;
-    gap: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
     width: 100%;
   }
 
-  .contact-buttons .contact-btn,
-  .contact-buttons[data-variant="compact"] .contact-btn {
-    flex: 1 1 0;
-    justify-content: center;
-    min-width: 0;
-    padding: 0 8px;
-    gap: 5px;
-    font-size: 13px;
-  }
-
-  .contact-btn__icon {
-    flex: 0 0 auto;
-    width: 20px;
-    height: 20px;
-  }
-
-  /* На узком экране «Позвонить» не помещается втроём — показываем короткую
-     подпись. Полное название остаётся в aria-label самой ссылки. */
-  .contact-btn__label--full {
+  /* На узком экране прячем название рядом с логотипом и показываем номер
+     целиком: и то и другое в строку не помещается, а номер здесь важнее —
+     это и действие, и знак, что за сайтом есть живые люди. */
+  .site-brand__name {
     display: none;
   }
 
-  .contact-btn__label--short {
-    display: inline;
+  .site-header__phone {
+    padding: 0 12px;
   }
 
   .vacancy-card__facts .vacancy-meta,
@@ -2359,7 +2385,8 @@ select {
     padding: 0 10px;
   }
 
-  .sticky-cta .contact-btn span {
+  .sticky-cta .contact-btn span,
+  .sticky-cta .contact-buttons__label {
     display: none;
   }
 }

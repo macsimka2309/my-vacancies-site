@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
+import { CallButton } from "./CallButton";
 
 export function SiteHeader() {
   return (
@@ -21,11 +22,7 @@ export function SiteHeader() {
           </picture>
           <span className="site-brand__name">{site.name}</span>
         </Link>
-        {site.phone ? (
-          <a className="site-header__phone" href={`tel:${site.phone.replace(/[^\d+]/g, "")}`}>
-            {site.phone}
-          </a>
-        ) : null}
+        <CallButton />
       </div>
     </header>
   );
