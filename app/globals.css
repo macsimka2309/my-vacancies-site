@@ -1144,6 +1144,14 @@ select {
   .city-context__salary {
     white-space: normal;
   }
+
+  /* Заголовок с длинным словом («Курьер на электровелосипеде в Самокате —
+     Москва») тоже задаёт минимальную ширину странице. Здесь нужен именно
+     `anywhere`: `break-word` переносит слово, но ширину не уменьшает. */
+  h1,
+  h2 {
+    overflow-wrap: anywhere;
+  }
 }
 
 .city-context__region {
