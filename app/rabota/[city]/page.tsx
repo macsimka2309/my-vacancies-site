@@ -5,8 +5,14 @@ import { cache } from "react";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { ContactButtons } from "@/components/vacancies/ContactButtons";
+import { joinProjects } from "@/lib/city-context";
 import { buildCityFaq, describePay, money } from "@/lib/city-page";
-import { buildCityPageDescription, buildCityPageTitle } from "@/lib/meta";
+import {
+  buildCityPageDescription,
+  buildCityPageTitle,
+  describeCityWork,
+  formatVacancies,
+} from "@/lib/meta";
 import { site } from "@/lib/site";
 import {
   buildBreadcrumbJsonLd,
@@ -115,17 +121,19 @@ export default async function CityPage({ params }: CityPageProps) {
           <p className="eyebrow">
             {page.region ?? "Россия"}
           </p>
-          <h1>Работа {where}</h1>
+          {/* H1 с профессиями, а не просто «Работа в Твери»: тот же урок,
+              что и с карточками (п. 42) — заголовок первого уровня весит в
+              поиске больше всего, и слова, которые ищут, должны быть в нём. */}
+          <h1>
+            Работа {describeCityWork(page.professions)} {where}
+          </h1>
           {/* Первый абзац — прямой ответ на запрос, цифры только из базы.
               Он же — то, что может процитировать поиск или ассистент. */}
           <p className="city-page__lead">
             {page.cityIn ? `В ${page.cityIn}` : `В городе ${page.city}`}{" "}
-            {page.total === 1 ? "одна вакансия" : `${page.total} вакансий`}{" "}
-            {page.professions.length > 1
-              ? `по ${page.professions.length} направлениям`
-              : ""}
+            {formatVacancies(page.total)}
             {page.projects.length > 1
-              ? ` от ${page.projects.length} работодателей: ${page.projects.join(", ")}`
+              ? ` от ${page.projects.length} работодателей: ${joinProjects(page.projects)}`
               : `: ${page.projects[0]}`}
             .{" "}
             {page.to !== null

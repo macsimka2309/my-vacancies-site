@@ -122,7 +122,7 @@ type CityPageMetaSource = {
 export function buildCityPageTitle(page: CityPageMetaSource) {
   const where = page.cityIn ? `в ${page.cityIn}` : `— ${page.city}`;
   const count = formatVacancies(page.total);
-  const work = describeWork(page.professions);
+  const work = describeCityWork(page.professions);
 
   // От самого содержательного к тому, что заведомо поместится: у длинных
   // названий вроде Санкт-Петербурга полная формула выходит за 60 знаков.
@@ -156,8 +156,8 @@ export function buildCityPageDescription(page: CityPageMetaSource) {
   );
 }
 
-// «курьером», «сборщиком заказов» или обоими — по составу города.
-function describeWork(professions: { title: string }[]) {
+/** «курьером», «сборщиком заказов» или обоими — по составу города. */
+export function describeCityWork(professions: { title: string }[]) {
   const hasCourier = professions.some((item) => /курьер/i.test(item.title));
   const hasPicker = professions.some((item) => /сборщик/i.test(item.title));
 
