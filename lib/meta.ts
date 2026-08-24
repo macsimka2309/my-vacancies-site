@@ -120,7 +120,7 @@ function getShiftRate(salary: string | null) {
   return shiftPart || null;
 }
 
-function formatVacancies(count: number) {
+export function formatVacancies(count: number) {
   const words: Record<string, string> = {
     one: "вакансия",
     few: "вакансии",

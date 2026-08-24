@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { buildCityContext, type CityContextVacancy } from "./city-context";
 import { db } from "./db";
 import type { IntentMatch, IntentStats } from "./intents";
 import { getSalaryCeiling, type SalaryBasis, type StructuredSalary } from "./salary";
@@ -137,6 +138,19 @@ export async function getActiveVacancySlugs() {
   const vacancies = await loadActiveVacancies();
 
   return vacancies.map((vacancy) => vacancy.slug);
+}
+
+/**
+ * Городской контекст для карточки вакансии (п. 35).
+ *
+ * Читает тот же кэшированный список, что и каталог, — отдельного запроса
+ * в базу не делает. Иначе каждая карточка ходила бы в базу за соседями,
+ * а мы только что научили её кэшироваться (п. 36).
+ */
+export async function getCityContext(current: CityContextVacancy) {
+  const vacancies = await loadActiveVacancies();
+
+  return buildCityContext(current, vacancies);
 }
 
 function uniqueSorted(values: Array<string | null | undefined>) {

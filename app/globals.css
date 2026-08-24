@@ -1083,6 +1083,65 @@ select {
   line-height: 1.25;
 }
 
+/* Что ещё есть в этом городе (п. 35). Список, а не карточки: блок стоит
+   под условиями и не должен спорить по весу с формой отклика выше. */
+.city-context__lead {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.city-context__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.city-context__list a {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  padding: 12px 16px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--motion),
+    background var(--motion);
+}
+
+.city-context__list a:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.city-context__position {
+  font-weight: 600;
+}
+
+.city-context__project {
+  margin-left: 8px;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.city-context__salary {
+  color: var(--accent-strong);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.city-context__region {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .text-block {
   display: grid;
   gap: 12px;
