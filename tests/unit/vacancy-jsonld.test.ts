@@ -90,6 +90,18 @@ describe("getRegionByCity", () => {
 });
 
 describe("buildJobPostingJsonLd", () => {
+  // В блоке вакансий и в агрегаторах видно именно `title`. Работодателем
+  // при этом остаёмся мы — бренд говорит, где работа, а не кто нанимает.
+  it("называет бренд в заголовке, но не в работодателе", () => {
+    const jsonLd = buildJobPostingJsonLd(buildVacancy()) as {
+      title: string;
+      hiringOrganization: { name: string };
+    };
+
+    expect(jsonLd.title).toBe("Курьер на авто в Ленте");
+    expect(jsonLd.hiringOrganization.name).toBe("Работа Рядом");
+  });
+
   it("отдаёт срок действия объявления", () => {
     const jsonLd = buildJobPostingJsonLd(buildVacancy());
 

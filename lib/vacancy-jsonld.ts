@@ -1,4 +1,5 @@
 import { getRegionByCity } from "./cities";
+import { buildPositionWithProject } from "./project";
 import { toJsonLdSalary } from "./salary";
 import { site } from "./site";
 import type { VacancyDetails } from "./vacancies";
@@ -13,7 +14,10 @@ export function buildJobPostingJsonLd(vacancy: VacancyDetails) {
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
-    title: vacancy.title,
+    // С брендом: в блоке вакансий и в агрегаторах видно именно это поле,
+    // а ищут «сборщик заказов в Ленте», а не «сборщик заказов».
+    // Работодателем при этом остаёмся мы — см. hiringOrganization ниже.
+    title: buildPositionWithProject(vacancy.title, vacancy.project),
     description,
     datePosted: vacancy.createdAt.toISOString(),
     // Без срока объявление отбраковывается при импорте в агрегаторы

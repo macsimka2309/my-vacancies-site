@@ -10,7 +10,7 @@ import { VacancyTextBlock } from "@/components/vacancies/VacancyTextBlock";
 import { buildVacancyDescription, buildVacancyTitle } from "@/lib/meta";
 import { buildBreadcrumbJsonLd } from "@/lib/site-jsonld";
 import { buildJobPostingJsonLd } from "@/lib/vacancy-jsonld";
-import { formatProject } from "@/lib/project";
+import { buildPositionWithProject, formatProject } from "@/lib/project";
 import { getVacancyBySlug } from "@/lib/vacancies";
 
 // Страница вакансии не зависит от параметров запроса, поэтому её можно
@@ -103,8 +103,11 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
 
       <section className="detail-hero">
         <p className="eyebrow">{formatProject(vacancy.project)}</p>
+        {/* Бренд в H1, а не только в надзаголовке: заголовок первого уровня
+            весит в поиске больше всего, а «Лента» — головное слово запроса. */}
         <h1>
-          {vacancy.title} — {vacancy.city}
+          {buildPositionWithProject(vacancy.title, vacancy.project)} —{" "}
+          {vacancy.city}
         </h1>
         <dl className="detail-meta" aria-label="Основные условия вакансии">
           <div>

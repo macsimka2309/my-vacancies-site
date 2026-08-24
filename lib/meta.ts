@@ -1,4 +1,5 @@
 import { getCityIn } from "./cities";
+import { buildPositionWithProject } from "./project";
 
 /**
  * Формулы `title` и `description`.
@@ -22,17 +23,36 @@ type VacancyMetaSource = {
 };
 
 export function buildVacancyTitle(vacancy: VacancyMetaSource) {
-  const cityIn = getCityIn(vacancy.city);
-  const position = cityIn
-    ? `${vacancy.title} в ${cityIn}`
-    : `${vacancy.title} — ${vacancy.city}`;
+  // Бренд идёт сразу за профессией — так человек и спрашивает: «лента
+  // сборщик заказов вакансии спб». Город после тире и в именительном:
+  // иначе в заголовке оказывается два «в» подряд.
+  const base = `${buildPositionWithProject(vacancy.title, vacancy.project)} — ${vacancy.city}`;
+
+  // Страховка на случай очень длинной связки. С нынешним каталогом самая
+  // длинная — 57 знаков («Курьер на электровелосипеде в Самокате — Великий
+  // Новгород»), так что сюда не попадаем. Но связку задаёт база, а не код.
+  if (base.length > TITLE_LIMIT) {
+    return `${vacancy.title} — ${vacancy.city}`;
+  }
+
   const shiftRate = getShiftRate(vacancy.salary);
 
-  // Ставка за смену — самое убедительное, что есть в заголовке. Добавляем
-  // её, только если весь заголовок после этого всё ещё помещается.
-  const withRate = shiftRate ? `${position} — ${shiftRate}` : position;
+  if (!shiftRate) {
+    return base;
+  }
 
-  return withRate.length <= TITLE_LIMIT ? withRate : position;
+  // Ставка — самое убедительное, что есть в заголовке, поэтому прежде чем
+  // её выбросить, пробуем короткую запись. Три знака решают судьбу
+  // Санкт-Петербурга: с «за смену» заголовок 61 знак, с «/смена» — 58.
+  for (const rate of [shiftRate, toCompactRate(shiftRate)]) {
+    const withRate = `${base}, ${rate}`;
+
+    if (withRate.length <= TITLE_LIMIT) {
+      return withRate;
+    }
+  }
+
+  return base;
 }
 
 export function buildVacancyDescription(vacancy: VacancyMetaSource) {
@@ -82,6 +102,12 @@ export function buildCatalogDescription(catalog: CatalogMetaSource) {
       "Выплаты каждую неделю, опыт не нужен. Оставьте телефон — перезвоним.",
     DESCRIPTION_LIMIT,
   );
+}
+
+// «до 6500 ₽ за смену» → «до 6500 ₽/смена». Запись «₽/мес» уже встречается
+// в витринных зарплатах, так что форма для читателя не новая.
+function toCompactRate(rate: string) {
+  return rate.replace(/\s*за смену$/i, "/смена");
 }
 
 // «до 6500 ₽ за смену · от 102 000 ₽/мес» → «до 6500 ₽ за смену».

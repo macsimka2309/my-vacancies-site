@@ -6,3 +6,34 @@
 export function formatProject(project: string) {
   return `официальный партнёр ${project}`;
 }
+
+/**
+ * Предложный падеж названия проекта — «в Ленте», «в Магните».
+ *
+ * Нужен заголовкам. Замер Вебмастера 24.08 показал, что 78 % показов
+ * приходится на запросы с названием бренда («лента сборщик заказов вакансии
+ * спб»), а в `title` и `H1` бренда не было вовсе — он стоял только в середине
+ * `description`. В выдаче искомое слово подсвечивается, и его отсутствие в
+ * заголовке стоило нам кликов при позициях в первой десятке.
+ */
+const PROJECT_IN: Record<string, string> = {
+  Лента: "Ленте",
+  Магнит: "Магните",
+  Самокат: "Самокате",
+};
+
+export function getProjectIn(project: string) {
+  return PROJECT_IN[project] ?? null;
+}
+
+/**
+ * «Сборщик заказов» + «Лента» → «Сборщик заказов в Ленте».
+ *
+ * Незнакомый проект склонять не пытаемся: неверный падеж заметнее, чем
+ * запятая. Появится четвёртый партнёр — достаточно строки в PROJECT_IN.
+ */
+export function buildPositionWithProject(title: string, project: string) {
+  const projectIn = getProjectIn(project);
+
+  return projectIn ? `${title} в ${projectIn}` : `${title}, ${project}`;
+}
