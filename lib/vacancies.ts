@@ -158,13 +158,21 @@ export async function getCityContext(current: CityContextVacancy) {
 /**
  * Цифры для оффера на первом экране (п. 6).
  *
- * Диапазон считается тем же `bounds`, что и на лендингах интентов: если
- * главная скажет одно, а `/vahta` — другое по пересекающимся наборам, это
+ * Считается по **уже отфильтрованному** списку, а не по всему каталогу.
+ * Иначе на `?city=Тверь` заголовок обещал «работу сборщиком заказов»,
+ * которой в Твери нет, а ставку называл общекаталожную — 1 000–11 000 ₽
+ * вместо тверских. Оффер, который не сходится с тем, что под ним, хуже
+ * отсутствующего.
+ *
+ * Диапазон берёт тот же `bounds`, что и лендинги интентов: если главная
+ * скажет одно, а `/vahta` — другое по пересекающимся наборам, это
  * противоречие увидит и человек, и ассистент.
  */
-export async function getCatalogStats() {
-  const vacancies = await loadActiveVacancies();
-
+export function summarizeVacancies(
+  vacancies: Array<
+    StructuredSalary & { title: string; project: string; city: string }
+  >,
+) {
   return {
     count: vacancies.length,
     cities: new Set(vacancies.map((vacancy) => vacancy.city)).size,

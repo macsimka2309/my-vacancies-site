@@ -21,7 +21,7 @@ import {
 } from "@/lib/site-jsonld";
 import {
   getActiveVacancies,
-  getCatalogStats,
+  summarizeVacancies,
   getVacancyFilterOptions,
   type VacancyFilters,
 } from "@/lib/vacancies";
@@ -78,10 +78,7 @@ async function VacancyHome({
   filters: VacancyFilters;
   showAll: boolean;
 }) {
-  const [filterOptions, catalog] = await Promise.all([
-    getVacancyFilterOptions(),
-    getCatalogStats(),
-  ]);
+  const filterOptions = await getVacancyFilterOptions();
   // Город приходит из рекламы ({region_name} в Директе) и может не совпасть
   // со справочником — тогда игнорируем его и показываем выбор города.
   const filters = withKnownCities(rawFilters, filterOptions.cities);
@@ -94,6 +91,8 @@ async function VacancyHome({
   );
   const cityIn =
     selectedCities.length === 1 ? getCityIn(selectedCities[0]) : null;
+  // Оффер описывает то, что человек увидит под ним, а не весь каталог.
+  const summary = summarizeVacancies(vacancies);
   const isTrimmed = !hasFilters && !showAll && vacancies.length > PREVIEW_LIMIT;
   const visibleVacancies = isTrimmed
     ? vacancies.slice(0, PREVIEW_LIMIT)
@@ -124,17 +123,18 @@ async function VacancyHome({
         <section className="page-header">
           <p className="eyebrow">{site.tagline}</p>
           <h1>
-            Работа {describeCityWork(catalog.professions)}
+            Работа {describeCityWork(summary.professions)}
             {cityIn ? ` в ${cityIn}` : ""}
           </h1>
           <p className="muted">
-            {formatVacancies(vacancies.length)}
-            {selectedCities.length
-              ? ""
-              : ` в ${catalog.cities} городах России`}
-            .{" "}
-            {catalog.shiftLow !== null && catalog.shiftHigh !== null
-              ? `Смена — от ${money(catalog.shiftLow)} до ${money(catalog.shiftHigh)} ₽ в зависимости от города, транспорта и числа часов.`
+            {formatVacancies(summary.count)}
+            {selectedCities.length ? "" : ` в ${summary.cities} городах России`}.{" "}
+            {summary.shiftLow !== null && summary.shiftHigh !== null
+              ? `Смена — от ${money(summary.shiftLow)} до ${money(summary.shiftHigh)} ₽${
+                  selectedCities.length
+                    ? " в зависимости от транспорта и числа часов."
+                    : " в зависимости от города, транспорта и числа часов."
+                }`
               : ""}
           </p>
           {/* Три факта, верные для всего каталога — проверено запросом:
@@ -144,7 +144,7 @@ async function VacancyHome({
           <ul className="offer-facts">
             <li>Выплаты каждую неделю</li>
             <li>От 18 лет</li>
-            <li>{joinProjects(catalog.projects)}</li>
+            <li>{joinProjects(summary.projects)}</li>
           </ul>
         </section>
         {selectedCities.length ? null : (
