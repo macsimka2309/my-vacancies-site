@@ -1133,7 +1133,17 @@ select {
 .city-context__salary {
   color: var(--accent-strong);
   font-weight: 700;
+  /* nowrap только там, где есть ширина. Витринная строка бывает длинной —
+     «4000–6000 ₽ за смену · от 110 000 ₽ за вахту», 44 знака, — и на узком
+     экране запрет переноса задавал минимальную ширину всей странице:
+     Санкт-Петербург разъезжался до 444px при вьюпорте 390. */
   white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .city-context__salary {
+    white-space: normal;
+  }
 }
 
 .city-context__region {
