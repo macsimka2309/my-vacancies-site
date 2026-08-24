@@ -805,7 +805,8 @@ select {
   margin: 0 0 8px;
 }
 
-.detail-layout {
+.detail-layout,
+.city-layout {
   display: grid;
   gap: 18px;
 }

@@ -13,7 +13,6 @@ import {
   describeCityWork,
   formatVacancies,
 } from "@/lib/meta";
-import { site } from "@/lib/site";
 import {
   buildBreadcrumbJsonLd,
   buildFaqJsonLd,
@@ -80,7 +79,7 @@ export default async function CityPage({ params }: CityPageProps) {
   return (
     <>
       <SiteHeader />
-      <main className="page-shell detail-layout">
+      <main className="page-shell city-layout">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -214,12 +213,12 @@ export default async function CityPage({ params }: CityPageProps) {
           </section>
         ) : null}
       </main>
-      <div className="sticky-cta">
-        <a className="button-link apply-button" href={`tel:${site.phone.replace(/[^\d+]/g, "")}`}>
-          Позвонить
-        </a>
-        <ContactButtons variant="compact" />
-      </div>
+      {/* Липкой панели здесь нет намеренно. На карточке вакансии она ведёт
+          к форме — главному действию (300 ₽ по ценности цели в Метрике).
+          Здесь формы нет: чтобы откликнуться, нужно сначала выбрать вакансию,
+          и большая кнопка «Позвонить» (100 ₽) просто перехватывала бы этот
+          выбор. Кому нужен звонок — телефон закреплён в шапке, и он
+          размечен целью, в отличие от такой кнопки. */}
       <SiteFooter />
     </>
   );
