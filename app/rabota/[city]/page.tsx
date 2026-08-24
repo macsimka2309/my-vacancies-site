@@ -158,7 +158,11 @@ export default async function CityPage({ params }: CityPageProps) {
             <h2>
               {profession.title} {where}
             </h2>
-            <p className="city-page__pay">{describePay(profession)}</p>
+            {/* Свод по профессии — только когда вакансий несколько. При
+                одной он дословно повторяет строку под ним. */}
+            {profession.count > 1 ? (
+              <p className="city-page__pay">{describePay(profession)}</p>
+            ) : null}
             <ul className="city-context__list">
               {profession.vacancies.map((vacancy) => (
                 <li key={vacancy.slug}>
