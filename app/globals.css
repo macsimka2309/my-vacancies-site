@@ -123,6 +123,27 @@ select {
   text-transform: uppercase;
 }
 
+/* Три факта под оффером (п. 6). Не украшение: это единственные утверждения,
+   верные для всех 169 вакансий — проверено запросом к базе. */
+.offer-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offer-facts li {
+  border: 1px solid rgba(33, 160, 56, 0.22);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .vacancy-list {
   display: grid;
   gap: 16px;
@@ -985,8 +1006,8 @@ select {
 
 /* Выбор города — первый экран для посетителя без города в ссылке. */
 .city-gate {
-  margin-bottom: 22px;
-  padding: 22px;
+  margin-bottom: 18px;
+  padding: 16px 18px;
   border: 1px solid rgba(33, 160, 56, 0.14);
   border-radius: var(--radius-panel);
   background: rgba(255, 255, 255, 0.96);
@@ -994,8 +1015,8 @@ select {
 }
 
 .city-gate h2 {
-  margin: 0 0 6px;
-  font-size: 22px;
+  margin: 0 0 10px;
+  font-size: 16px;
   line-height: 1.25;
 }
 
@@ -1024,7 +1045,7 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 14px 0 0;
+  margin: 10px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -2183,6 +2204,18 @@ select {
 
   .vacancy-layout {
     grid-template-columns: 1fr;
+  }
+
+  /* Фильтры — под карточки (п. 6). В одной колонке они вставали перед
+     списком и отодвигали первую вакансию ещё на сотню пикселей. Человеку,
+     который пришёл из объявления и живёт на странице 25 секунд, фильтры
+     не нужны — ему нужна вакансия. */
+  .filters-panel {
+    order: 2;
+  }
+
+  .vacancy-results {
+    order: 1;
   }
 
   .filters-panel {

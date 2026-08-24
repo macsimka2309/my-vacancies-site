@@ -4,15 +4,22 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { reachGoal } from "@/lib/metrika";
 
-const TOP_CITIES_LIMIT = 12;
+/**
+ * Шесть, а не двенадцать (п. 6). Замер на 390px: блок выбора города занимал
+ * 593 пикселя из 844, из них 356 — список городов. Первая карточка вакансии
+ * начиналась на 993px, то есть на 149px ниже экрана: человек за свои
+ * средние 25 секунд не видел ни одной вакансии. Кому нужен другой город —
+ * есть поиск и полный список в фильтрах.
+ */
+const TOP_CITIES_LIMIT = 6;
 
 type CityGateProps = {
   cityCounts: Array<{ city: string; count: number }>;
 };
 
-// Первый экран для посетителя без выбранного города: реклама ведёт на общий
-// список, и человек не находит свой город среди десятков других. Здесь он
-// выбирает город в один тап и сразу видит только свои вакансии.
+// Быстрый выбор города для посетителя, пришедшего на общий список. Это
+// инструмент сужения, а не пропускной пункт: оффер и вакансии человек видит
+// независимо от того, выбрал он город или нет.
 export function CityGate({ cityCounts }: CityGateProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -39,11 +46,9 @@ export function CityGate({ cityCounts }: CityGateProps) {
 
   return (
     <section className="city-gate" aria-labelledby="city-gate-title">
-      <h2 id="city-gate-title">В каком городе ищете работу?</h2>
-      <p className="muted">
-        Выберите город — покажем только те вакансии, куда можно выйти рядом с
-        домом.
-      </p>
+      {/* Не вопрос, а подпись: вопросом это было первым, что видел человек
+          после клика по объявлению, — вместо оффера. */}
+      <h2 id="city-gate-title">Ваш город</h2>
       <input
         className="city-gate__search"
         type="search"

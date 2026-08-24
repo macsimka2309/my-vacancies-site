@@ -155,6 +155,33 @@ export async function getCityContext(current: CityContextVacancy) {
   return buildCityContext(current, vacancies);
 }
 
+/**
+ * Цифры для оффера на первом экране (п. 6).
+ *
+ * Диапазон считается тем же `bounds`, что и на лендингах интентов: если
+ * главная скажет одно, а `/vahta` — другое по пересекающимся наборам, это
+ * противоречие увидит и человек, и ассистент.
+ */
+export async function getCatalogStats() {
+  const vacancies = await loadActiveVacancies();
+
+  return {
+    count: vacancies.length,
+    cities: new Set(vacancies.map((vacancy) => vacancy.city)).size,
+    professions: uniqueSorted(vacancies.map((vacancy) => vacancy.title)).map(
+      (title) => ({ title }),
+    ),
+    projects: uniqueSorted(vacancies.map((vacancy) => vacancy.project)),
+    ...bounds(
+      vacancies.map((vacancy) => [
+        vacancy.salaryShiftMin,
+        vacancy.salaryShiftMax,
+      ]),
+      "shift",
+    ),
+  };
+}
+
 /** Городская страница по её адресу. Незнакомый слаг — `null`, дальше 404. */
 export async function getCityPageBySlug(slug: string) {
   const vacancies = await loadActiveVacancies();

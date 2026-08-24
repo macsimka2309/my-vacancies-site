@@ -4,7 +4,15 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { CityGate } from "@/components/vacancies/CityGate";
 import { VacancyFiltersPanel } from "@/components/vacancies/VacancyFilters";
 import { VacancyList } from "@/components/vacancies/VacancyList";
-import { buildCatalogDescription, buildCatalogTitle } from "@/lib/meta";
+import { getCityIn } from "@/lib/cities";
+import { joinProjects } from "@/lib/city-context";
+import { money } from "@/lib/city-page";
+import {
+  buildCatalogDescription,
+  buildCatalogTitle,
+  describeCityWork,
+  formatVacancies,
+} from "@/lib/meta";
 import { site } from "@/lib/site";
 import {
   buildOrganizationJsonLd,
@@ -13,6 +21,7 @@ import {
 } from "@/lib/site-jsonld";
 import {
   getActiveVacancies,
+  getCatalogStats,
   getVacancyFilterOptions,
   type VacancyFilters,
 } from "@/lib/vacancies";
@@ -69,7 +78,10 @@ async function VacancyHome({
   filters: VacancyFilters;
   showAll: boolean;
 }) {
-  const filterOptions = await getVacancyFilterOptions();
+  const [filterOptions, catalog] = await Promise.all([
+    getVacancyFilterOptions(),
+    getCatalogStats(),
+  ]);
   // Город приходит из рекламы ({region_name} в Директе) и может не совпасть
   // со справочником — тогда игнорируем его и показываем выбор города.
   const filters = withKnownCities(rawFilters, filterOptions.cities);
@@ -80,6 +92,8 @@ async function VacancyHome({
   const hasFilters = Boolean(
     selectedCities.length || filters.titles?.length || filters.projects?.length,
   );
+  const cityIn =
+    selectedCities.length === 1 ? getCityIn(selectedCities[0]) : null;
   const isTrimmed = !hasFilters && !showAll && vacancies.length > PREVIEW_LIMIT;
   const visibleVacancies = isTrimmed
     ? vacancies.slice(0, PREVIEW_LIMIT)
@@ -101,18 +115,37 @@ async function VacancyHome({
             ]),
           }}
         />
+        {/* Оффер, а не вопрос (п. 6). Сюда приходит весь платный трафик —
+            400 визитов за четыре дня, все на «/», среднее время 25 секунд.
+            Заголовком было одно слово «Вакансии», а первое, что видел
+            человек после клика по объявлению «до 8 000 ₽ за смену», —
+            вопрос «В каком городе ищете работу?». Все цифры ниже считаются
+            из каталога: выдуманного в оффере нет ничего. */}
         <section className="page-header">
           <p className="eyebrow">{site.tagline}</p>
           <h1>
-            {selectedCities.length
-              ? `Вакансии — ${selectedCities.join(", ")}`
-              : "Вакансии"}
+            Работа {describeCityWork(catalog.professions)}
+            {cityIn ? ` в ${cityIn}` : ""}
           </h1>
           <p className="muted">
+            {formatVacancies(vacancies.length)}
             {selectedCities.length
-              ? "Выберите подходящую позицию и посмотрите подробные условия."
-              : "Работа рядом с домом: доставка, сборка заказов, вахта."}
+              ? ""
+              : ` в ${catalog.cities} городах России`}
+            .{" "}
+            {catalog.shiftLow !== null && catalog.shiftHigh !== null
+              ? `Смена — от ${money(catalog.shiftLow)} до ${money(catalog.shiftHigh)} ₽ в зависимости от города, транспорта и числа часов.`
+              : ""}
           </p>
+          {/* Три факта, верные для всего каталога — проверено запросом:
+              еженедельные выплаты и возраст от 18 указаны у всех 169 вакансий.
+              «Опыт не нужен» сюда не попал: он верен для 159 из 169, и как
+              обещание на первом экране это было бы неправдой. */}
+          <ul className="offer-facts">
+            <li>Выплаты каждую неделю</li>
+            <li>От 18 лет</li>
+            <li>{joinProjects(catalog.projects)}</li>
+          </ul>
         </section>
         {selectedCities.length ? null : (
           <CityGate cityCounts={filterOptions.cityCounts} />
