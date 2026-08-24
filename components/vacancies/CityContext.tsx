@@ -37,9 +37,11 @@ export function CityContext({ context }: { context: CityContextData }) {
       {hasPeers ? (
         <>
           <p className="city-context__lead">
-            {cityIn ? `В ${cityIn}` : `В городе ${context.city}`} —{" "}
-            {formatVacancies(context.total)} от{" "}
-            {joinProjects(context.projects)}.
+            {/* Двоеточие, а не «от»: названия проектов лежат в базе в
+                именительном падеже, и «от Лента и Самокат» — это то, что
+                получится, если попытаться пристроить к ним предлог. */}
+            {cityIn ? `В ${cityIn}` : `В городе ${context.city}`}{" "}
+            {formatVacancies(context.total)}: {joinProjects(context.projects)}.
             {context.noTransportPeer ? (
               <>
                 {" "}
