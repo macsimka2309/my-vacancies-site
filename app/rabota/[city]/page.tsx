@@ -133,8 +133,8 @@ export default async function CityPage({ params }: CityPageProps) {
             {page.cityIn ? `В ${page.cityIn}` : `В городе ${page.city}`}{" "}
             {formatVacancies(page.total)}
             {page.projects.length > 1
-              ? ` от ${page.projects.length} работодателей: ${joinProjects(page.projects)}`
-              : `: ${page.projects[0]}`}
+              ? `, работодатели — ${joinProjects(page.projects)}`
+              : `, работодатель — ${page.projects[0]}`}
             .{" "}
             {page.to !== null
               ? `Верхняя ставка смены — ${money(page.to)} ₽.`

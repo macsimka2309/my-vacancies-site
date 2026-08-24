@@ -193,7 +193,9 @@ export function buildCityFaq(page: CityPage) {
     question: `Какая работа есть ${where}?`,
     answer: `${page.total} ${vacancyWord(page.total)}: ${page.professions
       .map((profession) => profession.title.toLocaleLowerCase("ru-RU"))
-      .join(", ")}. Работодатели — ${page.projects.join(", ")}.`,
+      .join(", ")}. ${
+      page.projects.length > 1 ? "Работодатели" : "Работодатель"
+    } — ${page.projects.join(", ")}.`,
   });
 
   if (page.noTransportProfession) {
