@@ -13,6 +13,7 @@ function vacancy(
     project: "Лента",
     city: "Тверь",
     salary: "до 6000 ₽ за смену",
+    salaryShiftMin: null,
     salaryShiftMax: 6000,
     ...overrides,
   };
@@ -89,9 +90,11 @@ describe("buildCityContext", () => {
       ...elsewhere,
     ]);
 
+    // Слаг нужен, чтобы вести на городскую страницу (п. 12), а не на
+    // `?city=`, который канонизируется на главную и ссылкой не считается.
     expect(context.regionCities).toEqual([
-      { city: "Нижний Тагил", count: 2 },
-      { city: "Каменск-Уральский", count: 1 },
+      { city: "Нижний Тагил", slug: "nizhniy-tagil", count: 2 },
+      { city: "Каменск-Уральский", slug: "kamensk-uralskiy", count: 1 },
     ]);
     // Самара и Тверь — другие регионы, в списке им не место.
     expect(context.regionCities.map((item) => item.city)).not.toContain(

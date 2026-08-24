@@ -1,5 +1,7 @@
 import { unstable_cache } from "next/cache";
+import { findCityBySlug } from "./cities";
 import { buildCityContext, type CityContextVacancy } from "./city-context";
+import { buildCityPage, getIndexableCities } from "./city-page";
 import { db } from "./db";
 import type { IntentMatch, IntentStats } from "./intents";
 import { getSalaryCeiling, type SalaryBasis, type StructuredSalary } from "./salary";
@@ -151,6 +153,26 @@ export async function getCityContext(current: CityContextVacancy) {
   const vacancies = await loadActiveVacancies();
 
   return buildCityContext(current, vacancies);
+}
+
+/** Городская страница по её адресу. Незнакомый слаг — `null`, дальше 404. */
+export async function getCityPageBySlug(slug: string) {
+  const vacancies = await loadActiveVacancies();
+  const city = findCityBySlug(
+    slug,
+    uniqueSorted(vacancies.map((vacancy) => vacancy.city)),
+  );
+
+  return city ? buildCityPage(city, vacancies) : null;
+}
+
+/** Города, чьи страницы попадают в sitemap — порог см. в lib/city-page.ts. */
+export async function getIndexableCityPages() {
+  const vacancies = await loadActiveVacancies();
+
+  return getIndexableCities(vacancies)
+    .map((city) => buildCityPage(city, vacancies))
+    .filter((page): page is NonNullable<typeof page> => page !== null);
 }
 
 function uniqueSorted(values: Array<string | null | undefined>) {

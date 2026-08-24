@@ -8,6 +8,7 @@ import { InlineApplyForm } from "@/components/vacancies/InlineApplyForm";
 import { CityContext } from "@/components/vacancies/CityContext";
 import { ContactButtons } from "@/components/vacancies/ContactButtons";
 import { VacancyTextBlock } from "@/components/vacancies/VacancyTextBlock";
+import { getCitySlug } from "@/lib/cities";
 import { buildVacancyDescription, buildVacancyTitle } from "@/lib/meta";
 import { buildBreadcrumbJsonLd } from "@/lib/site-jsonld";
 import { buildJobPostingJsonLd } from "@/lib/vacancy-jsonld";
@@ -76,10 +77,13 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
 
   const cityContext = await getCityContext(vacancy);
   const jobPostingJsonLd = buildJobPostingJsonLd(vacancy);
-  // Уровень города появится вместе с городскими страницами (п. 12):
-  // сейчас `?city=…` канонизируется на главную.
+  const citySlug = getCitySlug(vacancy.city);
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: "Вакансии", path: "/" },
+    // Уровень города — только если у города есть своя страница (п. 12).
+    ...(citySlug
+      ? [{ name: `Работа — ${vacancy.city}`, path: `/rabota/${citySlug}` }]
+      : []),
     {
       name: `${vacancy.title} — ${vacancy.city}`,
       path: `/vacancies/${vacancy.slug}`,

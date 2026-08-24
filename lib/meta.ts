@@ -104,6 +104,70 @@ export function buildCatalogDescription(catalog: CatalogMetaSource) {
   );
 }
 
+type CityPageMetaSource = {
+  city: string;
+  cityIn: string | null;
+  total: number;
+  professions: { title: string }[];
+  to: number | null;
+};
+
+/**
+ * Заголовок городской страницы (п. 12).
+ *
+ * Профессии называем те, что в городе действительно есть: «работа курьером
+ * и сборщиком заказов» в городе, где сборщика нет, — обещание, которого мы
+ * не выполним, и посетитель уйдёт с первой же строки.
+ */
+export function buildCityPageTitle(page: CityPageMetaSource) {
+  const where = page.cityIn ? `в ${page.cityIn}` : `— ${page.city}`;
+  const count = formatVacancies(page.total);
+  const work = describeWork(page.professions);
+
+  // От самого содержательного к тому, что заведомо поместится: у длинных
+  // названий вроде Санкт-Петербурга полная формула выходит за 60 знаков.
+  const variants = [
+    `Работа ${work} ${where} — ${count}`,
+    `Работа ${work} ${where}`,
+    `Работа ${where} — ${count}`,
+    `Работа ${where}`,
+  ];
+
+  return variants.find((variant) => variant.length <= TITLE_LIMIT) ?? variants[3];
+}
+
+export function buildCityPageDescription(page: CityPageMetaSource) {
+  const where = page.cityIn ? `в ${page.cityIn}` : `— ${page.city}`;
+  const professions = page.professions
+    .map((profession) => profession.title.toLocaleLowerCase("ru-RU"))
+    .join(", ");
+
+  return truncate(
+    [
+      `${capitalize(formatVacancies(page.total))} ${where}: ${professions}.`,
+      page.to !== null
+        ? `До ${new Intl.NumberFormat("ru-RU").format(page.to)} ₽ за смену.`
+        : null,
+      "Выплаты каждую неделю. Оставьте телефон — перезвоним.",
+    ]
+      .filter(Boolean)
+      .join(" "),
+    DESCRIPTION_LIMIT,
+  );
+}
+
+// «курьером», «сборщиком заказов» или обоими — по составу города.
+function describeWork(professions: { title: string }[]) {
+  const hasCourier = professions.some((item) => /курьер/i.test(item.title));
+  const hasPicker = professions.some((item) => /сборщик/i.test(item.title));
+
+  if (hasCourier && hasPicker) {
+    return "курьером и сборщиком заказов";
+  }
+
+  return hasPicker ? "сборщиком заказов" : "курьером";
+}
+
 // «до 6500 ₽ за смену» → «до 6500 ₽/смена». Запись «₽/мес» уже встречается
 // в витринных зарплатах, так что форма для читателя не новая.
 function toCompactRate(rate: string) {

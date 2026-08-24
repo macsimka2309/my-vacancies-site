@@ -1,4 +1,4 @@
-import { getRegionByCity } from "./cities";
+import { getCitySlug, getRegionByCity } from "./cities";
 
 /**
  * Городской контекст карточки вакансии (п. 35).
@@ -24,6 +24,8 @@ export type CityContextVacancy = {
   project: string;
   city: string;
   salary: string | null;
+  /** Нижняя граница есть редко — у 40 вакансий из 169. */
+  salaryShiftMin: number | null;
   salaryShiftMax: number | null;
 };
 
@@ -42,8 +44,8 @@ export type CityContext = {
    * хотя работа для него в этом же городе есть.
    */
   noTransportPeer: CityContextVacancy | null;
-  /** Города того же региона, где тоже есть вакансии. */
-  regionCities: { city: string; count: number }[];
+  /** Города того же региона, где тоже есть вакансии, — со своими страницами. */
+  regionCities: { city: string; slug: string; count: number }[];
 };
 
 /** Сколько соседей по региону показываем: список, а не каталог. */
@@ -102,7 +104,13 @@ function buildRegionCities(
   }
 
   return [...counts.entries()]
-    .map(([city, count]) => ({ city, count }))
+    .map(([city, count]) => ({ city, slug: getCitySlug(city), count }))
+    // Без слага ссылку строить некуда: город вне справочника не имеет
+    // собственной страницы, а вести на канонизированный `?city=` бессмысленно.
+    .filter(
+      (item): item is { city: string; slug: string; count: number } =>
+        item.slug !== null,
+    )
     .sort(
       (left, right) =>
         right.count - left.count || left.city.localeCompare(right.city, "ru"),

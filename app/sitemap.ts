@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { INTENT_SLUGS } from "@/lib/intents";
 import { site } from "@/lib/site";
+import { getIndexableCityPages } from "@/lib/vacancies";
 
 // Генерируем на каждый запрос: на сборке нет доступа к БД, и при revalidate
 // sitemap пререндерится пустым (остаются только статические маршруты).
@@ -58,8 +59,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       null,
     );
 
+    // Городские страницы (п. 12) — только те, что проходят порог в три
+    // вакансии. Города с одной-двумя остаются доступными людям, но в карту
+    // не попадают и отдают `noindex`: страница из одной вакансии — это
+    // копия её карточки.
+    const cityPages = await getIndexableCityPages();
+    const cityRoutes: MetadataRoute.Sitemap = cityPages.map((page) => ({
+      url: `${site.url}/rabota/${page.slug}`,
+      lastModified: latestVacancyUpdate ?? PRIVACY_UPDATED_AT,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }));
+
     return [
       ...buildStaticRoutes(latestVacancyUpdate ?? PRIVACY_UPDATED_AT),
+      ...cityRoutes,
       ...vacancyRoutes,
     ];
   } catch {

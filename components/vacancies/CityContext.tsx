@@ -76,11 +76,11 @@ export function CityContext({ context }: { context: CityContextData }) {
         <p className="city-context__region">
           {context.region ? `${context.region}, другие города:` : "Рядом:"}{" "}
           {context.regionCities.map((item, index) => (
-            <span key={item.city}>
+            <span key={item.slug}>
               {index > 0 ? ", " : ""}
-              <Link href={`/?city=${encodeURIComponent(item.city)}`}>
-                {item.city}
-              </Link>{" "}
+              {/* На городскую страницу, а не на `?city=`: фильтр главной
+                  канонизируется на «/», и ссылка на него ничего не весит. */}
+              <Link href={`/rabota/${item.slug}`}>{item.city}</Link>{" "}
               <span className="muted">({item.count})</span>
             </span>
           ))}

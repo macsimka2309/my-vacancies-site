@@ -1142,6 +1142,44 @@ select {
   font-size: 14px;
 }
 
+/* Городская страница (п. 12). Список вакансий переиспользует стиль блока
+   «Ещё в городе» — это один и тот же объект, показанный в двух местах. */
+.city-page__lead {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.city-page__pay {
+  margin: -6px 0 14px;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.city-page__faq {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+}
+
+.city-page__faq dt {
+  font-weight: 700;
+}
+
+.city-page__faq dd {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.city-page__cities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .text-block {
   display: grid;
   gap: 12px;

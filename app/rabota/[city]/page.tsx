@@ -1,0 +1,214 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { ContactButtons } from "@/components/vacancies/ContactButtons";
+import { buildCityFaq, describePay, money } from "@/lib/city-page";
+import { buildCityPageDescription, buildCityPageTitle } from "@/lib/meta";
+import { site } from "@/lib/site";
+import {
+  buildBreadcrumbJsonLd,
+  buildFaqJsonLd,
+  buildVacancyListJsonLd,
+} from "@/lib/site-jsonld";
+import { getCityPageBySlug } from "@/lib/vacancies";
+
+// Тот же режим, что у карточек вакансий (п. 36): страница не зависит от
+// параметров запроса, поэтому живёт в ISR-кэше. Пустой список параметров —
+// сознательно: на сборке нет доступа к базе.
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  return [];
+}
+
+const loadCityPage = cache((slug: string) => getCityPageBySlug(slug));
+
+type CityPageProps = {
+  params: Promise<{
+    city: string;
+  }>;
+};
+
+export async function generateMetadata({
+  params,
+}: CityPageProps): Promise<Metadata> {
+  const { city } = await params;
+  const page = await loadCityPage(city);
+
+  if (!page) {
+    return { title: "Город не найден" };
+  }
+
+  const title = buildCityPageTitle(page);
+  const description = buildCityPageDescription(page);
+
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical: `/rabota/${page.slug}` },
+    // Города ниже порога остаются для человека, но поиску не отдаются:
+    // одна-две вакансии — это копия карточки, а не страница города.
+    // `follow` — чтобы робот всё равно прошёл по ссылкам на вакансии.
+    robots: page.indexable ? undefined : { index: false, follow: true },
+    openGraph: { type: "website", title, description },
+  };
+}
+
+export default async function CityPage({ params }: CityPageProps) {
+  const { city } = await params;
+  const page = await loadCityPage(city);
+
+  if (!page) {
+    notFound();
+  }
+
+  const where = page.cityIn ? `в ${page.cityIn}` : `— ${page.city}`;
+  const faq = buildCityFaq(page);
+  const vacancies = page.professions.flatMap(
+    (profession) => profession.vacancies,
+  );
+
+  return (
+    <>
+      <SiteHeader />
+      <main className="page-shell detail-layout">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              buildVacancyListJsonLd(
+                vacancies.map((vacancy) => ({
+                  slug: vacancy.slug,
+                  title: vacancy.title,
+                  city: vacancy.city,
+                })),
+              ),
+            ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              buildBreadcrumbJsonLd([
+                { name: "Вакансии", path: "/" },
+                { name: `Работа ${where}`, path: `/rabota/${page.slug}` },
+              ]),
+            ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(buildFaqJsonLd(faq)),
+          }}
+        />
+
+        <Link className="back-link" href="/">
+          Все города
+        </Link>
+
+        <section className="detail-hero">
+          <p className="eyebrow">
+            {page.region ?? "Россия"}
+          </p>
+          <h1>Работа {where}</h1>
+          {/* Первый абзац — прямой ответ на запрос, цифры только из базы.
+              Он же — то, что может процитировать поиск или ассистент. */}
+          <p className="city-page__lead">
+            {page.cityIn ? `В ${page.cityIn}` : `В городе ${page.city}`}{" "}
+            {page.total === 1 ? "одна вакансия" : `${page.total} вакансий`}{" "}
+            {page.professions.length > 1
+              ? `по ${page.professions.length} направлениям`
+              : ""}
+            {page.projects.length > 1
+              ? ` от ${page.projects.length} работодателей: ${page.projects.join(", ")}`
+              : `: ${page.projects[0]}`}
+            .{" "}
+            {page.to !== null
+              ? `Верхняя ставка смены — ${money(page.to)} ₽.`
+              : ""}{" "}
+            Опыт не нужен, выплаты еженедельные.
+            {page.noTransportProfession ? (
+              <>
+                {" "}
+                Свой транспорт нужен не везде: «{page.noTransportProfession}» —
+                работа на одной точке, внутри магазина.
+              </>
+            ) : null}
+          </p>
+          <div className="detail-actions">
+            <ContactButtons />
+          </div>
+        </section>
+
+        {page.professions.map((profession) => (
+          <section className="detail-section" key={profession.title}>
+            <h2>
+              {profession.title} {where}
+            </h2>
+            <p className="city-page__pay">{describePay(profession)}</p>
+            <ul className="city-context__list">
+              {profession.vacancies.map((vacancy) => (
+                <li key={vacancy.slug}>
+                  <Link href={`/vacancies/${vacancy.slug}`}>
+                    <span className="city-context__position">
+                      {vacancy.title}
+                      <span className="city-context__project">
+                        {vacancy.project}
+                      </span>
+                    </span>
+                    {vacancy.salary ? (
+                      <span className="city-context__salary">
+                        {vacancy.salary}
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+
+        {faq.length > 0 ? (
+          <section className="detail-section">
+            <h2>Частые вопросы</h2>
+            <dl className="city-page__faq">
+              {faq.map((item) => (
+                <div key={item.question}>
+                  <dt>{item.question}</dt>
+                  <dd>{item.answer}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ) : null}
+
+        {page.regionCities.length > 0 ? (
+          <section className="detail-section">
+            <h2>{page.region ?? "Рядом"}</h2>
+            <ul className="city-page__cities">
+              {page.regionCities.map((item) => (
+                <li key={item.slug}>
+                  <Link href={`/rabota/${item.slug}`}>
+                    {item.city} <span className="muted">({item.count})</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+      </main>
+      <div className="sticky-cta">
+        <a className="button-link apply-button" href={`tel:${site.phone.replace(/[^\d+]/g, "")}`}>
+          Позвонить
+        </a>
+        <ContactButtons variant="compact" />
+      </div>
+      <SiteFooter />
+    </>
+  );
+}
