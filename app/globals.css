@@ -1220,6 +1220,31 @@ select {
   list-style: none;
 }
 
+/* Автосохранение в таблице откликов. Отметка состояния обязательна: человек
+   не нажимал кнопку и иначе не знает, дошла ли правка. Ошибка сама не гаснет. */
+.admin-autosave {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-autosave__state {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-autosave__state[data-state="saving"] {
+  color: var(--muted);
+}
+
+.admin-autosave__state[data-state="saved"] {
+  color: var(--accent-strong);
+}
+
+.admin-autosave__state[data-state="error"] {
+  color: #b3261e;
+}
+
 .text-block {
   display: grid;
   gap: 12px;

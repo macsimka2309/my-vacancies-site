@@ -9,6 +9,7 @@ import {
   getInitialStatus,
 } from "@/lib/application-duplicate";
 import { toTrafficSource } from "@/lib/application-source";
+import { maybePurgeOldAuditLogs } from "@/lib/audit-retention";
 import { db } from "@/lib/db";
 import { getRedirectUrl } from "@/lib/redirect-url";
 
@@ -100,6 +101,7 @@ export async function POST(request: NextRequest) {
       newStatus: getInitialStatus(duplicate),
     },
   });
+  await maybePurgeOldAuditLogs();
 
   return NextResponse.redirect(
     getRedirectUrl(

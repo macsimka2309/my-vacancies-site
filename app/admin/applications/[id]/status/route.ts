@@ -3,9 +3,12 @@ import {
   canManageApplications,
   getAdminSessionFromRequest,
 } from "@/lib/admin-auth";
+import { maybePurgeOldAuditLogs } from "@/lib/audit-retention";
 import { db } from "@/lib/db";
 import { isLeadStatus } from "@/lib/lead-status";
 import { getRedirectUrl } from "@/lib/redirect-url";
+
+const COMMENT_LIMIT = 2000;
 
 type UpdateStatusRouteProps = {
   params: Promise<{
@@ -13,43 +16,47 @@ type UpdateStatusRouteProps = {
   }>;
 };
 
-export async function POST(request: NextRequest, { params }: UpdateStatusRouteProps) {
+/**
+ * Правка статуса и примечания.
+ *
+ * Отвечает двумя способами. Таблица откликов сохраняет поля сама, по выходу
+ * из поля, и ждёт JSON. Обычная отправка формы — как было, с редиректом:
+ * этот путь остаётся рабочим и не зависит от скриптов.
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: UpdateStatusRouteProps,
+) {
+  const wantsJson = request.headers
+    .get("accept")
+    ?.includes("application/json");
+  const { id } = await params;
   const session = await getAdminSessionFromRequest(request);
 
   if (!session) {
-    return NextResponse.redirect(
-      getRedirectUrl(request, "/admin?login=required"),
-      303,
-    );
+    return respond(request, wantsJson, 401, "login=required", "/admin?login=required");
   }
 
   if (!canManageApplications(session)) {
-    return NextResponse.redirect(
-      getRedirectUrl(request, "/admin?applications=forbidden"),
-      303,
+    return respond(
+      request,
+      wantsJson,
+      403,
+      "applications=forbidden",
+      "/admin?applications=forbidden",
     );
   }
 
-  const { id } = await params;
-  const formData = await request.formData();
-  const status = String(formData.get("status") ?? "");
-  const managerComment = normalizeComment(
-    String(formData.get("managerComment") ?? ""),
-  );
-  const searchQuery = String(formData.get("searchQuery") ?? "").trim();
+  const input = wantsJson
+    ? await readJson(request)
+    : await readForm(request);
 
-  if (!isLeadStatus(status)) {
-    return NextResponse.redirect(
-      getRedirectUrl(request, getAdminRedirect("status=invalid", searchQuery)),
-      303,
-    );
+  if (!isLeadStatus(input.status)) {
+    return respond(request, wantsJson, 400, "status=invalid", getAdminRedirect("status=invalid", input.searchQuery));
   }
 
-  if (managerComment && managerComment.length > 2000) {
-    return NextResponse.redirect(
-      getRedirectUrl(request, getAdminRedirect("note=too-long", searchQuery)),
-      303,
-    );
+  if (input.managerComment && input.managerComment.length > COMMENT_LIMIT) {
+    return respond(request, wantsJson, 400, "note=too-long", getAdminRedirect("note=too-long", input.searchQuery));
   }
 
   const application = await db.application.findUnique({
@@ -63,14 +70,17 @@ export async function POST(request: NextRequest, { params }: UpdateStatusRoutePr
   });
 
   if (!application) {
-    return NextResponse.redirect(
-      getRedirectUrl(request, getAdminRedirect("application=missing", searchQuery)),
-      303,
+    return respond(
+      request,
+      wantsJson,
+      404,
+      "application=missing",
+      getAdminRedirect("application=missing", input.searchQuery),
     );
   }
 
-  const statusChanged = application.status !== status;
-  const commentChanged = application.managerComment !== managerComment;
+  const statusChanged = application.status !== input.status;
+  const commentChanged = application.managerComment !== input.managerComment;
 
   if (statusChanged || commentChanged) {
     await db.$transaction([
@@ -79,8 +89,8 @@ export async function POST(request: NextRequest, { params }: UpdateStatusRoutePr
           id,
         },
         data: {
-          managerComment,
-          status,
+          managerComment: input.managerComment,
+          status: input.status,
         },
       }),
       db.applicationAuditLog.create({
@@ -88,8 +98,8 @@ export async function POST(request: NextRequest, { params }: UpdateStatusRoutePr
           actorUsername: session.username,
           adminUserId: session.userId,
           applicationId: id,
-          newManagerComment: commentChanged ? managerComment : null,
-          newStatus: statusChanged ? status : null,
+          newManagerComment: commentChanged ? input.managerComment : null,
+          newStatus: statusChanged ? input.status : null,
           previousManagerComment: commentChanged
             ? application.managerComment
             : null,
@@ -97,12 +107,55 @@ export async function POST(request: NextRequest, { params }: UpdateStatusRoutePr
         },
       }),
     ]);
+    await maybePurgeOldAuditLogs();
+  }
+
+  if (wantsJson) {
+    return NextResponse.json({ ok: true, changed: statusChanged || commentChanged });
   }
 
   return NextResponse.redirect(
-    getRedirectUrl(request, getAdminRedirect("updated=1", searchQuery)),
+    getRedirectUrl(request, getAdminRedirect("updated=1", input.searchQuery)),
     303,
   );
+}
+
+async function readJson(request: NextRequest) {
+  try {
+    const body = (await request.json()) as Record<string, unknown>;
+
+    return {
+      status: String(body.status ?? ""),
+      managerComment: normalizeComment(String(body.managerComment ?? "")),
+      searchQuery: "",
+    };
+  } catch {
+    return { status: "", managerComment: null, searchQuery: "" };
+  }
+}
+
+async function readForm(request: NextRequest) {
+  const formData = await request.formData();
+
+  return {
+    status: String(formData.get("status") ?? ""),
+    managerComment: normalizeComment(String(formData.get("managerComment") ?? "")),
+    searchQuery: String(formData.get("searchQuery") ?? "").trim(),
+  };
+}
+
+function respond(
+  request: NextRequest,
+  wantsJson: boolean | undefined,
+  code: number,
+  error: string,
+  location: string,
+) {
+  if (wantsJson) {
+    return NextResponse.json({ ok: false, error }, { status: code });
+  }
+
+  return NextResponse.redirect(getRedirectUrl(request, location), 303);
 }
 
 function normalizeComment(value: string) {

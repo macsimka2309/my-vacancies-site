@@ -1,4 +1,5 @@
 import { AdminMenu } from "@/components/admin/AdminMenu";
+import { ApplicationRowFields } from "@/components/admin/ApplicationRowFields";
 import { getTrafficSourceLabel } from "@/lib/application-source";
 import {
   type AdminRole,
@@ -9,10 +10,7 @@ import {
   getAdminRolesLabel,
 } from "@/lib/admin-auth";
 import { db } from "@/lib/db";
-import {
-  getLeadStatusLabel,
-  LEAD_STATUS_OPTIONS,
-} from "@/lib/lead-status";
+import { getLeadStatusLabel } from "@/lib/lead-status";
 
 export const dynamic = "force-dynamic";
 
@@ -206,73 +204,36 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 <th>Примечание</th>
                 <th>Telegram</th>
                 <th>Создан</th>
-                <th>Действие</th>
               </tr>
             </thead>
             <tbody>
-              {filteredApplications.map((application) => {
-                const formId = `application-${application.id}`;
-
-                return (
-                  <tr key={application.id}>
-                    <td>
-                      <strong>{application.candidateName}</strong>
-                      <a href={`tel:${application.normalizedPhone}`}>
-                        {application.normalizedPhone}
-                      </a>
-                    </td>
-                    <td>
-                      <strong>{application.vacancyTitleSnapshot}</strong>
-                      <span>{application.projectSnapshot}</span>
-                    </td>
-                    <td>{application.city ?? "Не указан"}</td>
-                    <td>{getTrafficSourceLabel(application.trafficSource)}</td>
-                    <td>
-                      <select
-                        aria-label={`Статус отклика ${application.candidateName}`}
-                        defaultValue={application.status}
-                        form={formId}
-                        name="status"
-                      >
-                        {LEAD_STATUS_OPTIONS.map((status) => (
-                          <option key={status.value} value={status.value}>
-                            {status.label}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <textarea
-                        aria-label={`Примечание к отклику ${application.candidateName}`}
-                        defaultValue={application.managerComment ?? ""}
-                        form={formId}
-                        maxLength={2000}
-                        name="managerComment"
-                        placeholder="Добавить примечание"
-                        rows={3}
-                      />
-                    </td>
-                    <td>{getTelegramStatus(application)}</td>
-                    <td>{formatDate(application.createdAt)}</td>
-                    <td>
-                      <form
-                        action={`/admin/applications/${application.id}/status`}
-                        id={formId}
-                        method="post"
-                      >
-                        <input
-                          name="searchQuery"
-                          type="hidden"
-                          value={searchQuery}
-                        />
-                        <button className="admin-save" type="submit">
-                          Сохранить
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                );
-              })}
+              {filteredApplications.map((application) => (
+                <tr key={application.id}>
+                  <td>
+                    <strong>{application.candidateName}</strong>
+                    <a href={`tel:${application.normalizedPhone}`}>
+                      {application.normalizedPhone}
+                    </a>
+                  </td>
+                  <td>
+                    <strong>{application.vacancyTitleSnapshot}</strong>
+                    <span>{application.projectSnapshot}</span>
+                  </td>
+                  <td>{application.city ?? "Не указан"}</td>
+                  <td>{getTrafficSourceLabel(application.trafficSource)}</td>
+                  {/* Статус и примечание сохраняются сами, по выходу из поля:
+                      кнопка «Сохранить» стояла девятой колонкой, и до неё
+                      приходилось доезжать вбок на каждую правку. */}
+                  <ApplicationRowFields
+                    candidateName={application.candidateName}
+                    id={application.id}
+                    managerComment={application.managerComment ?? ""}
+                    status={application.status}
+                  />
+                  <td>{getTelegramStatus(application)}</td>
+                  <td>{formatDate(application.createdAt)}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
           </div>
@@ -532,12 +493,15 @@ function getUserMessage(status: string | undefined): StatusMessage | null {
   return null;
 }
 
+// Контейнер живёт в UTC, и без явной зоны админка показывала время на три
+// часа назад: отклик, пришедший в 14:50 по Москве, значился как 11:50.
 function formatDate(value: Date) {
   return new Intl.DateTimeFormat("ru-RU", {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
     month: "2-digit",
+    timeZone: "Europe/Moscow",
     year: "numeric",
   }).format(value);
 }

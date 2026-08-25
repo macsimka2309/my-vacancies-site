@@ -1,7 +1,17 @@
+# Логи контейнеров по умолчанию растут без потолка: json-файл живёт, пока
+# жив контейнер, и его никто не ротирует. Три файла по 10 МБ — это около
+# месяца при нынешнем объёме и жёсткая верхняя граница в 30 МБ на сервис.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
     image: postgres:17-alpine
     restart: unless-stopped
+    logging: *logging
     env_file:
       - .env.production
     volumes:
@@ -30,6 +40,7 @@ services:
       context: .
       target: runner
     restart: unless-stopped
+    logging: *logging
     env_file:
       - .env.production
     depends_on:
