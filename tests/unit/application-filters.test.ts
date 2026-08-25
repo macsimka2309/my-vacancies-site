@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildAdminUrl,
   buildApplicationWhere,
   CITY_NOT_SET,
+  EMPTY_FILTERS,
   hasActiveFilters,
   matchesSource,
   parseApplicationFilters,
+  toggleValue,
 } from "@/lib/application-filters";
 import { getSourceBucket } from "@/lib/application-source";
 
@@ -55,25 +58,37 @@ describe("parseApplicationFilters", () => {
     });
 
     expect(filters).toEqual({
-      city: "Тверь",
-      project: "Лента",
+      cities: ["Тверь"],
+      projects: ["Лента"],
       query: "Иван",
-      source: "ads",
-      status: "NEW",
-      vacancyId: "clv0vacancy0001",
+      sources: ["ads"],
+      statuses: ["NEW"],
+      vacancyIds: ["clv0vacancy0001"],
     });
+  });
+
+  // «Покажи всё, до чего не дошли руки» — это несколько статусов сразу,
+  // одним значением так не спросишь.
+  it("принимает несколько значений одного фильтра", () => {
+    const filters = parseApplicationFilters({
+      status: ["NEW", "IN_PROGRESS"],
+      city: ["Москва", "Тверь"],
+    });
+
+    expect(filters.statuses).toEqual(["NEW", "IN_PROGRESS"]);
+    expect(filters.cities).toEqual(["Москва", "Тверь"]);
   });
 
   // Значение из адреса приходит от человека, а не от нас: мусор должен
   // отбрасываться, а не превращаться в запрос с несуществующим статусом.
   it("отбрасывает несуществующие статус и источник", () => {
     const filters = parseApplicationFilters({
-      source: "выдумка",
-      status: "ВЫДУМКА",
+      source: ["ads", "выдумка"],
+      status: ["ВЫДУМКА", "NEW"],
     });
 
-    expect(filters.status).toBeNull();
-    expect(filters.source).toBeNull();
+    expect(filters.statuses).toEqual(["NEW"]);
+    expect(filters.sources).toEqual(["ads"]);
   });
 
   it("пустые параметры не считаются фильтром", () => {
@@ -96,9 +111,9 @@ describe("buildApplicationWhere", () => {
     );
 
     expect(where).toEqual({
-      projectSnapshot: "Лента",
-      status: "NEW",
-      vacancyId: "clv0vacancy0001",
+      projectSnapshot: { in: ["Лента"] },
+      status: { in: ["NEW"] },
+      vacancyId: { in: ["clv0vacancy0001"] },
     });
   });
 
@@ -110,6 +125,18 @@ describe("buildApplicationWhere", () => {
     );
 
     expect(where).toEqual({ OR: [{ city: null }, { city: "" }] });
+  });
+
+  // «Москва плюс те, у кого город не проставлен» — одно условие, а не два
+  // прохода по списку.
+  it("совмещает выбранные города с «не указан»", () => {
+    const where = buildApplicationWhere(
+      parseApplicationFilters({ city: ["Москва", CITY_NOT_SET] }),
+    );
+
+    expect(where).toEqual({
+      OR: [{ city: { in: ["Москва"] } }, { city: null }, { city: "" }],
+    });
   });
 
   it("источник в условие не попадает — он не колонка", () => {
@@ -124,15 +151,44 @@ describe("buildApplicationWhere", () => {
 describe("matchesSource", () => {
   const row = { trafficSource: "yandex", utmSource: "yandex" };
 
-  it("без выбранного источника пропускает всё", () => {
-    expect(matchesSource(row, null)).toBe(true);
+  it("пустой набор пропускает всё", () => {
+    expect(matchesSource(row, [])).toBe(true);
   });
 
   it("отбирает по корзине, а не по строке", () => {
-    expect(matchesSource(row, "ads")).toBe(true);
-    expect(matchesSource(row, "search")).toBe(false);
+    expect(matchesSource(row, ["ads"])).toBe(true);
+    expect(matchesSource(row, ["search"])).toBe(false);
     expect(
-      matchesSource({ trafficSource: "yandex.ru", utmSource: null }, "search"),
+      matchesSource({ trafficSource: "yandex.ru", utmSource: null }, ["search"]),
     ).toBe(true);
+  });
+
+  it("несколько корзин работают как «или»", () => {
+    expect(matchesSource(row, ["search", "ads"])).toBe(true);
+    expect(matchesSource(row, ["search", "social"])).toBe(false);
+  });
+});
+
+describe("toggleValue", () => {
+  it("добавляет и убирает значение", () => {
+    expect(toggleValue([], "NEW")).toEqual(["NEW"]);
+    expect(toggleValue(["NEW"], "IN_PROGRESS")).toEqual(["NEW", "IN_PROGRESS"]);
+    expect(toggleValue(["NEW", "IN_PROGRESS"], "NEW")).toEqual(["IN_PROGRESS"]);
+  });
+});
+
+describe("buildAdminUrl", () => {
+  it("складывает набор в повторяющиеся параметры", () => {
+    const url = buildAdminUrl({
+      ...EMPTY_FILTERS,
+      statuses: ["NEW", "IN_PROGRESS"],
+      cities: ["Москва"],
+    });
+
+    expect(url).toBe("/admin?status=NEW&status=IN_PROGRESS&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0");
+  });
+
+  it("без фильтров даёт чистый адрес", () => {
+    expect(buildAdminUrl(EMPTY_FILTERS)).toBe("/admin");
   });
 });

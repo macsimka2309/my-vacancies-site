@@ -1234,8 +1234,15 @@ select {
 
 .admin-filters__row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+/* Город и вакансия — два широких поля с поиском: их 78 и 169, фишкам нужно
+   место, иначе выбранное уезжает в три строки. */
+.admin-filters__row--wide {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
 .admin-filters__field {
@@ -1249,6 +1256,25 @@ select {
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
+}
+
+.admin-filters__field .filter-chips {
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+}
+
+.admin-filters__field .city-select {
+  border-radius: 12px;
+}
+
+/* Выбранная фишка: без заливки набор из семи статусов не читается —
+   непонятно, что уже отобрано. */
+.filter-chip[data-on] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 700;
 }
 
 .admin-filters__field select,

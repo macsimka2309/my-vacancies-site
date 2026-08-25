@@ -8,19 +8,17 @@ import { isLeadStatus, type LeadStatusValue } from "./lead-status";
 /**
  * Фильтры списка откликов (п. 41).
  *
- * До этого в админке был только поиск одной строкой по всем полям сразу.
- * Он ищет подстроку и не может сказать, где она встретилась: запрос «Москва»
- * показывал и откликов из Москвы, и вакансии со словом «Москва» в названии,
- * и комментарий, где Москва просто упомянута. Скомбинировать условия было
- * нечем — «новые из Telegram по Самокату» приходилось искать глазами.
+ * Каждый фильтр — набор, а не одно значение. Одиночный выбор отвечал только
+ * на вопрос «покажи мне X», но не на «покажи всё, до чего ещё не дошли руки»:
+ * это «Новый ИЛИ Недозвон ИЛИ В работе», и одним значением так не спросишь.
  */
 export type ApplicationFilters = {
-  status: LeadStatusValue | null;
-  source: SourceBucket | null;
-  /** `CITY_NOT_SET` — отдельное значение, см. ниже. */
-  city: string | null;
-  project: string | null;
-  vacancyId: string | null;
+  statuses: LeadStatusValue[];
+  sources: SourceBucket[];
+  /** Может содержать `CITY_NOT_SET` наряду с обычными городами. */
+  cities: string[];
+  projects: string[];
+  vacancyIds: string[];
   query: string;
 };
 
@@ -32,37 +30,34 @@ export type ApplicationFilters = {
 export const CITY_NOT_SET = "__none__";
 
 export const EMPTY_FILTERS: ApplicationFilters = {
-  city: null,
-  project: null,
+  cities: [],
+  projects: [],
   query: "",
-  source: null,
-  status: null,
-  vacancyId: null,
+  sources: [],
+  statuses: [],
+  vacancyIds: [],
 };
 
 export function parseApplicationFilters(
   params: Record<string, string | string[] | undefined>,
 ): ApplicationFilters {
-  const status = single(params.status);
-  const source = single(params.source);
-
   return {
-    city: single(params.city) || null,
-    project: single(params.project) || null,
-    query: (single(params.q) ?? "").trim(),
-    source: source && isSourceBucket(source) ? source : null,
-    status: status && isLeadStatus(status) ? status : null,
-    vacancyId: single(params.vacancyId) || null,
+    cities: many(params.city),
+    projects: many(params.project),
+    query: (many(params.q)[0] ?? "").trim(),
+    sources: many(params.source).filter(isSourceBucket),
+    statuses: many(params.status).filter(isLeadStatus),
+    vacancyIds: many(params.vacancyId),
   };
 }
 
 export function hasActiveFilters(filters: ApplicationFilters) {
   return Boolean(
-    filters.status ||
-      filters.source ||
-      filters.city ||
-      filters.project ||
-      filters.vacancyId,
+    filters.statuses.length ||
+      filters.sources.length ||
+      filters.cities.length ||
+      filters.projects.length ||
+      filters.vacancyIds.length,
   );
 }
 
@@ -74,22 +69,32 @@ export function hasActiveFilters(filters: ApplicationFilters) {
 export function buildApplicationWhere(filters: ApplicationFilters) {
   const where: Record<string, unknown> = {};
 
-  if (filters.status) {
-    where.status = filters.status;
+  if (filters.statuses.length) {
+    where.status = { in: filters.statuses };
   }
 
-  if (filters.city === CITY_NOT_SET) {
-    where.OR = [{ city: null }, { city: "" }];
-  } else if (filters.city) {
-    where.city = filters.city;
+  if (filters.projects.length) {
+    where.projectSnapshot = { in: filters.projects };
   }
 
-  if (filters.project) {
-    where.projectSnapshot = filters.project;
+  if (filters.vacancyIds.length) {
+    where.vacancyId = { in: filters.vacancyIds };
   }
 
-  if (filters.vacancyId) {
-    where.vacancyId = filters.vacancyId;
+  if (filters.cities.length) {
+    const named = filters.cities.filter((city) => city !== CITY_NOT_SET);
+    const wantsEmpty = filters.cities.includes(CITY_NOT_SET);
+    const conditions: unknown[] = [];
+
+    if (named.length) {
+      conditions.push({ city: { in: named } });
+    }
+
+    if (wantsEmpty) {
+      conditions.push({ city: null }, { city: "" });
+    }
+
+    where.OR = conditions;
   }
 
   return where;
@@ -97,32 +102,40 @@ export function buildApplicationWhere(filters: ApplicationFilters) {
 
 type SourceRow = { trafficSource: string | null; utmSource: string | null };
 
-export function matchesSource(row: SourceRow, source: SourceBucket | null) {
+export function matchesSource(row: SourceRow, sources: SourceBucket[]) {
   return (
-    source === null || getSourceBucket(row.trafficSource, row.utmSource) === source
+    sources.length === 0 ||
+    sources.includes(getSourceBucket(row.trafficSource, row.utmSource))
   );
 }
 
-function single(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
-/** Ссылка с изменённым набором фильтров — для «Сбросить» и переключений. */
-export function buildAdminUrl(
-  filters: ApplicationFilters,
-  patch: Partial<ApplicationFilters> = {},
-) {
-  const merged = { ...filters, ...patch };
+/** Адрес с текущим набором фильтров — им же пользуется форма при отборе. */
+export function buildAdminUrl(filters: ApplicationFilters) {
   const params = new URLSearchParams();
 
-  if (merged.status) params.set("status", merged.status);
-  if (merged.source) params.set("source", merged.source);
-  if (merged.city) params.set("city", merged.city);
-  if (merged.project) params.set("project", merged.project);
-  if (merged.vacancyId) params.set("vacancyId", merged.vacancyId);
-  if (merged.query) params.set("q", merged.query);
+  for (const status of filters.statuses) params.append("status", status);
+  for (const source of filters.sources) params.append("source", source);
+  for (const city of filters.cities) params.append("city", city);
+  for (const project of filters.projects) params.append("project", project);
+  for (const id of filters.vacancyIds) params.append("vacancyId", id);
+  if (filters.query) params.set("q", filters.query);
 
   const search = params.toString();
 
   return search ? `/admin?${search}` : "/admin";
+}
+
+/** Добавляет или убирает значение из набора — на этом держатся все фишки. */
+export function toggleValue(values: string[], value: string) {
+  return values.includes(value)
+    ? values.filter((item) => item !== value)
+    : [...values, value];
+}
+
+function many(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value.filter(Boolean);
+  }
+
+  return value ? [value] : [];
 }

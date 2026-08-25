@@ -104,7 +104,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   // применяются уже над выборкой.
   const normalizedQuery = filters.query.toLocaleLowerCase("ru-RU");
   const applications = rows
-    .filter((application) => matchesSource(application, filters.source))
+    .filter((application) => matchesSource(application, filters.sources))
     .filter(
       (application) =>
         !normalizedQuery ||
