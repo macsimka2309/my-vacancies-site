@@ -148,6 +148,13 @@ model ApplicationAuditLog {
   newStatus              LeadStatus? @map("new_status")
   previousManagerComment String?     @map("previous_manager_comment") @db.Text
   newManagerComment      String?     @map("new_manager_comment") @db.Text
+  /// Имя и город правятся руками: телефон дал только цифры, остальное
+  /// менеджер узнаёт в разговоре. Без этих колонок правка города не
+  /// попадала бы в журнал вовсе — а город это разрез всей отчётности.
+  previousCandidateName  String?     @map("previous_candidate_name")
+  newCandidateName       String?     @map("new_candidate_name")
+  previousCity           String?     @map("previous_city")
+  newCity                String?     @map("new_city")
   createdAt              DateTime    @default(now()) @map("created_at")
 
   @@index([applicationId])

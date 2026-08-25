@@ -2,7 +2,27 @@
   "permissions": {
     "allow": [
       "mcp__claude-in-chrome__browser_batch",
-      "mcp__claude-in-chrome__computer"
+      "mcp__claude-in-chrome__computer",
+      "Bash(ssh -o ConnectTimeout=8 vac-ru \"sudo docker exec salihov-vacancy-postgres-1 psql -U salihov_vacancy -d salihov_vacancy -t -A -c \\\\\"select count\\(*\\), count\\(salary\\) from vacancies;\\\\\"\")",
+      "Bash(ssh vac-ru *)",
+      "Bash(npx vitest *)",
+      "Read(//opt/homebrew/Cellar/**)",
+      "Read(//opt/homebrew/anaconda3/bin/**)",
+      "Read(//Users/mesalikhov/.local/bin/**)",
+      "Bash(ls -la node_modules/.bin/tsc node_modules/.bin/next 2>&1; head -1 node_modules/.bin/tsc 2>/dev/null; echo \"--- searching:\"; find /Users/mesalikhov -maxdepth 4 -name \"node\" -type f -perm -u+x 2>/dev/null | head -5)",
+      "Bash(rsync -a --delete --exclude node_modules --exclude .next --exclude .git ./ vac-ru:/tmp/salihov-work/)",
+      "Bash(rsync -a vac-ru:/tmp/salihov-work/lib/generated/ ./lib/generated/)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(python3 -)",
+      "Bash(curl -s \"https://api.github.com/repos/macsimka2309/my-vacancies-site/actions/runs?per_page=2\")",
+      "Bash(python3 -c ' *)",
+      "Bash(rsync -a --exclude node_modules --exclude .next --exclude .git ./ vac-ru:/tmp/salihov-work/)",
+      "Bash(scp -q vac-ru:/tmp/hier-mobile.png /private/tmp/claude-501/)",
+      "Bash(export YT='y0__wgBELHFv4MBGPHMRyD1rNDZGDCCs_GmCBbLXKghR6xEPn47wBX4ZjRIFNOd')",
+      "Bash(curl -s -H 'Authorization: OAuth y0__wgBELHFv4MBGPHMRyD1rNDZGDCCs_GmCBbLXKghR6xEPn47wBX4ZjRIFNOd' https://api-metrika.yandex.net/management/v1/counter/110844259/goals?callbacks=1)",
+      "Bash(curl -s -X POST https://api.direct.yandex.com/json/v5/campaigns -H 'Authorization: Bearer y0__wgBELHFv4MBGPHMRyD1rNDZGDCCs_GmCBbLXKghR6xEPn47wBX4ZjRIFNOd' -H 'Accept-Language: ru' -H 'Content-Type: application/json' -d '{\"method\":\"get\",\"params\":{\"SelectionCriteria\":{},\"FieldNames\":[\"Id\",\"Name\",\"State\",\"Status\"]}}')"
     ]
   }
 }

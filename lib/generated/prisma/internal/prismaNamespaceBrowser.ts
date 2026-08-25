@@ -169,6 +169,10 @@ export const ApplicationAuditLogScalarFieldEnum = {
   newStatus: 'newStatus',
   previousManagerComment: 'previousManagerComment',
   newManagerComment: 'newManagerComment',
+  previousCandidateName: 'previousCandidateName',
+  newCandidateName: 'newCandidateName',
+  previousCity: 'previousCity',
+  newCity: 'newCity',
   createdAt: 'createdAt'
 } as const
 

@@ -34,3 +34,7 @@ prisma/dev.db
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Файлы IDE — у каждого свои, в репозитории им не место.
+.idea/
+.gigaide/

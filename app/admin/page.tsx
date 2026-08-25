@@ -1,5 +1,11 @@
 import { AdminMenu } from "@/components/admin/AdminMenu";
-import { ApplicationRowFields } from "@/components/admin/ApplicationRowFields";
+import { ApplicationFilters } from "@/components/admin/ApplicationFilters";
+import { ApplicationRow } from "@/components/admin/ApplicationRow";
+import {
+  buildApplicationWhere,
+  matchesSource,
+  parseApplicationFilters,
+} from "@/lib/application-filters";
 import { getTrafficSourceLabel } from "@/lib/application-source";
 import {
   type AdminRole,
@@ -66,22 +72,23 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
   const canManageUsers = canManageAdminUsers(session);
   const hasVacancyAccess = canManageVacancies(session);
-  const searchQuery = getSingleParam(params.q)?.trim() ?? "";
-  const [applications, users] = await Promise.all([
-    db.application.findMany({
-      orderBy: [
-        {
-          createdAt: "desc",
-        },
-      ],
+  const filters = parseApplicationFilters(params);
+  const where = buildApplicationWhere(filters);
+  const [rows, statusCounts, total, vacancies, users] = await Promise.all([
+    // Фильтрация ушла в SQL: до этого страница читала все отклики без
+    // ограничения и разбирала их в памяти. На четырнадцати записях разницы
+    // нет, но комбинировать пять условий в JS — тот же код, который всё
+    // равно пришлось бы переписать.
+    db.application.findMany({ where, orderBy: [{ createdAt: "desc" }] }),
+    db.application.groupBy({ by: ["status"], _count: { _all: true } }),
+    db.application.count(),
+    db.vacancy.findMany({
+      orderBy: [{ city: "asc" }, { title: "asc" }],
+      select: { city: true, id: true, project: true, title: true },
     }),
     canManageUsers
       ? db.adminUser.findMany({
-          orderBy: [
-            {
-              createdAt: "asc",
-            },
-          ],
+          orderBy: [{ createdAt: "asc" }],
           select: {
             fullName: true,
             id: true,
@@ -93,12 +100,24 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         })
       : Promise.resolve([] as AdminUserRow[]),
   ]);
-  const normalizedQuery = searchQuery.toLocaleLowerCase("ru-RU");
-  const filteredApplications = normalizedQuery
-    ? applications.filter((application) =>
+  // Источник — не колонка, а вычисляемая корзина, поэтому он и поиск
+  // применяются уже над выборкой.
+  const normalizedQuery = filters.query.toLocaleLowerCase("ru-RU");
+  const applications = rows
+    .filter((application) => matchesSource(application, filters.source))
+    .filter(
+      (application) =>
+        !normalizedQuery ||
         applicationMatchesQuery(application, normalizedQuery),
-      )
-    : applications;
+    );
+  const countByStatus = (status: string) =>
+    statusCounts.find((item) => item.status === status)?._count._all ?? 0;
+  const cityOptions = uniqueOptions(vacancies.map((item) => item.city));
+  const projectOptions = uniqueOptions(vacancies.map((item) => item.project));
+  const vacancyOptions = vacancies.map((item) => ({
+    label: `${item.title} — ${item.city}`,
+    value: item.id,
+  }));
 
   return (
     <main className="admin-shell">
@@ -128,67 +147,42 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         />
       </header>
 
-      <section className="admin-summary" aria-label="Сводка по откликам">
-        <SummaryItem label="Всего" value={applications.length} />
-        <SummaryItem
-          label="Новые"
-          value={applications.filter((item) => item.status === "NEW").length}
-        />
-        <SummaryItem
-          label="В работе"
-          value={
-            applications.filter((item) => item.status === "IN_PROGRESS").length
-          }
-        />
+      {/* Сводка намеренно считает всю базу, а не отфильтрованный список:
+          рядом с включённым фильтром «в работе: 8» при пяти строках читается
+          как противоречие, поэтому подпись говорит об этом прямо. */}
+      <section className="admin-summary" aria-label="Сводка по всей базе">
+        <SummaryItem label="Всего в базе" value={total} />
+        <SummaryItem label="Новые" value={countByStatus("NEW")} />
+        <SummaryItem label="В работе" value={countByStatus("IN_PROGRESS")} />
       </section>
 
       <section
         className="admin-applications-panel"
         aria-label="Поиск и список откликов"
       >
-        <div className="admin-search">
-          <form action="/admin" method="get">
-            <label htmlFor="application-search">Поиск по всем полям</label>
-            <div>
-              <input
-                defaultValue={searchQuery}
-                id="application-search"
-                name="q"
-                placeholder="Имя, телефон, вакансия, город, статус..."
-                type="search"
-              />
-              <button className="admin-save" type="submit">
-                Найти
-              </button>
-              {searchQuery ? (
-                <a className="secondary-link" href="/admin">
-                  Сбросить
-                </a>
-              ) : null}
-            </div>
-          </form>
-          <p className="muted">
-            Найдено: {filteredApplications.length} из {applications.length}
-          </p>
-          <a className="admin-save" href="/admin/applications/new">
-            Создать отклик
-          </a>
-        </div>
+        <ApplicationFilters
+          cities={cityOptions}
+          filters={filters}
+          found={applications.length}
+          projects={projectOptions}
+          total={total}
+          vacancies={vacancyOptions}
+        />
 
         <AdminResultMessage params={params} />
 
-        {applications.length === 0 ? (
+        {total === 0 ? (
           <div className="empty-state">
             <h2>Откликов пока нет</h2>
             <p className="muted">
               Когда кандидат отправит форму, заявка появится на этой странице.
             </p>
           </div>
-        ) : filteredApplications.length === 0 ? (
+        ) : applications.length === 0 ? (
           <div className="empty-state">
             <h2>Ничего не найдено</h2>
             <p className="muted">
-              Попробуйте изменить запрос или сбросить поиск.
+              Попробуйте изменить условия или сбросить фильтры.
             </p>
           </div>
         ) : (
@@ -207,32 +201,22 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               </tr>
             </thead>
             <tbody>
-              {filteredApplications.map((application) => (
-                <tr key={application.id}>
-                  <td>
-                    <strong>{application.candidateName}</strong>
-                    <a href={`tel:${application.normalizedPhone}`}>
-                      {application.normalizedPhone}
-                    </a>
-                  </td>
-                  <td>
-                    <strong>{application.vacancyTitleSnapshot}</strong>
-                    <span>{application.projectSnapshot}</span>
-                  </td>
-                  <td>{application.city ?? "Не указан"}</td>
-                  <td>{getTrafficSourceLabel(application.trafficSource)}</td>
-                  {/* Статус и примечание сохраняются сами, по выходу из поля:
-                      кнопка «Сохранить» стояла девятой колонкой, и до неё
-                      приходилось доезжать вбок на каждую правку. */}
-                  <ApplicationRowFields
-                    candidateName={application.candidateName}
-                    id={application.id}
-                    managerComment={application.managerComment ?? ""}
-                    status={application.status}
-                  />
-                  <td>{getTelegramStatus(application)}</td>
-                  <td>{formatDate(application.createdAt)}</td>
-                </tr>
+              {applications.map((application) => (
+                <ApplicationRow
+                  candidateName={application.candidateName}
+                  cities={cityOptions.map((option) => option.value)}
+                  city={application.city ?? ""}
+                  createdLabel={formatDate(application.createdAt)}
+                  id={application.id}
+                  key={application.id}
+                  managerComment={application.managerComment ?? ""}
+                  phone={application.normalizedPhone}
+                  project={application.projectSnapshot}
+                  sourceLabel={getTrafficSourceLabel(application.trafficSource)}
+                  status={application.status}
+                  telegramLabel={getTelegramStatus(application)}
+                  vacancyTitle={application.vacancyTitleSnapshot}
+                />
               ))}
             </tbody>
           </table>
@@ -495,6 +479,14 @@ function getUserMessage(status: string | undefined): StatusMessage | null {
 
 // Контейнер живёт в UTC, и без явной зоны админка показывала время на три
 // часа назад: отклик, пришедший в 14:50 по Москве, значился как 11:50.
+// Варианты фильтра берём из каталога вакансий: список городов и проектов
+// должен совпадать с тем, что реально можно выбрать в отклике.
+function uniqueOptions(values: string[]) {
+  return [...new Set(values.filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right, "ru"))
+    .map((value) => ({ label: value, value }));
+}
+
 function formatDate(value: Date) {
   return new Intl.DateTimeFormat("ru-RU", {
     day: "2-digit",

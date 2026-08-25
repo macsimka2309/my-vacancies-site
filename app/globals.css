@@ -1220,6 +1220,87 @@ select {
   list-style: none;
 }
 
+/* Фильтры списка откликов (п. 41). Обычная GET-форма: условия живут
+   в адресе, поэтому отобранный список можно переслать и открыть заново. */
+.admin-filters {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.admin-filters__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.admin-filters__field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.admin-filters__field > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.admin-filters__field select,
+.admin-filters__field input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--foreground);
+  padding: 8px 10px;
+}
+
+.admin-filters__field select:focus,
+.admin-filters__field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  outline: 0;
+}
+
+.admin-filters__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-filters__actions p {
+  margin: 0;
+  margin-right: auto;
+}
+
+/* Имя правится прямо в строке: телефон дал только цифры, остальное
+   менеджер узнаёт в разговоре, и записать это было некуда. */
+.admin-row__name {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--foreground);
+  font-weight: 700;
+  padding: 6px 8px;
+}
+
+.admin-row__name:hover {
+  border-color: var(--border);
+}
+
+.admin-row__name:focus {
+  border-color: var(--accent);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  outline: 0;
+}
+
 /* Автосохранение в таблице откликов. Отметка состояния обязательна: человек
    не нажимал кнопку и иначе не знает, дошла ли правка. Ошибка сама не гаснет. */
 .admin-autosave {

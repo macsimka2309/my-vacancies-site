@@ -10,6 +10,7 @@
  */
 export type * from './models/Vacancy.ts'
 export type * from './models/Application.ts'
+export type * from './models/RateLimit.ts'
 export type * from './models/AdminUser.ts'
 export type * from './models/ApplicationAuditLog.ts'
 export type * from './commonInputTypes.ts'

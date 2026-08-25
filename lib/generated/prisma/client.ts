@@ -52,6 +52,13 @@ export type Vacancy = Prisma.VacancyModel
  */
 export type Application = Prisma.ApplicationModel
 /**
+ * Model RateLimit
+ * Окна ограничителя частоты запросов. Раньше они жили в памяти процесса:
+ * каждый перезапуск контейнера обнулял счётчики, а при нескольких репликах
+ * защита формы исчезала — у каждой был свой счёт.
+ */
+export type RateLimit = Prisma.RateLimitModel
+/**
  * Model AdminUser
  * 
  */

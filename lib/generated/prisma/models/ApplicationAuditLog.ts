@@ -33,6 +33,10 @@ export type ApplicationAuditLogMinAggregateOutputType = {
   newStatus: $Enums.LeadStatus | null
   previousManagerComment: string | null
   newManagerComment: string | null
+  previousCandidateName: string | null
+  newCandidateName: string | null
+  previousCity: string | null
+  newCity: string | null
   createdAt: Date | null
 }
 
@@ -45,6 +49,10 @@ export type ApplicationAuditLogMaxAggregateOutputType = {
   newStatus: $Enums.LeadStatus | null
   previousManagerComment: string | null
   newManagerComment: string | null
+  previousCandidateName: string | null
+  newCandidateName: string | null
+  previousCity: string | null
+  newCity: string | null
   createdAt: Date | null
 }
 
@@ -57,6 +65,10 @@ export type ApplicationAuditLogCountAggregateOutputType = {
   newStatus: number
   previousManagerComment: number
   newManagerComment: number
+  previousCandidateName: number
+  newCandidateName: number
+  previousCity: number
+  newCity: number
   createdAt: number
   _all: number
 }
@@ -71,6 +83,10 @@ export type ApplicationAuditLogMinAggregateInputType = {
   newStatus?: true
   previousManagerComment?: true
   newManagerComment?: true
+  previousCandidateName?: true
+  newCandidateName?: true
+  previousCity?: true
+  newCity?: true
   createdAt?: true
 }
 
@@ -83,6 +99,10 @@ export type ApplicationAuditLogMaxAggregateInputType = {
   newStatus?: true
   previousManagerComment?: true
   newManagerComment?: true
+  previousCandidateName?: true
+  newCandidateName?: true
+  previousCity?: true
+  newCity?: true
   createdAt?: true
 }
 
@@ -95,6 +115,10 @@ export type ApplicationAuditLogCountAggregateInputType = {
   newStatus?: true
   previousManagerComment?: true
   newManagerComment?: true
+  previousCandidateName?: true
+  newCandidateName?: true
+  previousCity?: true
+  newCity?: true
   createdAt?: true
   _all?: true
 }
@@ -180,6 +204,10 @@ export type ApplicationAuditLogGroupByOutputType = {
   newStatus: $Enums.LeadStatus | null
   previousManagerComment: string | null
   newManagerComment: string | null
+  previousCandidateName: string | null
+  newCandidateName: string | null
+  previousCity: string | null
+  newCity: string | null
   createdAt: Date
   _count: ApplicationAuditLogCountAggregateOutputType | null
   _min: ApplicationAuditLogMinAggregateOutputType | null
@@ -213,6 +241,10 @@ export type ApplicationAuditLogWhereInput = {
   newStatus?: Prisma.EnumLeadStatusNullableFilter<"ApplicationAuditLog"> | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
   newManagerComment?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  previousCandidateName?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  newCandidateName?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  previousCity?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  newCity?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ApplicationAuditLog"> | Date | string
   application?: Prisma.XOR<Prisma.ApplicationScalarRelationFilter, Prisma.ApplicationWhereInput>
   adminUser?: Prisma.XOR<Prisma.AdminUserScalarRelationFilter, Prisma.AdminUserWhereInput>
@@ -227,6 +259,10 @@ export type ApplicationAuditLogOrderByWithRelationInput = {
   newStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   previousManagerComment?: Prisma.SortOrderInput | Prisma.SortOrder
   newManagerComment?: Prisma.SortOrderInput | Prisma.SortOrder
+  previousCandidateName?: Prisma.SortOrderInput | Prisma.SortOrder
+  newCandidateName?: Prisma.SortOrderInput | Prisma.SortOrder
+  previousCity?: Prisma.SortOrderInput | Prisma.SortOrder
+  newCity?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   application?: Prisma.ApplicationOrderByWithRelationInput
   adminUser?: Prisma.AdminUserOrderByWithRelationInput
@@ -244,6 +280,10 @@ export type ApplicationAuditLogWhereUniqueInput = Prisma.AtLeast<{
   newStatus?: Prisma.EnumLeadStatusNullableFilter<"ApplicationAuditLog"> | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
   newManagerComment?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  previousCandidateName?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  newCandidateName?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  previousCity?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  newCity?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ApplicationAuditLog"> | Date | string
   application?: Prisma.XOR<Prisma.ApplicationScalarRelationFilter, Prisma.ApplicationWhereInput>
   adminUser?: Prisma.XOR<Prisma.AdminUserScalarRelationFilter, Prisma.AdminUserWhereInput>
@@ -258,6 +298,10 @@ export type ApplicationAuditLogOrderByWithAggregationInput = {
   newStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   previousManagerComment?: Prisma.SortOrderInput | Prisma.SortOrder
   newManagerComment?: Prisma.SortOrderInput | Prisma.SortOrder
+  previousCandidateName?: Prisma.SortOrderInput | Prisma.SortOrder
+  newCandidateName?: Prisma.SortOrderInput | Prisma.SortOrder
+  previousCity?: Prisma.SortOrderInput | Prisma.SortOrder
+  newCity?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ApplicationAuditLogCountOrderByAggregateInput
   _max?: Prisma.ApplicationAuditLogMaxOrderByAggregateInput
@@ -276,6 +320,10 @@ export type ApplicationAuditLogScalarWhereWithAggregatesInput = {
   newStatus?: Prisma.EnumLeadStatusNullableWithAggregatesFilter<"ApplicationAuditLog"> | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.StringNullableWithAggregatesFilter<"ApplicationAuditLog"> | string | null
   newManagerComment?: Prisma.StringNullableWithAggregatesFilter<"ApplicationAuditLog"> | string | null
+  previousCandidateName?: Prisma.StringNullableWithAggregatesFilter<"ApplicationAuditLog"> | string | null
+  newCandidateName?: Prisma.StringNullableWithAggregatesFilter<"ApplicationAuditLog"> | string | null
+  previousCity?: Prisma.StringNullableWithAggregatesFilter<"ApplicationAuditLog"> | string | null
+  newCity?: Prisma.StringNullableWithAggregatesFilter<"ApplicationAuditLog"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ApplicationAuditLog"> | Date | string
 }
 
@@ -286,6 +334,10 @@ export type ApplicationAuditLogCreateInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
   application: Prisma.ApplicationCreateNestedOneWithoutAuditLogsInput
   adminUser: Prisma.AdminUserCreateNestedOneWithoutAuditLogsInput
@@ -300,6 +352,10 @@ export type ApplicationAuditLogUncheckedCreateInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
 }
 
@@ -310,6 +366,10 @@ export type ApplicationAuditLogUpdateInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   application?: Prisma.ApplicationUpdateOneRequiredWithoutAuditLogsNestedInput
   adminUser?: Prisma.AdminUserUpdateOneRequiredWithoutAuditLogsNestedInput
@@ -324,6 +384,10 @@ export type ApplicationAuditLogUncheckedUpdateInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -336,6 +400,10 @@ export type ApplicationAuditLogCreateManyInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
 }
 
@@ -346,6 +414,10 @@ export type ApplicationAuditLogUpdateManyMutationInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -358,6 +430,10 @@ export type ApplicationAuditLogUncheckedUpdateManyInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -380,6 +456,10 @@ export type ApplicationAuditLogCountOrderByAggregateInput = {
   newStatus?: Prisma.SortOrder
   previousManagerComment?: Prisma.SortOrder
   newManagerComment?: Prisma.SortOrder
+  previousCandidateName?: Prisma.SortOrder
+  newCandidateName?: Prisma.SortOrder
+  previousCity?: Prisma.SortOrder
+  newCity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -392,6 +472,10 @@ export type ApplicationAuditLogMaxOrderByAggregateInput = {
   newStatus?: Prisma.SortOrder
   previousManagerComment?: Prisma.SortOrder
   newManagerComment?: Prisma.SortOrder
+  previousCandidateName?: Prisma.SortOrder
+  newCandidateName?: Prisma.SortOrder
+  previousCity?: Prisma.SortOrder
+  newCity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -404,6 +488,10 @@ export type ApplicationAuditLogMinOrderByAggregateInput = {
   newStatus?: Prisma.SortOrder
   previousManagerComment?: Prisma.SortOrder
   newManagerComment?: Prisma.SortOrder
+  previousCandidateName?: Prisma.SortOrder
+  newCandidateName?: Prisma.SortOrder
+  previousCity?: Prisma.SortOrder
+  newCity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -502,6 +590,10 @@ export type ApplicationAuditLogCreateWithoutApplicationInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
   adminUser: Prisma.AdminUserCreateNestedOneWithoutAuditLogsInput
 }
@@ -514,6 +606,10 @@ export type ApplicationAuditLogUncheckedCreateWithoutApplicationInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
 }
 
@@ -555,6 +651,10 @@ export type ApplicationAuditLogScalarWhereInput = {
   newStatus?: Prisma.EnumLeadStatusNullableFilter<"ApplicationAuditLog"> | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
   newManagerComment?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  previousCandidateName?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  newCandidateName?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  previousCity?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
+  newCity?: Prisma.StringNullableFilter<"ApplicationAuditLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ApplicationAuditLog"> | Date | string
 }
 
@@ -565,6 +665,10 @@ export type ApplicationAuditLogCreateWithoutAdminUserInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
   application: Prisma.ApplicationCreateNestedOneWithoutAuditLogsInput
 }
@@ -577,6 +681,10 @@ export type ApplicationAuditLogUncheckedCreateWithoutAdminUserInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
 }
 
@@ -614,6 +722,10 @@ export type ApplicationAuditLogCreateManyApplicationInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
 }
 
@@ -624,6 +736,10 @@ export type ApplicationAuditLogUpdateWithoutApplicationInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminUser?: Prisma.AdminUserUpdateOneRequiredWithoutAuditLogsNestedInput
 }
@@ -636,6 +752,10 @@ export type ApplicationAuditLogUncheckedUpdateWithoutApplicationInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -647,6 +767,10 @@ export type ApplicationAuditLogUncheckedUpdateManyWithoutApplicationInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -658,6 +782,10 @@ export type ApplicationAuditLogCreateManyAdminUserInput = {
   newStatus?: $Enums.LeadStatus | null
   previousManagerComment?: string | null
   newManagerComment?: string | null
+  previousCandidateName?: string | null
+  newCandidateName?: string | null
+  previousCity?: string | null
+  newCity?: string | null
   createdAt?: Date | string
 }
 
@@ -668,6 +796,10 @@ export type ApplicationAuditLogUpdateWithoutAdminUserInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   application?: Prisma.ApplicationUpdateOneRequiredWithoutAuditLogsNestedInput
 }
@@ -680,6 +812,10 @@ export type ApplicationAuditLogUncheckedUpdateWithoutAdminUserInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -691,6 +827,10 @@ export type ApplicationAuditLogUncheckedUpdateManyWithoutAdminUserInput = {
   newStatus?: Prisma.NullableEnumLeadStatusFieldUpdateOperationsInput | $Enums.LeadStatus | null
   previousManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newManagerComment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCandidateName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newCity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -705,6 +845,10 @@ export type ApplicationAuditLogSelect<ExtArgs extends runtime.Types.Extensions.I
   newStatus?: boolean
   previousManagerComment?: boolean
   newManagerComment?: boolean
+  previousCandidateName?: boolean
+  newCandidateName?: boolean
+  previousCity?: boolean
+  newCity?: boolean
   createdAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
   adminUser?: boolean | Prisma.AdminUserDefaultArgs<ExtArgs>
@@ -719,6 +863,10 @@ export type ApplicationAuditLogSelectCreateManyAndReturn<ExtArgs extends runtime
   newStatus?: boolean
   previousManagerComment?: boolean
   newManagerComment?: boolean
+  previousCandidateName?: boolean
+  newCandidateName?: boolean
+  previousCity?: boolean
+  newCity?: boolean
   createdAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
   adminUser?: boolean | Prisma.AdminUserDefaultArgs<ExtArgs>
@@ -733,6 +881,10 @@ export type ApplicationAuditLogSelectUpdateManyAndReturn<ExtArgs extends runtime
   newStatus?: boolean
   previousManagerComment?: boolean
   newManagerComment?: boolean
+  previousCandidateName?: boolean
+  newCandidateName?: boolean
+  previousCity?: boolean
+  newCity?: boolean
   createdAt?: boolean
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
   adminUser?: boolean | Prisma.AdminUserDefaultArgs<ExtArgs>
@@ -747,10 +899,14 @@ export type ApplicationAuditLogSelectScalar = {
   newStatus?: boolean
   previousManagerComment?: boolean
   newManagerComment?: boolean
+  previousCandidateName?: boolean
+  newCandidateName?: boolean
+  previousCity?: boolean
+  newCity?: boolean
   createdAt?: boolean
 }
 
-export type ApplicationAuditLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "adminUserId" | "actorUsername" | "previousStatus" | "newStatus" | "previousManagerComment" | "newManagerComment" | "createdAt", ExtArgs["result"]["applicationAuditLog"]>
+export type ApplicationAuditLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "adminUserId" | "actorUsername" | "previousStatus" | "newStatus" | "previousManagerComment" | "newManagerComment" | "previousCandidateName" | "newCandidateName" | "previousCity" | "newCity" | "createdAt", ExtArgs["result"]["applicationAuditLog"]>
 export type ApplicationAuditLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
   adminUser?: boolean | Prisma.AdminUserDefaultArgs<ExtArgs>
@@ -779,6 +935,15 @@ export type $ApplicationAuditLogPayload<ExtArgs extends runtime.Types.Extensions
     newStatus: $Enums.LeadStatus | null
     previousManagerComment: string | null
     newManagerComment: string | null
+    /**
+     * Имя и город правятся руками: телефон дал только цифры, остальное
+     * менеджер узнаёт в разговоре. Без этих колонок правка города не
+     * попадала бы в журнал вовсе — а город это разрез всей отчётности.
+     */
+    previousCandidateName: string | null
+    newCandidateName: string | null
+    previousCity: string | null
+    newCity: string | null
     createdAt: Date
   }, ExtArgs["result"]["applicationAuditLog"]>
   composites: {}
@@ -1213,6 +1378,10 @@ export interface ApplicationAuditLogFieldRefs {
   readonly newStatus: Prisma.FieldRef<"ApplicationAuditLog", 'LeadStatus'>
   readonly previousManagerComment: Prisma.FieldRef<"ApplicationAuditLog", 'String'>
   readonly newManagerComment: Prisma.FieldRef<"ApplicationAuditLog", 'String'>
+  readonly previousCandidateName: Prisma.FieldRef<"ApplicationAuditLog", 'String'>
+  readonly newCandidateName: Prisma.FieldRef<"ApplicationAuditLog", 'String'>
+  readonly previousCity: Prisma.FieldRef<"ApplicationAuditLog", 'String'>
+  readonly newCity: Prisma.FieldRef<"ApplicationAuditLog", 'String'>
   readonly createdAt: Prisma.FieldRef<"ApplicationAuditLog", 'DateTime'>
 }
     
