@@ -214,6 +214,10 @@ function SearchFilter({
   selected: string[];
 }) {
   const [search, setSearch] = useState("");
+  // Подсказки показываем только когда в поле работают. Постоянно висящий
+  // список из двенадцати городов и двенадцати вакансий отодвигал таблицу
+  // почти на тысячу пикселей — ровно то, на что жаловались до фильтров.
+  const [isOpen, setIsOpen] = useState(false);
   const query = search.trim().toLocaleLowerCase("ru-RU");
   const available = useMemo(
     () =>
@@ -248,37 +252,44 @@ function SearchFilter({
           aria-label={`Поиск: ${label}`}
           className="city-select__input"
           inputMode="search"
+          onBlur={() => setIsOpen(false)}
           onChange={(event) => setSearch(event.target.value)}
+          onFocus={() => setIsOpen(true)}
           placeholder={chosen.length ? "Ещё…" : `Поиск: ${noun}…`}
           type="search"
           value={search}
         />
       </div>
-      <div
-        aria-label={`Доступные значения: ${label}`}
-        className="filter-chips"
-        role="group"
-      >
-        {available.length > 0 ? (
-          available.map((option) => (
-            <button
-              className="filter-chip"
-              key={option.value}
-              onClick={() => {
-                onToggle(option.value);
-                setSearch("");
-              }}
-              type="button"
-            >
-              {option.label}
-            </button>
-          ))
-        ) : (
-          <p className="filter-chips__empty">
-            {query ? "Ничего не найдено" : "Все значения выбраны"}
-          </p>
-        )}
-      </div>
+      {isOpen ? (
+        <div
+          aria-label={`Доступные значения: ${label}`}
+          className="filter-chips filter-chips--overlay"
+          role="group"
+        >
+          {available.length > 0 ? (
+            available.map((option) => (
+              <button
+                className="filter-chip"
+                key={option.value}
+                onClick={() => {
+                  onToggle(option.value);
+                  setSearch("");
+                }}
+                // Нажатие мышью иначе сначала уводит фокус из поля, список
+                // успевает закрыться, и клик уходит в пустоту.
+                onMouseDown={(event) => event.preventDefault()}
+                type="button"
+              >
+                {option.label}
+              </button>
+            ))
+          ) : (
+            <p className="filter-chips__empty">
+              {query ? "Ничего не найдено" : "Все значения выбраны"}
+            </p>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

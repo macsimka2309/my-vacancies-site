@@ -1264,6 +1264,28 @@ select {
   padding: 0;
 }
 
+/* Подсказки поиска ложатся поверх страницы, а не раздвигают её: иначе
+   выбор города каждый раз сдвигал таблицу под курсором. */
+.admin-filters__field {
+  position: relative;
+}
+
+.filter-chips--overlay {
+  position: absolute;
+  z-index: 5;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  padding: 10px;
+}
+
 .admin-filters__field .city-select {
   border-radius: 12px;
 }
