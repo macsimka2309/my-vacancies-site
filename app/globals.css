@@ -1224,7 +1224,7 @@ select {
    в адресе, поэтому отобранный список можно переслать и открыть заново. */
 .admin-filters {
   display: grid;
-  gap: 14px;
+  gap: 10px;
   /* Отступы задаёт сам блок: у панели `overflow: hidden` и никакой набивки —
      без этого первая буква подписи и правый край последнего списка
      срезались краем панели. */
@@ -1232,64 +1232,10 @@ select {
   padding: 16px;
 }
 
-.admin-filters__row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  align-items: start;
-}
-
 /* Город и вакансия — два широких поля с поиском: их 78 и 169, фишкам нужно
    место, иначе выбранное уезжает в три строки. */
-.admin-filters__row--wide {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-}
-
-.admin-filters__field {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-}
-
-.admin-filters__field > span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.admin-filters__field .filter-chips {
-  max-height: none;
-  overflow: visible;
-  padding: 0;
-}
-
 /* Подсказки поиска ложатся поверх страницы, а не раздвигают её: иначе
    выбор города каждый раз сдвигал таблицу под курсором. */
-.admin-filters__field {
-  position: relative;
-}
-
-.filter-chips--overlay {
-  position: absolute;
-  z-index: 5;
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 240px;
-  overflow-y: auto;
-  margin-top: 6px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  padding: 10px;
-}
-
-.admin-filters__field .city-select {
-  border-radius: 12px;
-}
-
 /* Выбранная фишка: без заливки набор из семи статусов не читается —
    непонятно, что уже отобрано. */
 .filter-chip[data-on] {
@@ -1297,36 +1243,6 @@ select {
   background: var(--accent-soft);
   color: var(--accent-strong);
   font-weight: 700;
-}
-
-.admin-filters__field select,
-.admin-filters__field input {
-  width: 100%;
-  min-height: 40px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: #ffffff;
-  color: var(--foreground);
-  padding: 8px 10px;
-}
-
-.admin-filters__field select:focus,
-.admin-filters__field input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft);
-  outline: 0;
-}
-
-.admin-filters__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
-
-.admin-filters__actions p {
-  margin: 0;
-  margin-right: auto;
 }
 
 /* Ни список, ни поле примечания не должны задавать ширину колонки своим
@@ -1340,6 +1256,142 @@ select {
 .admin-table td textarea {
   width: 100%;
   min-width: 150px;
+}
+
+/* Одна строка вместо пяти этажей: развёрнутыми наборами фишек фильтры
+   занимали пол-экрана — один статус разворачивался в четыре ряда. */
+.admin-filters__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-filters__search {
+  flex: 1 1 220px;
+  min-width: 0;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--foreground);
+  padding: 8px 12px;
+}
+
+.admin-filters__search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  outline: 0;
+}
+
+.admin-filters__count {
+  margin: 0 auto 0 4px;
+  font-size: 13px;
+}
+
+.admin-filters__drop {
+  position: relative;
+}
+
+.admin-filters__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+.admin-filters__trigger:hover {
+  border-color: var(--border-strong);
+}
+
+.admin-filters__trigger[data-on] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.admin-filters__trigger:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  outline: 0;
+}
+
+.admin-filters__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 6px;
+}
+
+/* Список ложится поверх страницы, а не раздвигает её: иначе выбор города
+   каждый раз сдвигал таблицу под курсором. */
+.admin-filters__menu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  left: 0;
+  display: grid;
+  gap: 10px;
+  width: max(260px, 100%);
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  padding: 12px;
+}
+
+.admin-filters__menu-search {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--foreground);
+  padding: 8px 10px;
+}
+
+.admin-filters__menu-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  outline: 0;
+}
+
+.admin-filters__menu .filter-chips {
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+}
+
+/* Выбранное видно и со свёрнутыми списками — убрать можно, ничего не открывая. */
+.admin-filters__chosen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-chip[data-on] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 700;
 }
 
 /* Имя правится прямо в строке: телефон дал только цифры, остальное
