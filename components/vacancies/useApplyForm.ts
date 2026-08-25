@@ -25,12 +25,16 @@ export const CONTACT_OPTIONS: Array<{
 /**
  * Общее состояние формы отклика для модалки и встроенной формы.
  *
- * Отклик отправляется в два шага. Первый — только телефон и согласие:
- * это всё, что нужно, чтобы перезвонить. Имя и удобный канал связи
- * спрашиваем уже на экране «Спасибо», когда человек ничем не рискует.
- * Раньше все четыре поля стояли до отправки, и каждое было поводом уйти.
+ * Отклик отправляется в два шага. Первый — имя, телефон и согласие. Имя
+ * добавлено в обязательные 26.08 по решению владельца: без него менеджер
+ * начинал разговор вслепую, а в базе копились записи «Без имени».
+ *
+ * На втором шаге, экране «Спасибо», остаётся только удобный канал связи —
+ * он ни на что не влияет до звонка, поэтому спрашивать его до отправки
+ * значит ставить лишнее препятствие перед единственным нужным действием.
  */
 export function useApplyForm(vacancy: ApplyVacancy) {
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
   // Honeypot — скрытое поле-ловушка для ботов.
@@ -40,7 +44,6 @@ export function useApplyForm(vacancy: ApplyVacancy) {
   const [applicationId, setApplicationId] = useState<string | null>(null);
 
   // Второй шаг.
-  const [name, setName] = useState("");
   const [preferredContact, setPreferredContact] =
     useState<PreferredContact>("phone");
   const [telegramUsername, setTelegramUsername] = useState("");
@@ -68,6 +71,7 @@ export function useApplyForm(vacancy: ApplyVacancy) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          name,
           phone,
           vacancyId: vacancy.id,
           consent,
@@ -105,7 +109,7 @@ export function useApplyForm(vacancy: ApplyVacancy) {
     }
   }
 
-  /** Второй шаг: имя и удобный канал. Молчаливый — отклик уже принят. */
+  /** Второй шаг: удобный канал связи. Молчаливый — отклик уже принят. */
   async function submitDetails() {
     if (!applicationId) {
       setIsDetailsSaved(true);
@@ -119,7 +123,6 @@ export function useApplyForm(vacancy: ApplyVacancy) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
           preferredContact,
           telegramUsername:
             preferredContact === "telegram" ? telegramUsername : "",

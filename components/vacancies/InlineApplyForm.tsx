@@ -20,8 +20,13 @@ type InlineApplyFormProps = {
  * Отклик прямо в карточке, без модалки.
  *
  * Было: карточка → кнопка → окно → телефон → галочка → отправить.
- * Стало: телефон → отправить. Согласие и остальное появляются по мере того,
- * как человек втягивается: сначала он видит одно поле, а не форму из пяти.
+ * Стало: имя, телефон → отправить. Согласие появляется, как только человек
+ * взялся за поля, а канал связи — уже на экране «Спасибо».
+ *
+ * Имя обязательно с 26.08 по решению владельца. Это осознанный размен:
+ * каждое поле до отправки — повод уйти, но менеджеру нужно знать, к кому
+ * он обращается. Смотреть надо на долю `application_form_open` →
+ * `application_submit`.
  */
 export function InlineApplyForm({
   vacancy,
@@ -29,12 +34,13 @@ export function InlineApplyForm({
 }: InlineApplyFormProps) {
   const form = useApplyForm(vacancy);
   const [isEngaged, setIsEngaged] = useState(variant === "expanded");
+  const nameId = useId();
   const phoneId = useId();
   const callbackPromise = getCallbackPromise();
 
   // Согласие и обещание звонка показываем, как только человек взялся за поле:
   // до этого они занимают место и отвлекают от единственного нужного действия.
-  const showConsent = isEngaged || form.phone.length > 0;
+  const showConsent = isEngaged || form.phone.length > 0 || form.name.length > 0;
 
   function engage() {
     if (!isEngaged) {
@@ -68,17 +74,11 @@ export function InlineApplyForm({
           </p>
         ) : (
           <form className="inline-apply__details" onSubmit={handleDetails}>
+            {/* Имя теперь спрашиваем до отправки, здесь остаётся только
+                канал связи: он ни на что не влияет до звонка. */}
             <p className="muted inline-apply__hint">
-              Как к вам обращаться и где удобнее ответить? Необязательно.
+              Где удобнее ответить? Необязательно.
             </p>
-            <input
-              className="ym-disable-keys"
-              autoComplete="name"
-              aria-label="Имя"
-              placeholder="Имя"
-              value={form.name}
-              onChange={(event) => form.setName(event.target.value)}
-            />
             <div className="apply-contact__options">
               {CONTACT_OPTIONS.map((option) => (
                 <label
@@ -148,6 +148,19 @@ export function InlineApplyForm({
           height: 1,
           opacity: 0,
         }}
+      />
+      <input
+        className="ym-disable-keys inline-apply__name"
+        autoComplete="name"
+        aria-label={`Имя для отклика на вакансию ${vacancy.title}, ${vacancy.city}`}
+        id={nameId}
+        maxLength={80}
+        minLength={2}
+        placeholder="Как вас зовут"
+        required
+        value={form.name}
+        onFocus={engage}
+        onChange={(event) => form.setName(event.target.value)}
       />
       <div className="inline-apply__row">
         <input

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { ANONYMOUS_NAME } from "@/lib/application-details";
 import {
   checkDuplicateByPhone,
   getInitialStatus,
@@ -15,8 +16,10 @@ const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 
 const applicationSchema = z.object({
-  // Имя необязательно: телефона достаточно, чтобы перезвонить.
-  name: z.string().trim().max(80).optional(),
+  // Имя обязательно с 26.08 по решению владельца. До этого хватало телефона,
+  // и каждый второй отклик приходил как «Без имени»: менеджер начинал
+  // разговор вслепую, а по базе такие записи не сгруппировать.
+  name: z.string().trim().min(2).max(80),
   phone: z.string().trim().min(1).max(40),
   // Необязательно и без значения по умолчанию: первый шаг формы спрашивает
   // только телефон, а канал связи человек выбирает уже на экране «Спасибо».
@@ -105,8 +108,9 @@ export async function POST(request: Request) {
   }
 
   const preferredContact = parsedBody.data.preferredContact ?? null;
-  // Имя необязательно — в базу и в бот кладём явную заглушку.
-  const candidateName = parsedBody.data.name || "Без имени";
+  // Заглушка осталась на два случая: отклики, заведённые менеджером вручную
+  // (там имени может не быть), и старые записи до 26.08.
+  const candidateName = parsedBody.data.name || ANONYMOUS_NAME;
   // Ник Telegram: убираем ведущий @ и лишние пробелы; нужен только для Telegram.
   const telegramUsername =
     preferredContact === "telegram"

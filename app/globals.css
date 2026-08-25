@@ -2582,6 +2582,24 @@ select {
   gap: 8px;
 }
 
+/* Имя стоит перед телефоном отдельной строкой: рядом с телефоном на узком
+   экране оба поля становятся нечитаемо тесными. */
+.inline-apply__name {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: 16px; /* меньше 16px — iOS зумит страницу при фокусе */
+}
+
+.inline-apply__name:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 .inline-apply__phone {
   flex: 1;
   min-width: 0;
