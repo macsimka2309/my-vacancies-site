@@ -1,5 +1,5 @@
 import { db } from "./db";
-import type { LeadStatusValue } from "./lead-status";
+import { DEFAULT_LEAD_STATUS, type LeadStatusValue } from "./lead-status";
 
 /**
  * Повторный отклик — телефон уже есть в базе.
@@ -57,5 +57,5 @@ export async function checkDuplicateByPhone(
 }
 
 export function getInitialStatus(check: DuplicateCheck): LeadStatusValue {
-  return check.isDuplicate ? "DUPLICATE" : "NEW";
+  return check.isDuplicate ? "DUPLICATE" : DEFAULT_LEAD_STATUS;
 }

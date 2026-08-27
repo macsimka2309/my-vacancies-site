@@ -152,8 +152,15 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           как противоречие, поэтому подпись говорит об этом прямо. */}
       <section className="admin-summary" aria-label="Сводка по всей базе">
         <SummaryItem label="Всего в базе" value={total} />
-        <SummaryItem label="Новые" value={countByStatus("NEW")} />
         <SummaryItem label="В работе" value={countByStatus("IN_PROGRESS")} />
+        <SummaryItem
+          label="На стажировку"
+          value={countByStatus("TO_INTERNSHIP")}
+        />
+        <SummaryItem
+          label="Вышли на стажировку"
+          value={countByStatus("INTERNSHIP_STARTED")}
+        />
       </section>
 
       <section

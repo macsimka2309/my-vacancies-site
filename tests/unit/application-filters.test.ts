@@ -53,7 +53,7 @@ describe("parseApplicationFilters", () => {
       project: "Лента",
       q: "  Иван  ",
       source: "ads",
-      status: "NEW",
+      status: "IN_PROGRESS",
       vacancyId: "clv0vacancy0001",
     });
 
@@ -62,7 +62,7 @@ describe("parseApplicationFilters", () => {
       projects: ["Лента"],
       query: "Иван",
       sources: ["ads"],
-      statuses: ["NEW"],
+      statuses: ["IN_PROGRESS"],
       vacancyIds: ["clv0vacancy0001"],
     });
   });
@@ -71,11 +71,11 @@ describe("parseApplicationFilters", () => {
   // одним значением так не спросишь.
   it("принимает несколько значений одного фильтра", () => {
     const filters = parseApplicationFilters({
-      status: ["NEW", "IN_PROGRESS"],
+      status: ["IN_PROGRESS", "RESERVE"],
       city: ["Москва", "Тверь"],
     });
 
-    expect(filters.statuses).toEqual(["NEW", "IN_PROGRESS"]);
+    expect(filters.statuses).toEqual(["IN_PROGRESS", "RESERVE"]);
     expect(filters.cities).toEqual(["Москва", "Тверь"]);
   });
 
@@ -84,17 +84,17 @@ describe("parseApplicationFilters", () => {
   it("отбрасывает несуществующие статус и источник", () => {
     const filters = parseApplicationFilters({
       source: ["ads", "выдумка"],
-      status: ["ВЫДУМКА", "NEW"],
+      status: ["ВЫДУМКА", "IN_PROGRESS"],
     });
 
-    expect(filters.statuses).toEqual(["NEW"]);
+    expect(filters.statuses).toEqual(["IN_PROGRESS"]);
     expect(filters.sources).toEqual(["ads"]);
   });
 
   it("пустые параметры не считаются фильтром", () => {
     expect(hasActiveFilters(parseApplicationFilters({}))).toBe(false);
     expect(hasActiveFilters(parseApplicationFilters({ q: "Иван" }))).toBe(false);
-    expect(hasActiveFilters(parseApplicationFilters({ status: "NEW" }))).toBe(
+    expect(hasActiveFilters(parseApplicationFilters({ status: "IN_PROGRESS" }))).toBe(
       true,
     );
   });
@@ -105,14 +105,14 @@ describe("buildApplicationWhere", () => {
     const where = buildApplicationWhere(
       parseApplicationFilters({
         project: "Лента",
-        status: "NEW",
+        status: "IN_PROGRESS",
         vacancyId: "clv0vacancy0001",
       }),
     );
 
     expect(where).toEqual({
       projectSnapshot: { in: ["Лента"] },
-      status: { in: ["NEW"] },
+      status: { in: ["IN_PROGRESS"] },
       vacancyId: { in: ["clv0vacancy0001"] },
     });
   });
@@ -171,9 +171,14 @@ describe("matchesSource", () => {
 
 describe("toggleValue", () => {
   it("добавляет и убирает значение", () => {
-    expect(toggleValue([], "NEW")).toEqual(["NEW"]);
-    expect(toggleValue(["NEW"], "IN_PROGRESS")).toEqual(["NEW", "IN_PROGRESS"]);
-    expect(toggleValue(["NEW", "IN_PROGRESS"], "NEW")).toEqual(["IN_PROGRESS"]);
+    expect(toggleValue([], "RESERVE")).toEqual(["RESERVE"]);
+    expect(toggleValue(["RESERVE"], "IN_PROGRESS")).toEqual([
+      "RESERVE",
+      "IN_PROGRESS",
+    ]);
+    expect(toggleValue(["RESERVE", "IN_PROGRESS"], "RESERVE")).toEqual([
+      "IN_PROGRESS",
+    ]);
   });
 });
 
@@ -181,11 +186,13 @@ describe("buildAdminUrl", () => {
   it("складывает набор в повторяющиеся параметры", () => {
     const url = buildAdminUrl({
       ...EMPTY_FILTERS,
-      statuses: ["NEW", "IN_PROGRESS"],
+      statuses: ["IN_PROGRESS", "RESERVE"],
       cities: ["Москва"],
     });
 
-    expect(url).toBe("/admin?status=NEW&status=IN_PROGRESS&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0");
+    expect(url).toBe(
+      "/admin?status=IN_PROGRESS&status=RESERVE&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0",
+    );
   });
 
   it("без фильтров даёт чистый адрес", () => {

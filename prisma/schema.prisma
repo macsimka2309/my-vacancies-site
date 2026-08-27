@@ -7,16 +7,16 @@ datasource db {
   provider = "postgresql"
 }
 
+/// Заменён 26.08 по решению владельца: прежний набор описывал воронку найма
+/// вообще, этот — нашу, где человека ведут до выхода на стажировку.
 enum LeadStatus {
-  NEW
   IN_PROGRESS
-  NO_ANSWER
-  INTERVIEW_DONE
-  FIT
-  NOT_FIT
-  SENT_TO_CLIENT
-  ACCEPTED
-  CANDIDATE_REFUSED
+  INTERVIEW_MOVED
+  RESERVE
+  REJECTED
+  TO_INTERNSHIP
+  INTERNSHIP_STARTED
+  DEAL_CLOSED
   DUPLICATE
 }
 
@@ -92,7 +92,7 @@ model Application {
   utmTerm              String?    @map("utm_term")
   /// ClientID Яндекс.Метрики — ключ для выгрузки офлайн-конверсий в Директ.
   ymClientId           String?    @map("ym_client_id")
-  status               LeadStatus @default(NEW)
+  status               LeadStatus @default(IN_PROGRESS)
   responsibleManager   String?    @map("responsible_manager")
   managerComment       String?    @map("manager_comment") @db.Text
   personalDataConsentAt DateTime? @map("personal_data_consent_at")

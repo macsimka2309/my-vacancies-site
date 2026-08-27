@@ -1,22 +1,69 @@
 import { describe, expect, it } from "vitest";
-import { getLeadStatusLabel, isLeadStatus } from "@/lib/lead-status";
+import {
+  DEFAULT_LEAD_STATUS,
+  getLeadStatusLabel,
+  isLeadStatus,
+  LEAD_STATUS_OPTIONS,
+} from "@/lib/lead-status";
 
-describe("lead-status", () => {
-  it("распознаёт валидные статусы", () => {
-    expect(isLeadStatus("NEW")).toBe(true);
-    expect(isLeadStatus("ACCEPTED")).toBe(true);
+describe("isLeadStatus", () => {
+  it("узнаёт статусы набора", () => {
+    expect(isLeadStatus("IN_PROGRESS")).toBe(true);
+    expect(isLeadStatus("INTERNSHIP_STARTED")).toBe(true);
     expect(isLeadStatus("DUPLICATE")).toBe(true);
   });
 
-  it("отклоняет неизвестные значения", () => {
-    expect(isLeadStatus("UNKNOWN")).toBe(false);
-    expect(isLeadStatus("")).toBe(false);
-    expect(isLeadStatus("new")).toBe(false);
+  // Набор заменён 26.08. Тест держит границу: если старое значение где-то
+  // осталось, оно не должно молча проходить проверку.
+  it("не принимает статусы прежнего набора", () => {
+    for (const old of [
+      "NEW",
+      "NO_ANSWER",
+      "INTERVIEW_DONE",
+      "FIT",
+      "NOT_FIT",
+      "SENT_TO_CLIENT",
+      "ACCEPTED",
+      "CANDIDATE_REFUSED",
+    ]) {
+      expect(isLeadStatus(old)).toBe(false);
+    }
   });
 
-  it("возвращает подпись для известного статуса и само значение для неизвестного", () => {
-    expect(getLeadStatusLabel("NEW")).toBe("Новый");
+  it("не принимает мусор", () => {
+    expect(isLeadStatus("")).toBe(false);
+    expect(isLeadStatus("ВЫДУМКА")).toBe(false);
+  });
+});
+
+describe("getLeadStatusLabel", () => {
+  it("переводит все восемь статусов", () => {
+    expect(LEAD_STATUS_OPTIONS).toHaveLength(8);
     expect(getLeadStatusLabel("IN_PROGRESS")).toBe("В работе");
-    expect(getLeadStatusLabel("WHATEVER")).toBe("WHATEVER");
+    expect(getLeadStatusLabel("INTERVIEW_MOVED")).toBe(
+      "Дату собеседования перенесли",
+    );
+    expect(getLeadStatusLabel("RESERVE")).toBe("Резерв");
+    expect(getLeadStatusLabel("REJECTED")).toBe("Отказ");
+    expect(getLeadStatusLabel("TO_INTERNSHIP")).toBe("На стажировку");
+    expect(getLeadStatusLabel("INTERNSHIP_STARTED")).toBe(
+      "Вышел на стажировку",
+    );
+    expect(getLeadStatusLabel("DEAL_CLOSED")).toBe("Сделка завершена");
+    expect(getLeadStatusLabel("DUPLICATE")).toBe("Дубль");
+  });
+
+  // Незнакомое значение отдаём как есть: в таблице лучше увидеть код
+  // статуса, чем пустую ячейку.
+  it("незнакомое значение возвращает как есть", () => {
+    expect(getLeadStatusLabel("NEW")).toBe("NEW");
+  });
+});
+
+describe("DEFAULT_LEAD_STATUS", () => {
+  // Отдельного «Нового» в наборе нет — отклик с сайта сразу в работе.
+  it("отклик с сайта попадает в работу", () => {
+    expect(DEFAULT_LEAD_STATUS).toBe("IN_PROGRESS");
+    expect(isLeadStatus(DEFAULT_LEAD_STATUS)).toBe(true);
   });
 });
