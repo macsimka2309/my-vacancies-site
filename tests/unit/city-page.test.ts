@@ -149,6 +149,7 @@ describe("заголовки городской страницы", () => {
       cityIn: "Санкт-Петербурге",
       total: 8,
       professions: [{ title: "Курьер на авто" }, { title: "Сборщик заказов" }],
+      projects: ["Лента", "Самокат"],
       to: 9500,
     });
 
@@ -162,5 +163,9 @@ describe("заголовки городской страницы", () => {
     expect(description).toContain("курьер на авто");
     expect(plain(description)).toContain("7 032 ₽ за смену");
     expect(description.length).toBeLessThanOrEqual(DESCRIPTION_LIMIT);
+    // Призыв убран 31.08: сниппет должен отвечать на вопрос, а не обещать
+    // ответить. Он же обрезался на полуслове — «Оставьте телефон —…».
+    expect(description).not.toContain("Оставьте телефон");
+    expect(description).not.toContain("…");
   });
 });

@@ -104,12 +104,57 @@ describe("buildVacancyTitle", () => {
 describe("buildVacancyDescription", () => {
   // Раньше описание начиналось с «официальный партнёр Лента ·» и содержало
   // маркер списка «•» — всё это было видно человеку в выдаче.
-  it("начинается с профессии, а не со служебных слов", () => {
+  it("начинается с профессии и бренда, без служебных слов", () => {
     const description = buildVacancyDescription(vacancy);
 
-    expect(description).toContain("Курьер на авто в Белгороде, Лента.");
+    expect(description).toContain("Курьер на авто в Ленте — Белгород.");
     expect(description).not.toContain("официальный партнёр");
     expect(description).not.toContain("•");
+    expect(description.length).toBeLessThanOrEqual(DESCRIPTION_LIMIT);
+  });
+
+  // Замер 31.08: 74 показа, один клик. Треть сниппета занимала фраза
+  // «Оставьте телефон — перезвоним и расскажем условия» — обещание
+  // рассказать условия тому, кто в этот момент ищет условия.
+  it("вместо призыва даёт факты", () => {
+    const description = buildVacancyDescription({
+      ...vacancy,
+      requirements: "Возраст от 18 лет, опыт не требуется — обучим.",
+      schedule: "Полный рабочий день. Графики 7/0, 5/2 или 2/2.",
+    });
+
+    expect(description).not.toContain("Оставьте телефон");
+    expect(description).toContain("выплаты каждую неделю");
+    expect(description).toContain("Опыт не нужен.");
+    expect(description).toContain("Графики 7/0, 5/2 или 2/2.");
+    expect(description.length).toBeLessThanOrEqual(DESCRIPTION_LIMIT);
+  });
+
+  // «Опыт не нужен» верно для 159 вакансий из 169 — общим обещанием
+  // это было бы неправдой.
+  it("молчит про опыт там, где его требуют", () => {
+    const description = buildVacancyDescription({
+      ...vacancy,
+      requirements: "Права категории B и стаж вождения от трёх лет.",
+    });
+
+    expect(description).not.toContain("Опыт не нужен");
+  });
+
+  // Длинный график не влезает целиком — берём первое предложение, а не
+  // обрезаем на полуслове.
+  it("ужимает график, когда он не помещается", () => {
+    const description = buildVacancyDescription({
+      ...vacancy,
+      city: "Санкт-Петербург",
+      requirements: "опыт не требуется",
+      schedule:
+        "Смены от 6 часов. Графики 2/2, 3/3 или 5/2, приоритет — выходные дни.",
+    });
+
+    expect(description).toContain("Смены от 6 часов.");
+    expect(description).not.toContain("приоритет");
+    expect(description).not.toContain("…");
     expect(description.length).toBeLessThanOrEqual(DESCRIPTION_LIMIT);
   });
 });

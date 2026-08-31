@@ -20,6 +20,9 @@ type VacancyMetaSource = {
   project: string;
   salary: string | null;
   title: string;
+  /** Заполнен у всех 169 вакансий, но до 31.08 нигде не показывался. */
+  schedule?: string | null;
+  requirements?: string | null;
 };
 
 export function buildVacancyTitle(vacancy: VacancyMetaSource) {
@@ -55,20 +58,34 @@ export function buildVacancyTitle(vacancy: VacancyMetaSource) {
   return base;
 }
 
+/**
+ * Описание — это сниппет в выдаче, а не место для призыва.
+ *
+ * Замер 31.08: 191 страница в индексе, 74 показа, **один клик**. Охват есть,
+ * выбора нет. При этом треть описания занимала фраза «Оставьте телефон —
+ * перезвоним и расскажем условия»: мы обещали рассказать условия человеку,
+ * который в этот момент ищет именно условия. Запросы недели — «ставка за час
+ * сборщика заказов ленты в ростове на дону», «сборщик заказов график»,
+ * «работа оплата ежедневно».
+ *
+ * Теперь вместо призыва идут факты, и `schedule` наконец попадает в сниппет:
+ * поле заполнено у всех 169 вакансий и не использовалось нигде.
+ */
 export function buildVacancyDescription(vacancy: VacancyMetaSource) {
-  const cityIn = getCityIn(vacancy.city);
-  const where = cityIn ? `в ${cityIn}` : `— ${vacancy.city}`;
+  const base = `${buildPositionWithProject(vacancy.title, vacancy.project)} — ${vacancy.city}.`;
+  const money = vacancy.salary
+    ? `${capitalize(vacancy.salary)}, выплаты каждую неделю.`
+    : "Выплаты каждую неделю.";
 
-  return truncate(
-    [
-      `${vacancy.title} ${where}, ${vacancy.project}.`,
-      vacancy.salary ? `${capitalize(vacancy.salary)}.` : null,
-      "Выплаты каждую неделю. Оставьте телефон — перезвоним и расскажем условия.",
-    ]
-      .filter(Boolean)
-      .join(" "),
-    DESCRIPTION_LIMIT,
-  );
+  return fillWithin(DESCRIPTION_LIMIT, [
+    [base],
+    [money],
+    // «Опыт не нужен» короче графика и отвечает на частый вопрос, поэтому
+    // идёт раньше. Утверждаем только там, где это написано в самой вакансии.
+    hasNoExperience(vacancy.requirements) ? ["Опыт не нужен."] : [],
+    // Полный график, если влезает; иначе первое предложение — там суть.
+    vacancy.schedule ? [vacancy.schedule, firstSentence(vacancy.schedule)] : [],
+  ]);
 }
 
 type CatalogMetaSource = {
@@ -110,6 +127,7 @@ type CityPageMetaSource = {
   total: number;
   professions: { title: string }[];
   to: number | null;
+  projects: string[];
 };
 
 /**
@@ -142,18 +160,19 @@ export function buildCityPageDescription(page: CityPageMetaSource) {
     .map((profession) => profession.title.toLocaleLowerCase("ru-RU"))
     .join(", ");
 
-  return truncate(
+  // Тот же разбор, что и у карточки: призыв уступил место фактам. Раньше
+  // он вдобавок обрезался на полуслове — «Оставьте телефон —…».
+  return fillWithin(DESCRIPTION_LIMIT, [
+    [`${capitalize(formatVacancies(page.total))} ${where}: ${professions}.`],
     [
-      `${capitalize(formatVacancies(page.total))} ${where}: ${professions}.`,
       page.to !== null
-        ? `До ${new Intl.NumberFormat("ru-RU").format(page.to)} ₽ за смену.`
-        : null,
-      "Выплаты каждую неделю. Оставьте телефон — перезвоним.",
-    ]
-      .filter(Boolean)
-      .join(" "),
-    DESCRIPTION_LIMIT,
-  );
+        ? `До ${new Intl.NumberFormat("ru-RU").format(page.to)} ₽ за смену, выплаты каждую неделю.`
+        : "Выплаты каждую неделю.",
+    ],
+    page.projects.length
+      ? [`Работодатели — ${joinList(page.projects)}.`]
+      : [],
+  ]);
 }
 
 /** «курьером», «сборщиком заказов» или обоими — по составу города. */
@@ -166,6 +185,52 @@ export function describeCityWork(professions: { title: string }[]) {
   }
 
   return hasPicker ? "сборщиком заказов" : "курьером";
+}
+
+/**
+ * Собирает строку из частей, добавляя каждую только если она помещается.
+ * У части может быть запасной, более короткий вариант — берём первый
+ * подходящий. Обрезать по лимиту нельзя: сниппет, оборванный на полуслове,
+ * хуже короткого.
+ */
+function fillWithin(limit: number, parts: string[][]) {
+  let result = "";
+
+  for (const variants of parts) {
+    for (const variant of variants) {
+      const candidate = result ? `${result} ${variant}` : variant;
+
+      if (candidate.length <= limit) {
+        result = candidate;
+        break;
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * «Опыт не нужен» — только там, где это написано в самой вакансии: верно
+ * для 159 из 169, и как общее обещание было бы неправдой.
+ */
+function hasNoExperience(requirements: string | null | undefined) {
+  return /опыт не тр|без опыта|обучим/i.test(requirements ?? "");
+}
+
+function firstSentence(value: string) {
+  const [sentence] = value.split(/(?<=\.)\s/);
+
+  return sentence ?? value;
+}
+
+/** «Магнит, Самокат и Лента» — перечисление до конца читается машинным. */
+function joinList(values: string[]) {
+  if (values.length < 2) {
+    return values[0] ?? "";
+  }
+
+  return `${values.slice(0, -1).join(", ")} и ${values.at(-1)}`;
 }
 
 // «до 6500 ₽ за смену» → «до 6500 ₽/смена». Запись «₽/мес» уже встречается
