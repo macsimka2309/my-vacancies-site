@@ -9,6 +9,9 @@ function vacancy(
   overrides: Partial<CityContextVacancy> & { slug: string },
 ): CityContextVacancy {
   return {
+    id: `id-${overrides.slug}`,
+    workFormat: "Свободный график",
+    schedule: "Полный рабочий день. Графики 7/0, 5/2 или 2/2.",
     title: "Курьер на авто",
     project: "Лента",
     city: "Тверь",

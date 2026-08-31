@@ -1,11 +1,26 @@
 import Link from "next/link";
 import { formatProject } from "@/lib/project";
-import type { VacancyListItem } from "@/lib/vacancies";
+
+/**
+ * Ровно те поля, которые карточка читает. Раньше стоял полный тип витрины,
+ * и из-за него городская страница не могла показать карточку: её вакансии
+ * несут меньше полей, хотя всё нужное у них есть.
+ */
+export type VacancyCardItem = {
+  id: string;
+  slug: string;
+  title: string;
+  project: string;
+  city: string;
+  workFormat: string;
+  schedule: string | null;
+  salary: string | null;
+};
 import { InlineApplyForm } from "./InlineApplyForm";
 import { ContactButtons } from "./ContactButtons";
 
 type VacancyCardProps = {
-  vacancy: VacancyListItem;
+  vacancy: VacancyCardItem;
 };
 
 export function VacancyCard({ vacancy }: VacancyCardProps) {

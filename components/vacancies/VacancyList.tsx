@@ -1,8 +1,7 @@
-import type { VacancyListItem } from "@/lib/vacancies";
-import { VacancyCard } from "./VacancyCard";
+import { VacancyCard, type VacancyCardItem } from "./VacancyCard";
 
 type VacancyListProps = {
-  vacancies: VacancyListItem[];
+  vacancies: VacancyCardItem[];
 };
 
 export function VacancyList({ vacancies }: VacancyListProps) {

@@ -5,6 +5,7 @@ import { cache } from "react";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { ContactButtons } from "@/components/vacancies/ContactButtons";
+import { VacancyList } from "@/components/vacancies/VacancyList";
 import { joinProjects } from "@/lib/city-context";
 import { buildCityFaq, describePay, money } from "@/lib/city-page";
 import {
@@ -162,25 +163,12 @@ export default async function CityPage({ params }: CityPageProps) {
             {profession.count > 1 ? (
               <p className="city-page__pay">{describePay(profession)}</p>
             ) : null}
-            <ul className="city-context__list">
-              {profession.vacancies.map((vacancy) => (
-                <li key={vacancy.slug}>
-                  <Link href={`/vacancies/${vacancy.slug}`}>
-                    <span className="city-context__position">
-                      {vacancy.title}
-                      <span className="city-context__project">
-                        {vacancy.project}
-                      </span>
-                    </span>
-                    {vacancy.salary ? (
-                      <span className="city-context__salary">
-                        {vacancy.salary}
-                      </span>
-                    ) : null}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Карточки, а не ссылки: до 31.08 городская страница не умела
+                принимать отклик вовсе — человек из поиска был обязан сначала
+                перейти в вакансию. Это лишний шаг ровно для того трафика,
+                ради которого страница и делалась. Сравнение по профессиям
+                при этом остаётся: оно в заголовке секции и своде над списком. */}
+            <VacancyList vacancies={profession.vacancies} />
           </section>
         ))}
 
@@ -213,12 +201,10 @@ export default async function CityPage({ params }: CityPageProps) {
           </section>
         ) : null}
       </main>
-      {/* Липкой панели здесь нет намеренно. На карточке вакансии она ведёт
-          к форме — главному действию (300 ₽ по ценности цели в Метрике).
-          Здесь формы нет: чтобы откликнуться, нужно сначала выбрать вакансию,
-          и большая кнопка «Позвонить» (100 ₽) просто перехватывала бы этот
-          выбор. Кому нужен звонок — телефон закреплён в шапке, и он
-          размечен целью, в отличие от такой кнопки. */}
+      {/* Липкой панели здесь нет намеренно: форма отклика теперь в каждой
+          карточке списка, и якорь к «той самой» форме указать не на что —
+          их на странице несколько. Кому нужен звонок, телефон закреплён
+          в шапке, и он размечен целью. */}
       <SiteFooter />
     </>
   );

@@ -19,10 +19,14 @@ import { getCitySlug, getRegionByCity } from "./cities";
  * сравнивать не с чем — им достаётся только соседство по региону.
  */
 export type CityContextVacancy = {
+  /** Нужен форме отклика: без него карточку на городской странице не собрать. */
+  id: string;
   slug: string;
   title: string;
   project: string;
   city: string;
+  workFormat: string;
+  schedule: string | null;
   salary: string | null;
   /** Нижняя граница есть редко — у 40 вакансий из 169. */
   salaryShiftMin: number | null;
