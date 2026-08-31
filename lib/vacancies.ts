@@ -275,6 +275,24 @@ const INTENT_WHERE: Record<IntentMatch, object> = {
     ],
   },
   dailyPayout: { conditions: { contains: "ежедневн", mode: "insensitive" } },
+  // Свой транспорт не нужен в двух случаях, и они разные: сборщик работает
+  // внутри магазина, вахтовику технику выдают в аренду. Оба честно попадают
+  // в «без своего транспорта», но в тексте лендинга разведены.
+  noTransport: {
+    OR: [
+      { title: { contains: "сборщик", mode: "insensitive" } },
+      { title: { contains: "вахт", mode: "insensitive" } },
+    ],
+  },
+  // Подработка — это про длину смены и свободу графика, а не про слово
+  // «подработка» в тексте: его в вакансиях нет ни разу. Берём короткие
+  // и гибкие смены из `schedule`.
+  partTime: {
+    OR: [
+      { schedule: { contains: "Свободный график", mode: "insensitive" } },
+      { schedule: { contains: "Смены от 6 часов", mode: "insensitive" } },
+    ],
+  },
 };
 
 const loadIntentVacancies = unstable_cache(
