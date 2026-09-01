@@ -20,6 +20,12 @@ const OPTIONAL_LIMITS = {
   schedule: 200,
 } as const;
 
+/**
+ * `age-limit` — отдельная ошибка, а не общий `invalid`: менеджер должен
+ * увидеть, что именно не так, иначе он трижды переправит текст наугад.
+ */
+export type VacancyFormError = "invalid" | "age-limit";
+
 export type VacancyFormData = {
   address: string | null;
   city: string;
@@ -33,6 +39,7 @@ export type VacancyFormData = {
   salaryShiftMin: number | null;
   salaryShiftMax: number | null;
   salaryShiftAvg: number | null;
+  salaryHour: number | null;
   salaryPeriodMin: number | null;
   salaryPeriodMax: number | null;
   salaryPeriod: SalaryPeriod | null;
@@ -45,7 +52,7 @@ export type VacancyFormData = {
 
 export function parseVacancyForm(
   formData: FormData,
-): { data: VacancyFormData } | { error: "invalid" } {
+): { data: VacancyFormData } | { error: VacancyFormError } {
   const required = Object.fromEntries(
     Object.entries(REQUIRED_LIMITS).map(([field, limit]) => [
       field,
@@ -74,6 +81,12 @@ export function parseVacancyForm(
     return { error: "invalid" };
   }
 
+  const salaryHour = normalizeRate(formData, "salaryHour");
+
+  if (salaryHour === undefined) {
+    return { error: "invalid" };
+  }
+
   const validThrough = normalizeDate(formData, "validThrough");
 
   if (validThrough === undefined) {
@@ -88,6 +101,19 @@ export function parseVacancyForm(
 
   if (!slug || slug.length > 120) {
     return { error: "invalid" };
+  }
+
+  // Верхняя граница возраста в тексте объявления запрещена ст. 25 Закона
+  // о занятости, а ст. 13.11.1 КоАП даёт штраф за каждое объявление.
+  // 26.08 такие формулировки убраны из 32 вакансий; проверка нужна, чтобы
+  // они не вернулись при следующей правке. Отбор кандидатов это не
+  // ограничивает — требование партнёра остаётся у менеджера, но не в тексте.
+  if (
+    hasAgeCeiling(required.requirements) ||
+    hasAgeCeiling(required.conditions) ||
+    hasAgeCeiling(required.responsibilities)
+  ) {
+    return { error: "age-limit" };
   }
 
   return {
@@ -105,6 +131,7 @@ export function parseVacancyForm(
       // редактор правит одно поле, а фильтр и разметка получают суммы.
       ...parseSalaryText(optional.salary),
       salaryShiftAvg,
+      salaryHour,
       validThrough,
       schedule: optional.schedule ?? null,
       slug,
@@ -112,6 +139,14 @@ export function parseVacancyForm(
       workFormat: required.workFormat!,
     },
   };
+}
+
+/** «18–45», «18-50», «до 50 лет», «от 18 до 45» — все формы верхней границы. */
+const AGE_CEILING =
+  /\b18\s*[–—-]\s*\d{2}\s*лет|от\s*18\s*до\s*\d{2}|до\s*\d{2}\s*лет/i;
+
+function hasAgeCeiling(value: string | null | undefined) {
+  return AGE_CEILING.test(value ?? "");
 }
 
 function normalizeRequired(
@@ -140,6 +175,28 @@ function normalizeOptional(
 
 // Пустое поле — это null, мусор — ошибка формы: молча обнулять введённое
 // нельзя, иначе редактор не узнает, что цифра не сохранилась.
+/**
+ * Ставка за час: дробная у части вакансий (112,5 ₽/час), поэтому целым
+ * числом её не принять. Запятая как разделитель — так её и вводят.
+ */
+const MAX_HOUR_RATE = 5000;
+
+function normalizeRate(formData: FormData, field: string) {
+  const value = String(formData.get(field) ?? "")
+    .replace(/\s/g, "")
+    .replace(",", ".");
+
+  if (!value) {
+    return null;
+  }
+
+  const rate = Number(value);
+
+  return Number.isFinite(rate) && rate > 0 && rate <= MAX_HOUR_RATE
+    ? rate
+    : undefined;
+}
+
 function normalizeAmount(formData: FormData, field: string) {
   const value = String(formData.get(field) ?? "").replace(/\s/g, "");
 

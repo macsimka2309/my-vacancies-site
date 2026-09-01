@@ -39,7 +39,7 @@ export async function POST(
 
   if ("error" in parsed) {
     return NextResponse.redirect(
-      getRedirectUrl(request, `/admin/vacancies/${id}?result=invalid`),
+      getRedirectUrl(request, `/admin/vacancies/${id}?result=${parsed.error}`),
       303,
     );
   }

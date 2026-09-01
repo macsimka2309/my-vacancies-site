@@ -14,6 +14,8 @@ export type SalaryPeriod = "MONTH" | "VAHTA";
 export type SalaryBasis = "shift" | "period";
 
 export type StructuredSalary = {
+  /** Ставка за час: не зависит от длины смены, поэтому сравнима всегда. */
+  salaryHour?: number | null;
   salaryShiftMin: number | null;
   salaryShiftMax: number | null;
   salaryPeriodMin: number | null;
@@ -77,7 +79,7 @@ export function getSalaryCeiling(
 }
 
 export type JsonLdSalary = {
-  unitText: "DAY" | "MONTH";
+  unitText: "HOUR" | "DAY" | "MONTH";
   min: number | null;
   max: number | null;
 };
@@ -88,6 +90,12 @@ export type JsonLdSalary = {
  * вакансий в разметку идёт ставка за смену.
  */
 export function toJsonLdSalary(salary: StructuredSalary): JsonLdSalary | null {
+  // Час — самая точная единица из тех, что у нас есть: она не зависит
+  // от длины смены, поэтому в разметку идёт первой.
+  if (salary.salaryHour) {
+    return { unitText: "HOUR", min: salary.salaryHour, max: salary.salaryHour };
+  }
+
   if (
     salary.salaryPeriod === "MONTH" &&
     (salary.salaryPeriodMin !== null || salary.salaryPeriodMax !== null)
@@ -116,6 +124,7 @@ export function toJsonLdSalary(salary: StructuredSalary): JsonLdSalary | null {
  */
 export function describeStructuredSalary(salary: StructuredSalary): string {
   const parts = [
+    salary.salaryHour ? `час ${formatRate(salary.salaryHour)} ₽` : "",
     formatBounds("смена", salary.salaryShiftMin, salary.salaryShiftMax),
     formatBounds(
       salary.salaryPeriod === "VAHTA" ? "вахта" : "месяц",
@@ -184,4 +193,19 @@ function parseBounds(segment: string) {
   }
 
   return { min: Math.min(...amounts), max: Math.max(...amounts) };
+}
+
+/**
+ * «112.5» → «112,5», «117» → «117». Дробная часть есть у части ставок,
+ * и округлять её нельзя: это тариф, а не наша оценка.
+ */
+export function formatRate(value: number) {
+  return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(
+    value,
+  );
+}
+
+/** Витринная подпись ставки: «117 ₽/час». */
+export function formatHourlyRate(value: number | null | undefined) {
+  return value ? `${formatRate(value)} ₽/час` : null;
 }

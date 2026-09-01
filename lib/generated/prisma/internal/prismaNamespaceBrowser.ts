@@ -85,6 +85,7 @@ export const VacancyScalarFieldEnum = {
   salaryShiftMin: 'salaryShiftMin',
   salaryShiftMax: 'salaryShiftMax',
   salaryShiftAvg: 'salaryShiftAvg',
+  salaryHour: 'salaryHour',
   salaryPeriodMin: 'salaryPeriodMin',
   salaryPeriodMax: 'salaryPeriodMax',
   salaryPeriod: 'salaryPeriod',

@@ -18,6 +18,7 @@ type VacancyFormValues = {
   salaryShiftMin: number | null;
   salaryShiftMax: number | null;
   salaryShiftAvg: number | null;
+  salaryHour: number | null;
   salaryPeriodMin: number | null;
   salaryPeriodMax: number | null;
   salaryPeriod: SalaryPeriod | null;
@@ -79,6 +80,14 @@ export function VacancyForm({
           label="Зарплата"
           maxLength={120}
           name="salary"
+        />
+        <Field
+          defaultValue={vacancy?.salaryHour?.toString().replace(".", ",")}
+          description="Тариф от партнёра. Единственная сравнимая единица: смены идут от 4 до 16 часов, поэтому сумма «за смену» несравнима, а час сравним всегда. Дробную ставку писать через запятую."
+          inputMode="decimal"
+          label="Ставка за час, ₽"
+          name="salaryHour"
+          placeholder="117 или 112,5"
         />
         <Field
           defaultValue={vacancy?.salaryShiftAvg?.toString()}
@@ -194,7 +203,9 @@ export function VacancyFormMessage({ result }: { result?: string }) {
   const text =
     result === "slug-exists"
       ? "Такой адрес страницы уже используется."
-      : "Проверьте обязательные поля и длину текста.";
+      : result === "age-limit"
+        ? "Уберите верхнюю границу возраста из текста: в объявлении о работе она запрещена (ст. 25 Закона о занятости, штраф по ст. 13.11.1 КоАП за каждое объявление). Пишите «Возраст от 18 лет» — ограничение партнёра остаётся у менеджера."
+        : "Проверьте обязательные поля и длину текста.";
 
   return (
     <p className="form-message form-message--error admin-page-message">{text}</p>

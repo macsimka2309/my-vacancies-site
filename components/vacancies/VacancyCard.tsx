@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatProject } from "@/lib/project";
+import { formatHourlyRate } from "@/lib/salary";
 
 /**
  * Ровно те поля, которые карточка читает. Раньше стоял полный тип витрины,
@@ -15,6 +16,8 @@ export type VacancyCardItem = {
   workFormat: string;
   schedule: string | null;
   salary: string | null;
+  /** Ставка за час — не зависит от длины смены, в отличие от «за смену». */
+  salaryHour?: number | null;
 };
 import { InlineApplyForm } from "./InlineApplyForm";
 import { ContactButtons } from "./ContactButtons";
@@ -24,6 +27,8 @@ type VacancyCardProps = {
 };
 
 export function VacancyCard({ vacancy }: VacancyCardProps) {
+  const hourly = formatHourlyRate(vacancy.salaryHour);
+
   return (
     <article className="vacancy-card">
       <div className="vacancy-card__body">
@@ -34,6 +39,9 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
         {vacancy.salary ? (
           <p className="vacancy-salary">{vacancy.salary}</p>
         ) : null}
+        {/* Час впереди смены: смены идут от 4 до 16 часов, и сумма «за смену»
+            сама по себе несравнима — час сравним всегда. */}
+        {hourly ? <p className="vacancy-rate">{hourly}</p> : null}
         {/* «Подробнее» стоит в одном ряду с форматом и графиком: это такая
             же справочная информация о вакансии, а не действие наравне
             с откликом. */}

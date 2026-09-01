@@ -1,5 +1,6 @@
 import { getCityIn } from "./cities";
 import { buildPositionWithProject } from "./project";
+import { formatHourlyRate } from "./salary";
 
 /**
  * Формулы `title` и `description`.
@@ -23,6 +24,8 @@ type VacancyMetaSource = {
   /** Заполнен у всех 169 вакансий, но до 31.08 нигде не показывался. */
   schedule?: string | null;
   requirements?: string | null;
+  /** Ставка за час — её же спрашивают в поиске: «зп в час», «179 р в час». */
+  salaryHour?: number | null;
 };
 
 export function buildVacancyTitle(vacancy: VacancyMetaSource) {
@@ -36,6 +39,14 @@ export function buildVacancyTitle(vacancy: VacancyMetaSource) {
   // Новгород»), так что сюда не попадаем. Но связку задаёт база, а не код.
   if (base.length > TITLE_LIMIT) {
     return `${vacancy.title} — ${vacancy.city}`;
+  }
+
+  // Час впереди смены: он сравним независимо от её длины, и именно его
+  // набирают в поиске — «ставка за час сборщика», «сборщик лента зп в час».
+  const hourly = formatHourlyRate(vacancy.salaryHour);
+
+  if (hourly && `${base}, ${hourly}`.length <= TITLE_LIMIT) {
+    return `${base}, ${hourly}`;
   }
 
   const shiftRate = getShiftRate(vacancy.salary);
@@ -73,12 +84,14 @@ export function buildVacancyTitle(vacancy: VacancyMetaSource) {
  */
 export function buildVacancyDescription(vacancy: VacancyMetaSource) {
   const base = `${buildPositionWithProject(vacancy.title, vacancy.project)} — ${vacancy.city}.`;
+  const hourly = formatHourlyRate(vacancy.salaryHour);
   const money = vacancy.salary
     ? `${capitalize(vacancy.salary)}, выплаты каждую неделю.`
     : "Выплаты каждую неделю.";
 
   return fillWithin(DESCRIPTION_LIMIT, [
     [base],
+    hourly ? [`${capitalize(hourly)}.`] : [],
     [money],
     // «Опыт не нужен» короче графика и отвечает на частый вопрос, поэтому
     // идёт раньше. Утверждаем только там, где это написано в самой вакансии.
