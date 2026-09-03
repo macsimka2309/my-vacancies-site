@@ -108,3 +108,40 @@ function nextMonth() {
 
   return date.toISOString().slice(0, 10);
 }
+
+describe("верхняя граница возраста", () => {
+  // Ст. 25 Закона о занятости запрещает возрастные ограничения в объявлении,
+  // ст. 13.11.1 КоАП даёт штраф за каждое. 26.08 такие формулировки убраны
+  // из 32 вакансий — проверка держит границу, чтобы они не вернулись.
+  it("не пропускает «18–45» и «18-50» в требованиях", () => {
+    for (const text of [
+      "Возраст 18–45 лет.",
+      "Возраст 18-50 лет.",
+      "Требуется человек от 18 до 45",
+      "Возраст до 50 лет",
+    ]) {
+      const parsed = parseVacancyForm(buildForm({ requirements: text }));
+
+      expect("error" in parsed && parsed.error).toBe("age-limit");
+    }
+  });
+
+  it("не пропускает границу и в условиях с обязанностями", () => {
+    expect(
+      parseVacancyForm(buildForm({ conditions: "Возраст 18–45 лет." })),
+    ).toEqual({ error: "age-limit" });
+    expect(
+      parseVacancyForm(buildForm({ responsibilities: "от 18 до 50" })),
+    ).toEqual({ error: "age-limit" });
+  });
+
+  // Нижняя граница законна и остаётся: ограничение по совершеннолетию
+  // прямо предусмотрено трудовым законодательством.
+  it("пропускает «от 18 лет» без верхней границы", () => {
+    const parsed = parseVacancyForm(
+      buildForm({ requirements: "Возраст от 18 лет, опыт не требуется — обучим." }),
+    );
+
+    expect("data" in parsed).toBe(true);
+  });
+});
