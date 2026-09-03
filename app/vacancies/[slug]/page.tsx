@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { InlineApplyForm } from "@/components/vacancies/InlineApplyForm";
 import { CityContext } from "@/components/vacancies/CityContext";
 import { ContactButtons } from "@/components/vacancies/ContactButtons";
+import { PieceworkBreakdown } from "@/components/vacancies/PieceworkBreakdown";
 import { VacancyTextBlock } from "@/components/vacancies/VacancyTextBlock";
 import { getCitySlug } from "@/lib/cities";
 import { buildVacancyDescription, buildVacancyTitle } from "@/lib/meta";
@@ -154,6 +155,12 @@ export default async function VacancyPage({ params }: VacancyPageProps) {
         </ul>
       </section>
 
+      {/* Оплата — первое, что ищут в вакансии, поэтому идёт перед
+          обязанностями, а не в конце «Условий». */}
+      <PieceworkBreakdown
+        hasHourlyRate={Boolean(vacancy.salaryHour)}
+        tariff={vacancy.payTariff}
+      />
       <VacancyTextBlock title="Обязанности" text={vacancy.responsibilities} />
       <VacancyTextBlock title="Требования" text={vacancy.requirements} />
       <VacancyTextBlock title="Условия" text={vacancy.conditions} />

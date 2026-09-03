@@ -11,6 +11,7 @@ type VacancyFormValues = {
   conditions: string;
   contactComment: string | null;
   isActive: boolean;
+  payTariff: string | null;
   project: string;
   requirements: string;
   responsibilities: string;
@@ -152,6 +153,13 @@ export function VacancyForm({
         required
       />
       <TextField
+        defaultValue={vacancy?.payTariff}
+        description="Вставьте тариф из таблицы партнёра как есть — «заказ 148р перевес свыше 20 кг-60р…» или список «Повышенное вручение - 42». Сайт сам разберёт его на составляющие: цена заказа встанет на карточку, остальное — в блок «Из чего складывается оплата». Понятные ему подписи перечислены в lib/piecework.ts; непонятные молча пропускаются."
+        label="Сдельный тариф"
+        maxLength={2_000}
+        name="payTariff"
+      />
+      <TextField
         defaultValue={vacancy?.contactComment}
         label="Контактный комментарий"
         maxLength={2_000}
@@ -236,10 +244,12 @@ function Field({
 
 function TextField({
   defaultValue,
+  description,
   label,
   ...textareaProps
 }: {
   defaultValue?: string | null;
+  description?: string;
   label: string;
 } & Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -249,6 +259,7 @@ function TextField({
     <label className="apply-field">
       <span>{label}</span>
       <textarea defaultValue={defaultValue ?? ""} rows={6} {...textareaProps} />
+      {description ? <small>{description}</small> : null}
     </label>
   );
 }

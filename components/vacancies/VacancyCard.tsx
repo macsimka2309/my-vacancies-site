@@ -1,4 +1,9 @@
 import Link from "next/link";
+import {
+  formatPayPerOrder,
+  getPayPerOrder,
+  parsePiecework,
+} from "@/lib/piecework";
 import { formatProject } from "@/lib/project";
 import { formatHourlyRate } from "@/lib/salary";
 
@@ -18,6 +23,8 @@ export type VacancyCardItem = {
   salary: string | null;
   /** Ставка за час — не зависит от длины смены, в отличие от «за смену». */
   salaryHour?: number | null;
+  /** Сдельный тариф партнёра. У 88 вакансий часа нет, и платят только так. */
+  payTariff?: string | null;
 };
 import { InlineApplyForm } from "./InlineApplyForm";
 import { ContactButtons } from "./ContactButtons";
@@ -28,6 +35,12 @@ type VacancyCardProps = {
 
 export function VacancyCard({ vacancy }: VacancyCardProps) {
   const hourly = formatHourlyRate(vacancy.salaryHour);
+  // Из всей сдельной росписи на карточку идёт одно число — цена заказа.
+  // Остальное (вес, километры, крупногабарит) ждёт на детальной: в списке
+  // это шесть строк мелкого текста, сквозь которые не видно самой вакансии.
+  const perOrder = formatPayPerOrder(
+    getPayPerOrder(parsePiecework(vacancy.payTariff)),
+  );
 
   return (
     <article className="vacancy-card">
@@ -41,7 +54,11 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
         ) : null}
         {/* Час впереди смены: смены идут от 4 до 16 часов, и сумма «за смену»
             сама по себе несравнима — час сравним всегда. */}
-        {hourly ? <p className="vacancy-rate">{hourly}</p> : null}
+        {hourly || perOrder ? (
+          <p className="vacancy-rate">
+            {[hourly, perOrder].filter(Boolean).join(" · ")}
+          </p>
+        ) : null}
         {/* «Подробнее» стоит в одном ряду с форматом и графиком: это такая
             же справочная информация о вакансии, а не действие наравне
             с откликом. */}

@@ -582,6 +582,39 @@ select {
   letter-spacing: -0.01em;
 }
 
+/* Ставка за час и цена заказа — под витринной суммой за смену и мельче её.
+   Это не второй заголовок, а расшифровка первого: «до 6000 ₽ за смену»
+   отвечает «сколько выйдет», «за заказ 148 ₽» — «из чего сложится». */
+.vacancy-rate {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* Роспись сдельной оплаты на детальной. Таблица из двух колонок читается
+   быстрее списка: глаз идёт по числам, а не по подписям. */
+.pay-parts {
+  display: grid;
+  gap: 8px 18px;
+  margin: 0;
+  grid-template-columns: 1fr auto;
+}
+
+.pay-parts dt {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.pay-parts dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .vacancy-meta,
 .detail-meta {
   display: flex;

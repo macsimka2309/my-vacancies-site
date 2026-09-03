@@ -16,6 +16,9 @@ const REQUIRED_LIMITS = {
 const OPTIONAL_LIMITS = {
   address: 300,
   contactComment: 2_000,
+  // Сдельный тариф вставляют из таблицы партнёра целиком: у Магнита это
+  // список из полутора десятков строк.
+  payTariff: 2_000,
   salary: 120,
   schedule: 200,
 } as const;
@@ -32,6 +35,7 @@ export type VacancyFormData = {
   conditions: string;
   contactComment: string | null;
   isActive: boolean;
+  payTariff: string | null;
   project: string;
   requirements: string;
   responsibilities: string;
@@ -123,6 +127,7 @@ export function parseVacancyForm(
       conditions: required.conditions!,
       contactComment: optional.contactComment ?? null,
       isActive: formData.get("isActive") === "on",
+      payTariff: optional.payTariff ?? null,
       project: required.project!,
       requirements: required.requirements!,
       responsibilities: required.responsibilities!,

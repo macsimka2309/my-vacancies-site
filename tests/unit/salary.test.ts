@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   describeStructuredSalary,
+  formatHourlyRate,
   getSalaryCeiling,
   parseSalaryText,
   toJsonLdSalary,
@@ -144,5 +145,34 @@ describe("describeStructuredSalary", () => {
     expect(describeStructuredSalary(parseSalaryText("по договорённости"))).toContain(
       "Разобрать не удалось",
     );
+  });
+});
+
+describe("formatHourlyRate", () => {
+  it("подписывает целую ставку без изменений", () => {
+    expect(formatHourlyRate(205)).toBe("205 ₽/час");
+  });
+
+  // Настоящие дробные тарифы каталога на 03.09: Обнинск, Красноярск,
+  // Краснодар-вахта и Тамбов. Копейки в заголовке выдачи читаются как
+  // ошибка, а не как точность.
+  it("убирает копейки округлением вниз", () => {
+    expect(formatHourlyRate(209.23)).toBe("209 ₽/час");
+    expect(formatHourlyRate(195.2)).toBe("195 ₽/час");
+    expect(formatHourlyRate(104.8)).toBe("104 ₽/час");
+  });
+
+  // Вниз, а не по правилам арифметики: заголовок — это обещание. 112 при
+  // тарифе 112,5 человек получит, 113 — нет.
+  it("не округляет половину вверх", () => {
+    expect(formatHourlyRate(112.5)).toBe("112 ₽/час");
+  });
+
+  it("молчит там, где ставки нет", () => {
+    expect(formatHourlyRate(null)).toBeNull();
+    expect(formatHourlyRate(undefined)).toBeNull();
+    // У Ленты на авто и у Магнита в таблице стоит «час 0р»: часовой ставки
+    // нет по договору, и подписывать «0 ₽/час» нельзя.
+    expect(formatHourlyRate(0)).toBeNull();
   });
 });
