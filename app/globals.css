@@ -93,6 +93,26 @@ select {
   color: var(--muted);
 }
 
+/* Визуально скрыть, не убирая из DOM и дерева доступности. Не то же
+   самое, что display:none/visibility:hidden — те выкидывают элемент
+   и из accessibility-дерева, поисковик читает его иначе, чем видит
+   человек. Этот приём — стандартная практика (skip-to-content и т.п.),
+   не «скрытый текст» в смысле рекомендаций Google. Используется для H1
+   и подписи с цифрами на холодном заходе (п. 59): текст нужен странице
+   и роботу, но физически дублирует то, что уже показано в блоках
+   доверия выше. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .page-header {
   display: grid;
   gap: 10px;

@@ -139,22 +139,32 @@ async function VacancyHome({
             вопрос «В каком городе ищете работу?». Все цифры ниже считаются
             из каталога: выдуманного в оффере нет ничего. */}
         <section className="page-header" id="vacancies">
-          <p className="eyebrow">{site.tagline}</p>
-          <h1>
-            Работа {describeCityWork(summary.professions)}
-            {cityIn ? ` в ${cityIn}` : ""}
-          </h1>
-          <p className="muted">
-            {formatVacancies(summary.count)}
-            {selectedCities.length ? "" : ` в ${summary.cities} городах России`}.{" "}
-            {summary.shiftLow !== null && summary.shiftHigh !== null
-              ? `Смена — от ${money(summary.shiftLow)} до ${money(summary.shiftHigh)} ₽${
-                  selectedCities.length
-                    ? " в зависимости от транспорта и числа часов."
-                    : " в зависимости от города, транспорта и числа часов."
-                }`
-              : ""}
-          </p>
+          {/* Холодному заходу эйбрау, H1 и подпись с цифрами визуально не
+              нужны — то же самое (партнёры, условия) человек уже прочитал
+              в блоках доверия несколькими секундами раньше (замечание
+              владельца 04.09). Но не display:none/visibility:hidden: они
+              убирают элемент и из дерева доступности, и robots увидели бы
+              страницу без единственного H1 и без описательного текста,
+              с которым построен title/description. .visually-hidden прячет
+              только от глаз — текст остаётся в DOM для SEO и скринридеров. */}
+          <div className={coldLanding ? "visually-hidden" : undefined}>
+            <p className="eyebrow">{site.tagline}</p>
+            <h1>
+              Работа {describeCityWork(summary.professions)}
+              {cityIn ? ` в ${cityIn}` : ""}
+            </h1>
+            <p className="muted">
+              {formatVacancies(summary.count)}
+              {selectedCities.length ? "" : ` в ${summary.cities} городах России`}.{" "}
+              {summary.shiftLow !== null && summary.shiftHigh !== null
+                ? `Смена — от ${money(summary.shiftLow)} до ${money(summary.shiftHigh)} ₽${
+                    selectedCities.length
+                      ? " в зависимости от транспорта и числа часов."
+                      : " в зависимости от города, транспорта и числа часов."
+                  }`
+                : ""}
+            </p>
+          </div>
           {/* Три факта, верные для всего каталога — проверено запросом:
               еженедельные выплаты и возраст от 18 указаны у всех 169 вакансий.
               «Опыт не нужен» сюда не попал: он верен для 159 из 169, и как
