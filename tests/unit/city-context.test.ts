@@ -41,7 +41,7 @@ const sverdlovsk = [
   vacancy({ slug: "kurer-lenta-ekb-velo", city: "Екатеринбург", title: "Курьер на велосипеде" }),
   vacancy({ slug: "kurer-samokat-nt-velo", city: "Нижний Тагил", title: "Курьер на велосипеде" }),
   vacancy({ slug: "kurer-samokat-nt-evelo", city: "Нижний Тагил", title: "Курьер на электровелосипеде" }),
-  vacancy({ slug: "kurer-lenta-ku-largus", city: "Каменск-Уральский", title: "Курьер (большой багажник)" }),
+  vacancy({ slug: "kurer-lenta-ku-largus", city: "Каменск-Уральский", title: "Курьер (универсал)" }),
 ];
 
 const elsewhere = [
