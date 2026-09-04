@@ -24,6 +24,7 @@ type AdminUserSummary = {
 type AdminMenuProps = {
   canManageVacancies: boolean;
   canManageUsers: boolean;
+  canViewReports: boolean;
   fullName: string | null;
   passwordMessage: StatusMessage | null;
   rolesLabel: string;
@@ -35,6 +36,7 @@ type AdminMenuProps = {
 export function AdminMenu({
   canManageVacancies,
   canManageUsers,
+  canViewReports,
   fullName,
   passwordMessage,
   rolesLabel,
@@ -87,11 +89,16 @@ export function AdminMenu({
         </div>
       </details>
 
-      {canManageUsers || canManageVacancies ? (
+      {canManageUsers || canManageVacancies || canViewReports ? (
         <nav className="admin-page-menu" aria-label="Действия администратора">
           {canManageVacancies ? (
             <a className="admin-save admin-menu-link" href="/admin/vacancies">
               Вакансии
+            </a>
+          ) : null}
+          {canViewReports ? (
+            <a className="admin-save admin-menu-link" href="/admin/reports">
+              Отчёты
             </a>
           ) : null}
           {canManageUsers ? (

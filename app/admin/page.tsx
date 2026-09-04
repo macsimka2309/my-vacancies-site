@@ -129,6 +129,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         <AdminMenu
           canManageVacancies={hasVacancyAccess}
           canManageUsers={canManageUsers}
+          canViewReports={canManageApplications(session)}
           fullName={session.fullName}
           passwordMessage={getPasswordMessage(
             getSingleParam(params.password),
