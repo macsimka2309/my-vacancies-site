@@ -171,10 +171,22 @@ select {
   gap: 16px;
 }
 
+/* Заголовок и подпись секции — по центру и одной строкой у подписи:
+   замечание владельца 04.09. max-width держит подпись читаемой ширины,
+   а не во всю ширину контейнера с карточками. */
+.trust-blocks__intro {
+  display: grid;
+  gap: 8px;
+  max-width: 640px;
+  margin: 0 auto 24px;
+  text-align: center;
+}
+
 .trust-blocks__heading {
-  margin: 6px 0 24px;
+  margin: 0;
   font-size: 30px;
   line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .trust-block {
@@ -205,6 +217,14 @@ select {
   background: var(--accent-soft);
   color: var(--accent-strong);
   flex: none;
+}
+
+/* Текст карточек — по ширине, а не рваным правым краем: просьба
+   владельца 04.09. Только абзацы карточек доверия — не весь `.text-block`
+   сайта: на детальной странице вакансии (обязанности, требования)
+   такое выравнивание ни к чему. */
+.trust-block .text-block__para {
+  text-align: justify;
 }
 
 /* «Что нужно, чтобы начать» — чекмарки, а не точки: список читается как

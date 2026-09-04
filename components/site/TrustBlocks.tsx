@@ -31,8 +31,12 @@ type TrustBlocksProps = {
 export function TrustBlocks({ projects }: TrustBlocksProps) {
   return (
     <section aria-label="Как мы работаем">
-      <p className="eyebrow">Прежде чем звонить</p>
-      <h2 className="trust-blocks__heading">Как это устроено</h2>
+      <div className="trust-blocks__intro">
+        <h2 className="trust-blocks__heading">Как это устроено</h2>
+        <p className="muted">
+          Коротко: что мы делаем, что нужно для старта и что будет после отклика.
+        </p>
+      </div>
 
       <div className="trust-blocks">
         <article className="detail-section trust-block">

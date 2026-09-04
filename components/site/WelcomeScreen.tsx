@@ -11,17 +11,14 @@ type WelcomeScreenProps = {
  * и не отдельный маршрут. Пролистывается как любой длинный контент: ниже,
  * без перехода, идёт витрина вакансий (`#vacancies` — якорь ссылки-подсказки
  * на случай, если человек не понял, что можно листать дальше).
+ *
+ * Заголовок и подпись — внутри `TrustBlocks`, а не здесь: с логотипом
+ * «Работа Рядом» в шапке прямо над экраном второй раз то же название
+ * читалось как дублирование (замечание владельца 04.09).
  */
 export function WelcomeScreen({ projects }: WelcomeScreenProps) {
   return (
     <section className="welcome-screen" aria-label="Добро пожаловать">
-      <div className="welcome-screen__intro">
-        <p className="eyebrow">Работа Рядом</p>
-        <p className="muted">
-          Коротко о том, что мы делаем, что нужно, чтобы начать, и что
-          будет после того, как вы оставите номер.
-        </p>
-      </div>
       <TrustBlocks projects={projects} />
       <a className="welcome-screen__scroll-cue" href="#vacancies">
         Смотреть вакансии
