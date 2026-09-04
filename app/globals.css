@@ -295,12 +295,16 @@ select {
 .welcome-screen {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 32px;
+  /* flex-start, а не center: по центру контент на широких мониторах
+     повисал в воздухе с пустым полем над заголовком — жалоба владельца
+     04.09. Сверху — сразу текст, а не воздух; если экран выше контента,
+     остаток уходит вниз, к подсказке «Смотреть вакансии», а не наверх. */
+  justify-content: flex-start;
+  gap: 28px;
   /* 72px — примерная высота липкой шапки; не критично на пиксель,
      секция должна занимать «примерно экран», а не ровно до px. */
   min-height: calc(100dvh - 72px);
-  padding: 40px 0 24px;
+  padding: 56px 0 24px;
 }
 
 .welcome-screen__intro {

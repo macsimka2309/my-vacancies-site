@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { joinProjects } from "@/lib/city-context";
 import { getCallbackPromise } from "@/lib/callback";
-import { site } from "@/lib/site";
 
 type TrustBlocksProps = {
   /** Проекты каталога — те же, что в фактах под оффером (п. 6). */
@@ -49,13 +48,14 @@ export function TrustBlocks({ projects }: TrustBlocksProps) {
           </div>
           <div className="text-block">
             <p className="text-block__para">
-              Подбираем курьеров и сборщиков заказов для партнёров:{" "}
-              {joinProjects(projects)}. Оформление — в компании-партнёре, мы
-              доводим человека до первой смены.
+              Мы подбираем курьеров и сборщиков заказов для партнёров:{" "}
+              {joinProjects(projects)}. Оформление проходит в
+              компании-партнёре — мы сопровождаем кандидата до выхода на
+              первую смену.
             </p>
             <p className="text-block__para">
-              Номер видит один рекрутёр — {getRecruiterFirstName(site.legalName)}.
-              Третьим лицам не передаём, рассылок нет.
+              Отклик видят рекрутёры нашей компании. Мы не передаём
+              контакты третьим лицам и не рассылаем сообщения.
             </p>
           </div>
         </article>
@@ -76,12 +76,12 @@ export function TrustBlocks({ projects }: TrustBlocksProps) {
                 обещать общий ответ нельзя — см. п. 9. */}
             <ul className="trust-checklist">
               <li>От 18 лет</li>
-              <li>Смартфон на Android</li>
+              <li>Смартфон на базе Android</li>
             </ul>
             <p className="text-block__para">
-              Медкнижка, гражданство или патент, своя техника или техника
-              партнёра — условия у каждого проекта разные. Полный список
-              указан в карточке конкретной вакансии, до звонка.
+              Требования по медицинской книжке, гражданству или патенту и
+              по технике — индивидуальны для каждого проекта. Полный
+              перечень указан в описании вакансии.
             </p>
           </div>
         </article>
@@ -96,8 +96,8 @@ export function TrustBlocks({ projects }: TrustBlocksProps) {
           </div>
           <ol className="trust-timeline">
             <li>{getCallbackPromise()}</li>
-            <li>Документы и первая смена — обычно на следующий день</li>
-            <li>Деньги — каждую неделю</li>
+            <li>Оформление документов и первая смена — как правило, на следующий день</li>
+            <li>Выплаты — каждую неделю</li>
           </ol>
         </article>
       </div>
@@ -122,16 +122,4 @@ function TrustIcon({ children }: { children: ReactNode }) {
       </svg>
     </span>
   );
-}
-
-/**
- * «Салихов Руслан Эркинович» → «Руслан» — то же имя, что видно в телефоне
- * шапки и футера. Показываем имя, а не «менеджер»: обезличенный контакт
- * читается как ещё один посредник, а это ровно тот страх, который блок
- * должен снимать.
- */
-function getRecruiterFirstName(legalName: string) {
-  const [, firstName] = legalName.split(" ");
-
-  return firstName ?? legalName;
 }
