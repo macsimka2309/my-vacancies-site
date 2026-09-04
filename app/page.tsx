@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { TrustBlocks } from "@/components/site/TrustBlocks";
+import { WelcomeScreen } from "@/components/site/WelcomeScreen";
 import { CityGate } from "@/components/vacancies/CityGate";
 import { VacancyFiltersPanel } from "@/components/vacancies/VacancyFilters";
 import { VacancyList } from "@/components/vacancies/VacancyList";
 import { getCityIn } from "@/lib/cities";
 import { joinProjects } from "@/lib/city-context";
+import { isColdLanding } from "@/lib/cold-landing";
 import { money } from "@/lib/city-page";
 import {
   buildCatalogDescription,
@@ -67,14 +70,23 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const params = searchParams ? await searchParams : {};
   const filters = getFiltersFromSearchParams(params);
   const showAll = getSingleParam(params.all) === "1";
+  // Приветственный экран (п. 59) — только холодному заходу: без города,
+  // фильтра и рекламной метки. У остального трафика уже есть намерение,
+  // которое эта секция не должна задерживать (см. lib/cold-landing.ts,
+  // почему гейт перед каталогом для него отклонён — п. 6).
+  const coldLanding = isColdLanding(params);
 
-  return <VacancyHome filters={filters} showAll={showAll} />;
+  return (
+    <VacancyHome coldLanding={coldLanding} filters={filters} showAll={showAll} />
+  );
 }
 
 async function VacancyHome({
+  coldLanding,
   filters: rawFilters,
   showAll,
 }: {
+  coldLanding: boolean;
   filters: VacancyFilters;
   showAll: boolean;
 }) {
@@ -114,13 +126,19 @@ async function VacancyHome({
             ]),
           }}
         />
+        {/* Приветственный экран — только холодному заходу, перед оффером,
+            не вместо него. Якорь оффера ниже (id="vacancies") — на него
+            ведёт ссылка-подсказка внутри экрана. */}
+        {coldLanding ? (
+          <WelcomeScreen projects={filterOptions.projects} />
+        ) : null}
         {/* Оффер, а не вопрос (п. 6). Сюда приходит весь платный трафик —
             400 визитов за четыре дня, все на «/», среднее время 25 секунд.
             Заголовком было одно слово «Вакансии», а первое, что видел
             человек после клика по объявлению «до 8 000 ₽ за смену», —
             вопрос «В каком городе ищете работу?». Все цифры ниже считаются
             из каталога: выдуманного в оффере нет ничего. */}
-        <section className="page-header">
+        <section className="page-header" id="vacancies">
           <p className="eyebrow">{site.tagline}</p>
           <h1>
             Работа {describeCityWork(summary.professions)}
@@ -165,6 +183,14 @@ async function VacancyHome({
             ) : null}
           </div>
         </section>
+        {/* Тёплому заходу — тот же блок доверия, но ниже списка, а не
+            выше: список вакансий уже главное действие первого экрана
+            (п. 6), и приветственный экран для этого трафика не показан
+            (см. coldLanding выше), поэтому дублировать блок незачем,
+            только показать его один раз в другом месте. */}
+        {coldLanding ? null : (
+          <TrustBlocks projects={filterOptions.projects} />
+        )}
       </main>
       <SiteFooter />
     </>

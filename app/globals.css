@@ -160,6 +160,185 @@ select {
   min-width: 0;
 }
 
+/* Три блока доверия (п. 59). Место на странице у секции — в разных
+   контекстах разное: под списком вакансий для тёплого захода (список
+   остаётся главным действием первого экрана — п. 6), внутри приветственного
+   экрана для холодного (см. .welcome-screen ниже) — сама секция об этом
+   не знает, только оформляет содержимое. */
+.trust-blocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.trust-blocks__heading {
+  margin: 6px 0 24px;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.trust-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.trust-block__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trust-block__head h3 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+.trust-block__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  flex: none;
+}
+
+/* «Что нужно, чтобы начать» — чекмарки, а не точки: список читается как
+   пройденный порог, а не как перечисление. */
+.trust-checklist {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.trust-checklist li {
+  position: relative;
+  padding-left: 26px;
+  line-height: 1.5;
+}
+
+.trust-checklist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2317852f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5L20 7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Таймлайн «что будет после отклика» — шаги пронумерованы и соединены
+   линией: порядок здесь имеет значение, обычный список его не передаёт. */
+.trust-timeline {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: trust-step;
+}
+
+.trust-timeline li {
+  position: relative;
+  padding: 0 0 22px 42px;
+  line-height: 1.5;
+}
+
+.trust-timeline li:last-child {
+  padding-bottom: 0;
+}
+
+.trust-timeline li::before {
+  counter-increment: trust-step;
+  content: counter(trust-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  z-index: 1;
+}
+
+.trust-timeline li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 28px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+/* Приветственный экран (п. 59) — только для холодного захода на «/» без
+   города, фильтра и рекламной метки (lib/cold-landing.ts). Обычная секция
+   в начале потока высотой в экран, а не модалка и не отдельный маршрут:
+   пролистывается как любой длинный контент, ниже без перехода идёт
+   витрина. Платному и городскому трафику эта секция не показывается —
+   первая карточка вакансии остаётся видна сразу, как проверено в п. 6. */
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 32px;
+  /* 72px — примерная высота липкой шапки; не критично на пиксель,
+     секция должна занимать «примерно экран», а не ровно до px. */
+  min-height: calc(100dvh - 72px);
+  padding: 40px 0 24px;
+}
+
+.welcome-screen__intro {
+  display: grid;
+  gap: 10px;
+  max-width: 640px;
+}
+
+.welcome-screen__scroll-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+  color: var(--accent-strong);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.welcome-screen__scroll-cue svg {
+  animation: welcome-scroll-cue-bounce 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-screen__scroll-cue svg {
+    animation: none;
+  }
+}
+
+@keyframes welcome-scroll-cue-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
 .filters-panel {
   position: sticky;
   top: 20px;
