@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { findCityBySlug } from "./cities";
 import { buildCityContext, type CityContextVacancy } from "./city-context";
-import { buildCityPage, getIndexableCities } from "./city-page";
+import { buildCityPage, getIndexableCities, latestUpdatedAt } from "./city-page";
 import { db } from "./db";
 import type { IntentMatch, IntentStats } from "./intents";
 import { getSalaryCeiling, type SalaryBasis, type StructuredSalary } from "./salary";
@@ -34,6 +34,10 @@ export type VacancyFilterOptions = {
 // ходить в базу на каждый заход с каждой комбинацией фильтров.
 // createdAt намеренно не выбираем: он нужен только на детальной странице,
 // а в кэше даты пришлось бы восстанавливать из строк.
+// updatedAt, наоборот, выбираем: это единственный правдивый источник даты
+// для «Обновлено» и `dateModified` на городских и интент-страницах (п. 38).
+// После unstable_cache он приходит строкой — везде, где нужна дата,
+// оборачиваем в `new Date(...)` заново (см. latestUpdatedAt в lib/city-page.ts).
 const loadActiveVacancies = unstable_cache(
   async () =>
     db.vacancy.findMany({
@@ -63,6 +67,7 @@ const loadActiveVacancies = unstable_cache(
         salaryPeriod: true,
         schedule: true,
         address: true,
+        updatedAt: true,
       },
     }),
   ["active-vacancies"],
@@ -323,6 +328,7 @@ const loadIntentVacancies = unstable_cache(
         salaryPeriod: true,
         schedule: true,
         address: true,
+        updatedAt: true,
       },
     }),
   ["intent-vacancies"],
@@ -353,6 +359,10 @@ export async function getIntentStats(
       vacancies.map((item) => [item.salaryPeriodMin, item.salaryPeriodMax]),
       "period",
     ),
+    // Как в sitemap.ts: дата реальной правки данных, а не время рендера —
+    // иначе страница на каждый заход сообщала бы «обновлено только что»,
+    // и такому сигналу поисковик и ассистент перестают доверять (п. 38).
+    updatedAt: latestUpdatedAt(vacancies),
   };
 }
 

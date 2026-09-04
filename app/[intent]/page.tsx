@@ -6,11 +6,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { VacancyList } from "@/components/vacancies/VacancyList";
 import { getIntent, INTENT_SLUGS } from "@/lib/intents";
+import { formatUpdatedDate } from "@/lib/meta";
 import { site } from "@/lib/site";
 import {
   buildBreadcrumbJsonLd,
   buildFaqJsonLd,
   buildVacancyListJsonLd,
+  buildWebPageJsonLd,
 } from "@/lib/site-jsonld";
 import { getIntentStats, getIntentVacancies } from "@/lib/vacancies";
 
@@ -99,6 +101,11 @@ export default async function IntentPage({ params }: IntentPageProps) {
               ]),
               buildFaqJsonLd(faq),
               buildVacancyListJsonLd(visibleVacancies),
+              // dateModified — только когда есть хоть одна вакансия: без
+              // неё нет и данных, дату которых можно было бы честно назвать.
+              ...(stats.updatedAt
+                ? [buildWebPageJsonLd(`/${intent.slug}`, stats.updatedAt)]
+                : []),
             ]),
           }}
         />
@@ -112,6 +119,11 @@ export default async function IntentPage({ params }: IntentPageProps) {
           {/* Прямой ответ первым абзацем: его читает человек за первые
               секунды, и его же цитируют поиск и ассистенты. */}
           <p className="intent-lead">{intent.lead(stats)}</p>
+          {stats.updatedAt ? (
+            <p className="city-page__updated muted">
+              Обновлено {formatUpdatedDate(stats.updatedAt)}
+            </p>
+          ) : null}
         </section>
 
         <section className="intent-faq" aria-label="Частые вопросы">

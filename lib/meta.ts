@@ -275,6 +275,16 @@ export function formatVacancies(count: number) {
   return `${count} ${word}`;
 }
 
+// Видимая дата рядом с dateModified в JSON-LD (п. 38): человек и ассистент
+// видят одну и ту же дату реальной правки данных, не время рендера.
+export function formatUpdatedDate(value: Date | string) {
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
 function capitalize(value: string) {
   return value.charAt(0).toLocaleUpperCase("ru-RU") + value.slice(1);
 }

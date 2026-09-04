@@ -6,6 +6,7 @@ import {
   buildVacancyDescription,
   buildVacancyTitle,
   DESCRIPTION_LIMIT,
+  formatUpdatedDate,
   TITLE_LIMIT,
 } from "@/lib/meta";
 
@@ -200,5 +201,19 @@ describe("buildCatalogDescription", () => {
 
     expect(description.length).toBeLessThanOrEqual(DESCRIPTION_LIMIT);
     expect(description).toContain("169 вакансий в 78 городах России");
+  });
+});
+
+describe("formatUpdatedDate", () => {
+  it("форматирует дату в человекочитаемый вид на русском", () => {
+    expect(formatUpdatedDate(new Date("2026-08-25T09:30:00.000Z"))).toBe(
+      "25 августа 2026 г.",
+    );
+  });
+
+  it("принимает дату строкой — так она приходит после unstable_cache", () => {
+    expect(formatUpdatedDate("2026-01-05T00:00:00.000Z")).toBe(
+      "5 января 2026 г.",
+    );
   });
 });

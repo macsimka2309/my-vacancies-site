@@ -31,6 +31,8 @@ export type CityContextVacancy = {
   /** Нижняя граница есть редко — у 40 вакансий из 169. */
   salaryShiftMin: number | null;
   salaryShiftMax: number | null;
+  /** Для «Обновлено» и dateModified на городской странице (п. 38). */
+  updatedAt: Date | string;
 };
 
 export type CityContext = {

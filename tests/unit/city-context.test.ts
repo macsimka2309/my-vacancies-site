@@ -18,6 +18,7 @@ function vacancy(
     salary: "до 6000 ₽ за смену",
     salaryShiftMin: null,
     salaryShiftMax: 6000,
+    updatedAt: new Date("2026-08-20T00:00:00.000Z"),
     ...overrides,
   };
 }

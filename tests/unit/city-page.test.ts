@@ -26,6 +26,7 @@ function vacancy(
     salary: "до 6000 ₽ за смену",
     salaryShiftMin: null,
     salaryShiftMax: 6000,
+    updatedAt: new Date("2026-08-20T00:00:00.000Z"),
     ...overrides,
   };
 }
@@ -100,6 +101,28 @@ describe("buildCityPage", () => {
 
   it("в sitemap отдаёт только города выше порога", () => {
     expect(getIndexableCities(catalog)).toEqual(["Тверь"]);
+  });
+
+  it("берёт дату обновления от самой свежей вакансии города, а не время рендера", () => {
+    const catalogWithDates = [
+      vacancy({
+        slug: "kurer-lenta-tver-avto",
+        updatedAt: new Date("2026-08-10T00:00:00.000Z"),
+      }),
+      vacancy({
+        slug: "kurer-magnit-tver-avto",
+        updatedAt: new Date("2026-08-25T00:00:00.000Z"),
+      }),
+      vacancy({
+        slug: "sborshik-lenta-tver",
+        title: "Сборщик заказов",
+        updatedAt: new Date("2026-08-15T00:00:00.000Z"),
+      }),
+    ];
+
+    expect(buildCityPage("Тверь", catalogWithDates)?.lastUpdated).toBe(
+      "2026-08-25T00:00:00.000Z",
+    );
   });
 });
 

@@ -12,12 +12,14 @@ import {
   buildCityPageDescription,
   buildCityPageTitle,
   describeCityWork,
+  formatUpdatedDate,
   formatVacancies,
 } from "@/lib/meta";
 import {
   buildBreadcrumbJsonLd,
   buildFaqJsonLd,
   buildVacancyListJsonLd,
+  buildWebPageJsonLd,
 } from "@/lib/site-jsonld";
 import { getCityPageBySlug } from "@/lib/vacancies";
 
@@ -112,6 +114,16 @@ export default async function CityPage({ params }: CityPageProps) {
             __html: JSON.stringify(buildFaqJsonLd(faq)),
           }}
         />
+        {/* dateModified — дата реальной правки вакансий города, не время
+            рендера ISR-страницы (п. 38, см. комментарий в buildWebPageJsonLd). */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              buildWebPageJsonLd(`/rabota/${page.slug}`, page.lastUpdated),
+            ),
+          }}
+        />
 
         <Link className="back-link" href="/">
           Все города
@@ -148,10 +160,40 @@ export default async function CityPage({ params }: CityPageProps) {
               </>
             ) : null}
           </p>
+          {/* Тот же принцип, что в JSON-LD выше: дата данных, не рендера. */}
+          <p className="city-page__updated muted">
+            Обновлено {formatUpdatedDate(page.lastUpdated)}
+          </p>
           <div className="detail-actions">
             <ContactButtons />
           </div>
         </section>
+
+        {/* Таблица, а не только фраза в лиде: компактный, легко цитируемый
+            блок «сколько платят» — то, что вырезает ответ ассистент (п. 38).
+            Только когда профессий больше одной — при одной она дословно
+            повторила бы верхнюю ставку смены из лида над ней. */}
+        {page.professions.length > 1 ? (
+          <section className="detail-section" aria-label="Сколько платят">
+            <h2>Сколько платят {where}</h2>
+            <table className="city-page__pay-table">
+              <thead>
+                <tr>
+                  <th scope="col">Профессия</th>
+                  <th scope="col">Ставка за смену</th>
+                </tr>
+              </thead>
+              <tbody>
+                {page.professions.map((profession) => (
+                  <tr key={profession.title}>
+                    <th scope="row">{profession.title}</th>
+                    <td>{describePay(profession)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        ) : null}
 
         {page.professions.map((profession) => (
           <section className="detail-section" key={profession.title}>

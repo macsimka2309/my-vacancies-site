@@ -104,6 +104,27 @@ export function buildBreadcrumbJsonLd(crumbs: Crumb[]) {
 }
 
 /**
+ * Дата реальной правки данных страницы — сигнал свежести для поиска и
+ * ассистентов (п. 38). `dateModified`, а не время рендера: страница на ISR
+ * (`revalidate = 300`) в любой момент могла отдать закэшированный HTML,
+ * и генерировать дату заново означало бы врать о том, когда контент
+ * действительно менялся — тот же принцип, что и в sitemap.ts.
+ */
+export function buildWebPageJsonLd(path: string, dateModified: Date | string) {
+  return {
+    "@context": "https://schema.org/",
+    "@type": "WebPage",
+    "@id": `${site.url}${path}#webpage`,
+    url: `${site.url}${path}`,
+    inLanguage: "ru-RU",
+    dateModified: new Date(dateModified).toISOString(),
+    isPartOf: {
+      "@id": `${site.url}/#website`,
+    },
+  };
+}
+
+/**
  * Блок вопросов и ответов. Даёт расширенный сниппет в выдаче и первый
  * пригодный для цитирования фрагмент на сайте (частично закрывает п. 38
  * для этих страниц).

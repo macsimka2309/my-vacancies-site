@@ -37,6 +37,8 @@ export type IntentStats = {
   shiftHigh: number | null;
   periodLow: number | null;
   periodHigh: number | null;
+  /** Дата последней правки данных подборки — для «Обновлено» и dateModified (п. 38). ISO-строка или null, если вакансий нет. */
+  updatedAt: string | null;
 };
 
 export type IntentFaq = {

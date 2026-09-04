@@ -1456,6 +1456,47 @@ select {
   font-weight: 700;
 }
 
+.city-page__updated {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* Компактная таблица ставок (п. 38) — цитируемый блок, а не украшение:
+   поэтому без лишних декораций, только читаемые границы и выравнивание. */
+.city-page__pay-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.city-page__pay-table th,
+.city-page__pay-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.city-page__pay-table thead th {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.city-page__pay-table tbody th {
+  font-weight: 600;
+}
+
+.city-page__pay-table tbody td {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.city-page__pay-table tbody tr:last-child th,
+.city-page__pay-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .city-page__faq {
   display: grid;
   gap: 16px;

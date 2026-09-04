@@ -55,6 +55,8 @@ export type CityPage = {
   /** Порог пройден — страницу можно отдавать поиску. */
   indexable: boolean;
   regionCities: { city: string; slug: string; count: number }[];
+  /** Дата последней правки вакансии города — ISO-строка, для «Обновлено» и dateModified (п. 38). */
+  lastUpdated: string;
 };
 
 export function buildCityPage(
@@ -91,7 +93,28 @@ export function buildCityPage(
     noTransportProfession: noTransport?.title ?? null,
     indexable: inCity.length >= CITY_PAGE_MIN_VACANCIES,
     regionCities: buildRegionCities(city, all),
+    // inCity точно не пуст — проверено строкой выше.
+    lastUpdated: latestUpdatedAt(inCity)!,
   };
+}
+
+/**
+ * Самая свежая `updatedAt` среди вакансий подборки — как в sitemap.ts,
+ * это дата реальной правки данных, а не время рендера страницы (п. 38).
+ *
+ * После unstable_cache Date превращается в ISO-строку (JSON не хранит
+ * объекты Date) — `new Date(...)` здесь работает для обоих случаев.
+ */
+export function latestUpdatedAt(
+  vacancies: { updatedAt: Date | string }[],
+): string | null {
+  const latest = vacancies.reduce<number | null>((latest, vacancy) => {
+    const time = new Date(vacancy.updatedAt).getTime();
+
+    return latest === null || time > latest ? time : latest;
+  }, null);
+
+  return latest === null ? null : new Date(latest).toISOString();
 }
 
 /** Города, чьи страницы можно отдавать поиску — для sitemap. */

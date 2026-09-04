@@ -13,6 +13,7 @@ function buildStats(overrides: Partial<IntentStats> = {}): IntentStats {
     shiftHigh: 6000,
     periodLow: 62_000,
     periodHigh: 168_000,
+    updatedAt: "2026-08-20T00:00:00.000Z",
     ...overrides,
   };
 }
