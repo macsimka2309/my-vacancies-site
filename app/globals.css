@@ -117,6 +117,10 @@ select {
   display: grid;
   gap: 10px;
   margin-bottom: 28px;
+  /* Якорь #vacancies (ссылка со welcome-экрана) иначе подводит секцию
+     впритык к верху вьюпорта, а липкая .site-header (~72px) перекрывает
+     её верх — выглядит как «страница перемотана», хотя это перекрытие. */
+  scroll-margin-top: 88px;
 }
 
 .page-header h1,
