@@ -63,6 +63,21 @@ export function getIntent(slug: string): Intent | null {
   return INTENTS.find((intent) => intent.slug === slug) ?? null;
 }
 
+/**
+ * Квиз-подбор вместо каталога (п. 14). Реальный вопрос кандидата —
+ * не «какой город», а «на чём я могу работать»: ведёт на готовые страницы
+ * интентов, а не на отдельную форму, поэтому подборка и счётчик у квиза
+ * и у прямой ссылки на страницу — одни и те же данные.
+ *
+ * «Пешком» сюда не входит: это большинство каталога без единого отличающего
+ * признака в данных, отдельная кнопка под него ничего бы не сужала.
+ */
+export const WORK_MODE_QUIZ: Array<{ slug: IntentSlug; label: string }> = [
+  { slug: "rabota-na-svoem-avto", label: "На своём авто" },
+  { slug: "vahta", label: "Вахтой, с проживанием" },
+  { slug: "rabota-bez-transporta", label: "Без своего транспорта" },
+];
+
 const INTENTS: Intent[] = [
   {
     slug: "vahta",

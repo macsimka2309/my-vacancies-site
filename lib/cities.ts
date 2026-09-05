@@ -324,6 +324,24 @@ function findCity(city: string | null | undefined) {
 }
 
 // «Орёл» и «Орел» — один город: в каталоге встречались оба написания.
-function normalizeCityKey(city: string) {
+export function normalizeCityKey(city: string) {
   return city.trim().toLowerCase().replace(/ё/g, "е").replace(/\s+/g, " ");
+}
+
+/**
+ * Сверяет город из ссылки (`?city=…`) со списком городов, которые реально
+ * есть в подборке. Незнакомое или неточно набранное значение — `null`,
+ * а не догадка: иначе можно молча показать пустой список вместо каталога.
+ */
+export function matchKnownCity(
+  city: string | null | undefined,
+  knownCities: string[],
+) {
+  if (!city) {
+    return null;
+  }
+
+  const key = normalizeCityKey(city);
+
+  return knownCities.find((known) => normalizeCityKey(known) === key) ?? null;
 }

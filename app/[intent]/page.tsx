@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { CityGate } from "@/components/vacancies/CityGate";
 import { VacancyList } from "@/components/vacancies/VacancyList";
+import { getCityIn, matchKnownCity } from "@/lib/cities";
 import { getIntent, INTENT_SLUGS } from "@/lib/intents";
 import { formatUpdatedDate } from "@/lib/meta";
 import { site } from "@/lib/site";
@@ -14,7 +16,7 @@ import {
   buildVacancyListJsonLd,
   buildWebPageJsonLd,
 } from "@/lib/site-jsonld";
-import { getIntentStats, getIntentVacancies } from "@/lib/vacancies";
+import { buildIntentStats, getIntentVacancies } from "@/lib/vacancies";
 
 // Как и на странице вакансии: кэшируем ISR, но не пререндерим на сборке —
 // там нет доступа к базе. Неизвестный адрес отдаёт 404 ниже по коду.
@@ -33,9 +35,11 @@ type IntentPageProps = {
   params: Promise<{
     intent: string;
   }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 // Один запрос на рендер: generateMetadata и сама страница берут из кэша.
+// Без city — тем счёт под метаданные не зависит от адреса, только от слага.
 const loadPage = cache(async (slug: string) => {
   const intent = getIntent(slug);
 
@@ -43,12 +47,9 @@ const loadPage = cache(async (slug: string) => {
     return null;
   }
 
-  const [vacancies, stats] = await Promise.all([
-    getIntentVacancies(intent.match),
-    getIntentStats(intent.match),
-  ]);
+  const vacancies = await getIntentVacancies(intent.match);
 
-  return { intent, vacancies, stats };
+  return { intent, vacancies, stats: buildIntentStats(vacancies) };
 });
 
 export async function generateMetadata({
@@ -74,7 +75,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function IntentPage({ params }: IntentPageProps) {
+export default async function IntentPage({
+  params,
+  searchParams,
+}: IntentPageProps) {
   const { intent: slug } = await params;
   const page = await loadPage(slug);
 
@@ -82,7 +86,27 @@ export default async function IntentPage({ params }: IntentPageProps) {
     notFound();
   }
 
-  const { intent, vacancies, stats } = page;
+  const { intent } = page;
+  const cityParam = searchParams ? (await searchParams).city : undefined;
+  const cityCandidate = Array.isArray(cityParam) ? cityParam[0] : cityParam;
+  // Как на главной: город из ссылки может не совпасть со справочником
+  // (опечатка, чужой регистр) — тогда его тихо игнорируем, а не показываем
+  // пустой список.
+  const knownCities = [...new Set(page.vacancies.map((item) => item.city))];
+  const selectedCity = matchKnownCity(cityCandidate, knownCities);
+  const vacancies = selectedCity
+    ? page.vacancies.filter((item) => item.city === selectedCity)
+    : page.vacancies;
+  // Второй вопрос квиза (п. 14) уже отвечен адресом страницы — здесь
+  // остаётся только первый, город, той же виджетом, что и на главной.
+  const cityCounts = knownCities
+    .map((city) => ({
+      city,
+      count: page.vacancies.filter((item) => item.city === city).length,
+    }))
+    .sort((a, b) => b.count - a.count);
+  const stats = selectedCity ? buildIntentStats(vacancies) : page.stats;
+  const cityIn = selectedCity ? getCityIn(selectedCity) : null;
   const faq = intent.faq(stats);
   const visibleVacancies = vacancies.slice(0, PREVIEW_LIMIT);
   const isTrimmed = vacancies.length > PREVIEW_LIMIT;
@@ -115,7 +139,10 @@ export default async function IntentPage({ params }: IntentPageProps) {
 
         <section className="page-header">
           <p className="eyebrow">{site.tagline}</p>
-          <h1>{intent.h1}</h1>
+          <h1>
+            {intent.h1}
+            {cityIn ? ` в ${cityIn}` : ""}
+          </h1>
           {/* Прямой ответ первым абзацем: его читает человек за первые
               секунды, и его же цитируют поиск и ассистенты. */}
           <p className="intent-lead">{intent.lead(stats)}</p>
@@ -125,6 +152,17 @@ export default async function IntentPage({ params }: IntentPageProps) {
             </p>
           ) : null}
         </section>
+
+        {/* Второй вопрос квиза (п. 14) уже отвечен адресом страницы —
+            здесь остаётся только город, тем же виджетом, что на главной.
+            Не гейт: список ниже виден независимо от выбора (п. 6). */}
+        {selectedCity ? (
+          <p className="muted">
+            <Link href={`/${intent.slug}`}>Все города</Link>
+          </p>
+        ) : (
+          <CityGate cityCounts={cityCounts} intentSlug={intent.slug} />
+        )}
 
         <section className="intent-faq" aria-label="Частые вопросы">
           <h2>Частые вопросы</h2>
@@ -149,6 +187,16 @@ export default async function IntentPage({ params }: IntentPageProps) {
                 </a>
               ) : null}
             </>
+          ) : selectedCity ? (
+            // Отличаем от «такой работы нет вообще» (intent.emptyText):
+            // подборка есть, просто не в этом городе — выдуманного текста
+            // тут не нужно, достаточно предложить снять фильтр.
+            <div className="empty-state">
+              <h3>В этом городе таких вакансий пока нет.</h3>
+              <Link className="button-link" href={`/${intent.slug}`}>
+                Посмотреть все города
+              </Link>
+            </div>
           ) : (
             <div className="empty-state">
               <h3>{intent.emptyText}</h3>

@@ -339,15 +339,16 @@ export async function getIntentVacancies(match: IntentMatch) {
   return loadIntentVacancies(match);
 }
 
-/**
- * Цифры для текста лендинга. Считаются из той же подборки, что показана
- * ниже на странице, — иначе текст и список разошлись бы.
- */
-export async function getIntentStats(
-  match: IntentMatch,
-): Promise<IntentStats> {
-  const vacancies = await loadIntentVacancies(match);
+export type IntentVacancyRow = Awaited<
+  ReturnType<typeof loadIntentVacancies>
+>[number];
 
+/**
+ * Цифры для текста лендинга. Вынесено из `getIntentStats`, чтобы страница
+ * могла честно посчитать их же для среза по городу (п. 14) — не запрашивая
+ * подборку заново, а пересчитав по уже отфильтрованному списку.
+ */
+export function buildIntentStats(vacancies: IntentVacancyRow[]): IntentStats {
   return {
     count: vacancies.length,
     cities: new Set(vacancies.map((item) => item.city)).size,
@@ -364,6 +365,16 @@ export async function getIntentStats(
     // и такому сигналу поисковик и ассистент перестают доверять (п. 38).
     updatedAt: latestUpdatedAt(vacancies),
   };
+}
+
+/**
+ * Цифры для текста лендинга. Считаются из той же подборки, что показана
+ * ниже на странице, — иначе текст и список разошлись бы.
+ */
+export async function getIntentStats(
+  match: IntentMatch,
+): Promise<IntentStats> {
+  return buildIntentStats(await loadIntentVacancies(match));
 }
 
 /**

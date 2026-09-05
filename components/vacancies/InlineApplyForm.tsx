@@ -4,6 +4,7 @@ import { FormEvent, useId, useState } from "react";
 import { getCallbackPromise } from "@/lib/callback";
 import { reachGoal } from "@/lib/metrika";
 import { formatPhone } from "@/lib/phone";
+import { site } from "@/lib/site";
 import {
   type ApplyVacancy,
   CONTACT_OPTIONS,
@@ -63,15 +64,28 @@ export function InlineApplyForm({
   }
 
   if (form.isSent) {
+    // Номер называем только для звонка: под Telegram/MAX пока нечего
+    // сказать — со своего бизнес-аккаунта в этих мессенджерах ещё не
+    // пишем, обещать заранее нечем (п. 17).
+    const showCallbackNumber = form.preferredContact === "phone";
+
     return (
       <div className="inline-apply inline-apply--done" data-variant={variant}>
         <p className="inline-apply__done" role="status">
           <span aria-hidden="true">✓</span> Отклик принят. {callbackPromise}.
         </p>
-        {form.isDetailsSaved ? (
+        {showCallbackNumber ? (
           <p className="muted inline-apply__hint">
-            Держите телефон под рукой.
+            Звонок поступит с номера {site.phone} — сохраните его, чтобы не
+            пропустить.
           </p>
+        ) : null}
+        {form.isDetailsSaved ? (
+          showCallbackNumber ? null : (
+            <p className="muted inline-apply__hint">
+              Держите телефон под рукой.
+            </p>
+          )
         ) : (
           <form className="inline-apply__details" onSubmit={handleDetails}>
             {/* Имя теперь спрашиваем до отправки, здесь остаётся только

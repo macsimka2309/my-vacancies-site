@@ -15,12 +15,18 @@ const TOP_CITIES_LIMIT = 6;
 
 type CityGateProps = {
   cityCounts: Array<{ city: string; count: number }>;
+  /**
+   * Слаг страницы интента (п. 14), если гейт встроен туда, а не в общую
+   * витрину — тогда выбор города сужает уже применённый фильтр «как хотите
+   * работать», а не сбрасывает его.
+   */
+  intentSlug?: string;
 };
 
 // Быстрый выбор города для посетителя, пришедшего на общий список. Это
 // инструмент сужения, а не пропускной пункт: оффер и вакансии человек видит
 // независимо от того, выбрал он город или нет.
-export function CityGate({ cityCounts }: CityGateProps) {
+export function CityGate({ cityCounts, intentSlug }: CityGateProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
 
@@ -36,12 +42,15 @@ export function CityGate({ cityCounts }: CityGateProps) {
   }, [cityCounts, query]);
 
   function selectCity(city: string) {
-    reachGoal("city_select", { city });
+    reachGoal("city_select", { city, intent: intentSlug ?? "" });
     // Здесь прокрутка вверх нужна, в отличие от фильтров: человек мог уйти
     // вниз, разыскивая свой город в списке, и после выбора остался бы
     // где-то посреди результатов. Наверху его встретит заголовок с городом
     // и сразу под ним — вакансии.
-    router.push(`/?city=${encodeURIComponent(city)}`);
+    const href = intentSlug
+      ? `/${intentSlug}?city=${encodeURIComponent(city)}`
+      : `/?city=${encodeURIComponent(city)}`;
+    router.push(href);
   }
 
   return (

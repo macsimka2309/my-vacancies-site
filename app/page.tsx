@@ -6,10 +6,12 @@ import { WelcomeScreen } from "@/components/site/WelcomeScreen";
 import { CityGate } from "@/components/vacancies/CityGate";
 import { VacancyFiltersPanel } from "@/components/vacancies/VacancyFilters";
 import { VacancyList } from "@/components/vacancies/VacancyList";
+import { WorkModeGate } from "@/components/vacancies/WorkModeGate";
 import { getCityIn } from "@/lib/cities";
 import { joinProjects } from "@/lib/city-context";
 import { isColdLanding } from "@/lib/cold-landing";
 import { money } from "@/lib/city-page";
+import { getIntent, WORK_MODE_QUIZ } from "@/lib/intents";
 import {
   buildCatalogDescription,
   buildCatalogTitle,
@@ -24,6 +26,7 @@ import {
 } from "@/lib/site-jsonld";
 import {
   getActiveVacancies,
+  getIntentStats,
   summarizeVacancies,
   getVacancyFilterOptions,
   type VacancyFilters,
@@ -109,6 +112,21 @@ async function VacancyHome({
   const visibleVacancies = isTrimmed
     ? vacancies.slice(0, PREVIEW_LIMIT)
     : vacancies;
+  // Второй вопрос квиза (п. 14) — считаем, только пока виден первый
+  // (CityGate): после выбора города это уже не первый экран, а обычная
+  // витрина по запросу. Пустые подборки не показываем — кнопка в никуда
+  // хуже отсутствующей кнопки.
+  const workModeOptions = selectedCities.length
+    ? []
+    : (
+        await Promise.all(
+          WORK_MODE_QUIZ.map(async ({ slug, label }) => ({
+            slug,
+            label,
+            count: (await getIntentStats(getIntent(slug)!.match)).count,
+          })),
+        )
+      ).filter((option) => option.count > 0);
 
   return (
     <>
@@ -185,7 +203,10 @@ async function VacancyHome({
           )}
         </section>
         {selectedCities.length ? null : (
-          <CityGate cityCounts={filterOptions.cityCounts} />
+          <>
+            <CityGate cityCounts={filterOptions.cityCounts} />
+            <WorkModeGate options={workModeOptions} />
+          </>
         )}
         <section className="vacancy-layout">
           <VacancyFiltersPanel
