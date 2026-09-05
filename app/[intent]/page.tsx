@@ -18,9 +18,12 @@ import {
 } from "@/lib/site-jsonld";
 import { buildIntentStats, getIntentVacancies } from "@/lib/vacancies";
 
-// Как и на странице вакансии: кэшируем ISR, но не пререндерим на сборке —
-// там нет доступа к базе. Неизвестный адрес отдаёт 404 ниже по коду.
-export const revalidate = 300;
+// force-dynamic, а не ISR: страница теперь читает `searchParams` (город
+// квиза, п. 14) — Next не даёт делать это в статически оптимизируемом
+// роуте (DYNAMIC_SERVER_USAGE). Кэш всё равно на уровне данных —
+// `getIntentVacancies` завёрнут в unstable_cache на 300 секунд, как и
+// раньше, так каждый запрос не бьёт по базе.
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   return [];
