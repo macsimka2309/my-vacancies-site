@@ -52,7 +52,7 @@ export const site: SiteConfig = {
     afterHours: "Перезвоним утром, после 9:00",
   },
   /** Ник получателя в Telegram (без @). */
-  telegram: "HR_Russslan0303",
+  telegram: "mydreamvacancy",
   /** Ссылка на профиль-получателя в MAX (universal link — открывает приложение, если установлено). */
   max: "https://max.ru/u/f9LHodD0cOKBCVZGavwAZXHhEOgBXIZeWI4UJ840qz1RB5a7UCHuMYcuvNg",
   /**
