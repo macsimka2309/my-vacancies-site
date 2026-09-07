@@ -54,7 +54,7 @@ export const site: SiteConfig = {
   /** Ник получателя в Telegram (без @). */
   telegram: "mydreamvacancy",
   /** Ссылка на профиль-получателя в MAX (universal link — открывает приложение, если установлено). */
-  max: "https://max.ru/u/f9LHodD0cOKBCVZGavwAZXHhEOgBXIZeWI4UJ840qz1RB5a7UCHuMYcuvNg",
+  max: "https://max.ru/u/f9LHodD0cOJ49OKEvi8FeABhgf4RWc2--yaOt34pp6Jq4Hff3ocjxmj-EoY",
   /**
    * Ключ IndexNow — им поисковик проверяет, что сайтом владеем мы.
    * Не секрет: файл с этим же значением лежит в public/ и открыт всем,
