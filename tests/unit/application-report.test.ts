@@ -65,12 +65,29 @@ describe("buildLeadReport", () => {
 
     expect(rows[0]).toMatchObject({
       total: 4,
-      // TO_INTERNSHIP, INTERNSHIP_STARTED и DEAL_CLOSED — все дошли хотя бы
-      // до стажировки.
-      reachedInternship: 3,
-      // Реально вышли — только последние два.
-      startedShift: 2,
-      startedShare: 0.5,
+      // TO_INTERNSHIP и INTERNSHIP_STARTED дошли хотя бы до стажировки.
+      reachedInternship: 2,
+      // Реально вышел — только INTERNSHIP_STARTED. DEAL_CLOSED не считаем:
+      // 07.09 обнаружилось, что менеджер закрывает им и обычные отказы
+      // («16 лет», «ндз») — статус не различает успех и неуспех.
+      startedShift: 1,
+      startedShare: 0.25,
+    });
+  });
+
+  // Закрытые отказом (даже под статусом «Сделка завершена») не должны
+  // задваивать «вышел на смену» — регресс 07.09.
+  it("DEAL_CLOSED без реального выхода не считается успехом", () => {
+    const rows = buildLeadReport([
+      row({ status: "DEAL_CLOSED" }),
+      row({ status: "DEAL_CLOSED" }),
+    ]);
+
+    expect(rows[0]).toMatchObject({
+      total: 2,
+      reachedInternship: 0,
+      startedShift: 0,
+      startedShare: 0,
     });
   });
 
