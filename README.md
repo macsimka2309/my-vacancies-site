@@ -4,7 +4,7 @@ Minimal vacancy website MVP with Next.js, PostgreSQL, Prisma, and Telegram notif
 
 ## Documentation
 
-- [Project explanation for beginners](docs/project-explained.md)
+- [Conversion backlog and product decisions](docs/conversion-backlog.md)
 - [Server deployment guide](docs/deployment.md)
 
 ## Setup
