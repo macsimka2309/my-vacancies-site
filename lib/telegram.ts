@@ -46,6 +46,13 @@ export async function sendApplicationTelegramNotification(
       parse_mode: "HTML",
       text: formatApplicationTelegramMessage(payload),
     }),
+    // Без таймаута зависший fetch держит ответ кандидату: отклик уже
+    // сохранён в базе до этого вызова, но HTTP-ответ браузеру уходит
+    // только после него (app/api/applications/route.ts). Обнаружено
+    // 15.10 — сеть сервера не достучалась до api.telegram.org за 8–10 с
+    // (похоже на блокировку диапазона, не сбой кода), и без этого таймаута
+    // кандидат видел бы «Отправляем…» всё это время при каждой заявке.
+    signal: AbortSignal.timeout(5000),
   });
 
   if (!response.ok) {
