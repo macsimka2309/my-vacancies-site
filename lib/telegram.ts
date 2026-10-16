@@ -26,6 +26,18 @@ const CONTACT_LABEL: Record<
   max: "MAX",
 };
 
+// По умолчанию — прямой адрес Telegram: он работает почти везде (локальная
+// разработка, другие окружения). На vac-ru api.telegram.org недоступен
+// напрямую (блокировка диапазона, обнаружено 15.10), поэтому именно там
+// в .env.production задан TELEGRAM_API_BASE_URL на nginx-реверс-прокси на
+// отдельном сервере (bot-server, 45.133.19.61) — он пускает только с IP
+// vac-ru (см. /etc/nginx/sites-available/tg-proxy на bot-server), так что
+// открытым обходом блокировки для посторонних не становится. Переключение
+// через env, а не хардкод здесь — чтобы прокси можно было поменять или
+// убрать без деплоя кода.
+const TELEGRAM_API_BASE_URL =
+  process.env.TELEGRAM_API_BASE_URL?.trim() || "https://api.telegram.org";
+
 export async function sendApplicationTelegramNotification(
   payload: ApplicationTelegramPayload,
 ) {
@@ -36,7 +48,7 @@ export async function sendApplicationTelegramNotification(
     throw new Error("Telegram credentials are not configured.");
   }
 
-  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+  const response = await fetch(`${TELEGRAM_API_BASE_URL}/bot${token}/sendMessage`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
